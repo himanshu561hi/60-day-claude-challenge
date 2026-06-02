@@ -46,7 +46,7 @@ To maximize my execution rate over this 60-day sprint, I am focusing on:
 
 Here is the high-definition cinematic dashboard generated from my Day 1 diagnostic profile setup:
 
-![My AI Personality Profile](watermarked_img_249667420878437346.png)
+![My AI Personality Profile](Day1screenshot.png)
 
 ---
 
