@@ -1,0 +1,300 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  .wrap{background:#0a0a0f;color:#e8e6f0;font-family:'Syne',sans-serif;padding:0 0 40px;min-height:100vh}
+  .hero{position:relative;overflow:hidden;padding:0}
+  .portrait-container{width:100%;background:#0d0d15;border-bottom:1px solid #1e1e2e;position:relative;overflow:hidden}
+  .portrait-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,#1a1040 0%,#0d0d15 60%,#0a0a0f 100%);z-index:0}
+  .grid-lines{position:absolute;inset:0;z-index:1;opacity:0.07}
+  .title-badge{display:inline-flex;align-items:center;gap:8px;background:#15101e;border:1px solid #4f3b8a;padding:6px 14px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#9b78e8;letter-spacing:0.08em;margin-bottom:16px}
+  .dot{width:6px;height:6px;border-radius:50%;background:#9b78e8;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .section{padding:28px 28px 0}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#4f3b8a;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .section-label::after{content:'';flex:1;height:1px;background:#1e1e2e}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .card{background:#0f0f1a;border:1px solid #1e1e2e;border-radius:8px;padding:14px 16px}
+  .card.full{grid-column:1/-1}
+  .card.accent-purple{border-color:#4f3b8a}
+  .card.accent-teal{border-color:#0f6e56}
+  .card-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4f3b8a;text-transform:uppercase;margin-bottom:6px}
+  .card-tag.teal{color:#1d9e75}
+  .card-tag.amber{color:#ba7517}
+  .card-tag.coral{color:#d85a30}
+  .card-tag.pink{color:#d4537e}
+  .card h3{font-size:15px;font-weight:700;color:#e8e6f0;margin-bottom:6px}
+  .card p{font-size:13px;color:#8886a0;line-height:1.6}
+  .stat-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .stat-label{font-size:12px;color:#8886a0;min-width:120px;font-family:'JetBrains Mono',monospace}
+  .stat-bar{flex:1;height:4px;background:#1e1e2e;border-radius:2px;overflow:hidden}
+  .stat-fill{height:100%;border-radius:2px;transition:width 1s ease}
+  .bar-purple{background:#7f77dd}
+  .bar-teal{background:#1d9e75}
+  .bar-amber{background:#ef9f27}
+  .bar-coral{background:#d85a30}
+  .bar-pink{background:#d4537e}
+  .tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{font-size:11px;padding:3px 10px;border-radius:3px;font-family:'JetBrains Mono',monospace}
+  .tag.purple{background:#1a1040;color:#9b78e8;border:1px solid #4f3b8a}
+  .tag.teal{background:#04342c;color:#5dcaa5;border:1px solid #0f6e56}
+  .tag.amber{background:#412402;color:#ef9f27;border:1px solid #854f0b}
+  .tag.coral{background:#4a1b0c;color:#f0997b;border:1px solid #993c1d}
+  .tag.gray{background:#1e1e2a;color:#888780;border:1px solid #3a3a4a}
+  .ai-title{font-size:28px;font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,#9b78e8 0%,#5dcaa5 50%,#ef9f27 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:8px}
+  .cinematic-quote{font-size:13px;color:#6664a0;font-style:italic;line-height:1.7;border-left:2px solid #4f3b8a;padding-left:12px}
+  .career-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #1e1e2e}
+  .career-item:last-child{border-bottom:none}
+  .career-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#4f3b8a;padding-top:2px;min-width:20px}
+  .career-text h4{font-size:13px;font-weight:700;color:#c8c6e0;margin-bottom:2px}
+  .career-text p{font-size:12px;color:#6664a0}
+  .diff-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+  .diff-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+  .improve-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e1e2e}
+  .improve-item:last-child{border-bottom:none}
+  .improve-check{width:18px;height:18px;border:1px solid #4f3b8a;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .improve-check i{font-size:11px;color:#9b78e8}
+  .portrait-frame{position:relative;z-index:2;padding:36px 28px 28px;display:flex;align-items:flex-end;gap:28px}
+</style>
+<h2 class="sr-only">AI Personality Profile — a cinematic, personalized deep-dive based on your usage patterns, prompts, goals and communication style.</h2>
+<div class="wrap">
+
+  <div class="portrait-container" style="height:320px">
+    <div class="portrait-bg"></div>
+    <div class="grid-lines">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#9b78e8" stroke-width="0.5"/></pattern></defs>
+        <rect width="100%" height="100%" fill="url(#grid)"/>
+      </svg>
+    </div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;z-index:2" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="glowA" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#4f3b8a" stop-opacity="0.4"/><stop offset="100%" stop-color="#0a0a0f" stop-opacity="0"/></radialGradient>
+        <radialGradient id="glowB" cx="70%" cy="60%" r="30%"><stop offset="0%" stop-color="#0f6e56" stop-opacity="0.25"/><stop offset="100%" stop-color="#0a0a0f" stop-opacity="0"/></radialGradient>
+        <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1a1040"/><stop offset="100%" stop-color="#0d0d15"/></linearGradient>
+        <linearGradient id="figureGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#3c3489"/><stop offset="100%" stop-color="#26215c"/></linearGradient>
+        <linearGradient id="glowLine" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#4f3b8a" stop-opacity="0"/><stop offset="50%" stop-color="#9b78e8" stop-opacity="1"/><stop offset="100%" stop-color="#1d9e75" stop-opacity="0"/></linearGradient>
+        <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+        <filter id="blur6"><feGaussianBlur stdDeviation="6"/></filter>
+      </defs>
+      <rect width="680" height="320" fill="url(#glowA)"/>
+      <rect width="680" height="320" fill="url(#glowB)"/>
+
+      <rect x="40" y="60" width="160" height="100" rx="4" fill="url(#screenGrad)" stroke="#4f3b8a" stroke-width="0.8" opacity="0.9"/>
+      <rect x="44" y="64" width="152" height="8" rx="2" fill="#1a1040"/>
+      <circle cx="50" cy="68" r="2" fill="#d85a30" opacity="0.8"/>
+      <circle cx="58" cy="68" r="2" fill="#ef9f27" opacity="0.8"/>
+      <circle cx="66" cy="68" r="2" fill="#1d9e75" opacity="0.8"/>
+      <rect x="44" y="76" width="90" height="2" rx="1" fill="#4f3b8a" opacity="0.6"/>
+      <rect x="44" y="82" width="70" height="2" rx="1" fill="#3c3489" opacity="0.5"/>
+      <rect x="44" y="88" width="110" height="2" rx="1" fill="#9b78e8" opacity="0.4"/>
+      <rect x="44" y="94" width="60" height="2" rx="1" fill="#4f3b8a" opacity="0.5"/>
+      <rect x="44" y="100" width="130" height="2" rx="1" fill="#3c3489" opacity="0.4"/>
+      <rect x="44" y="106" width="85" height="2" rx="1" fill="#1d9e75" opacity="0.5"/>
+      <rect x="44" y="112" width="95" height="2" rx="1" fill="#4f3b8a" opacity="0.4"/>
+      <rect x="44" y="118" width="50" height="2" rx="1" fill="#9b78e8" opacity="0.6"/>
+      <rect x="44" y="124" width="120" height="2" rx="1" fill="#3c3489" opacity="0.4"/>
+      <rect x="44" y="130" width="75" height="2" rx="1" fill="#4f3b8a" opacity="0.5"/>
+      <rect x="44" y="136" width="100" height="2" rx="1" fill="#9b78e8" opacity="0.3"/>
+      <rect x="44" y="142" width="65" height="2" rx="1" fill="#1d9e75" opacity="0.4"/>
+      <rect x="44" y="148" width="80" height="2" rx="1" fill="#4f3b8a" opacity="0.5"/>
+
+      <rect x="480" y="40" width="180" height="130" rx="4" fill="url(#screenGrad)" stroke="#0f6e56" stroke-width="0.8" opacity="0.85"/>
+      <text x="500" y="58" fill="#5dcaa5" font-size="8" font-family="monospace" opacity="0.9">SYSTEM STATUS</text>
+      <rect x="490" y="65" width="160" height="20" rx="2" fill="#04342c" opacity="0.8"/>
+      <text x="500" y="79" fill="#1d9e75" font-size="8" font-family="monospace">AI_PROFILE: ACTIVE</text>
+      <rect x="490" y="91" width="130" height="4" rx="2" fill="#1e1e2e"/>
+      <rect x="490" y="91" width="113" height="4" rx="2" fill="#1d9e75" opacity="0.8"/>
+      <text x="490" y="108" fill="#5dcaa5" font-size="7" font-family="monospace" opacity="0.7">CREATIVITY  ████████░ 89%</text>
+      <text x="490" y="120" fill="#9b78e8" font-size="7" font-family="monospace" opacity="0.7">SYSTEMS     ███████░░ 82%</text>
+      <text x="490" y="132" fill="#ef9f27" font-size="7" font-family="monospace" opacity="0.7">EXECUTION   ██████░░░ 74%</text>
+      <text x="490" y="144" fill="#d85a30" font-size="7" font-family="monospace" opacity="0.7">PATIENCE    ████░░░░░ 51%</text>
+      <text x="490" y="156" fill="#d4537e" font-size="7" font-family="monospace" opacity="0.7">FOCUS       ██████░░░ 73%</text>
+
+      <ellipse cx="340" cy="190" rx="200" ry="160" fill="url(#figureGrad)" opacity="0.08" filter="url(#blur6)"/>
+      <rect x="310" y="80" width="60" height="60" rx="30" fill="#1a1040" stroke="#4f3b8a" stroke-width="1.5"/>
+      <ellipse cx="340" cy="102" rx="16" ry="18" fill="#3c3489"/>
+      <ellipse cx="340" cy="96" rx="12" ry="12" fill="#26215c"/>
+      <circle cx="334" cy="93" r="3" fill="#534ab7" opacity="0.7"/>
+      <circle cx="346" cy="93" r="3" fill="#534ab7" opacity="0.7"/>
+      <path d="M 333 100 Q 340 106 347 100" stroke="#9b78e8" stroke-width="1.2" fill="none" opacity="0.8"/>
+      <path d="M 320 160 L 310 165 L 300 210 L 320 212 L 325 240 L 340 242 L 355 240 L 360 212 L 380 210 L 370 165 L 360 160 Z" fill="#1a1040" stroke="#4f3b8a" stroke-width="1"/>
+      <path d="M 300 210 L 280 220 L 275 260 L 295 262 L 300 212 Z" fill="#15101e" stroke="#3c3489" stroke-width="0.8"/>
+      <path d="M 380 210 L 400 220 L 405 260 L 385 262 L 380 212 Z" fill="#15101e" stroke="#3c3489" stroke-width="0.8"/>
+      <path d="M 320 240 L 310 290 L 330 292 L 340 268 L 350 292 L 370 290 L 360 240 Z" fill="#0f0f1a" stroke="#1e1e2e" stroke-width="0.8"/>
+
+      <text x="270" y="230" fill="#9b78e8" font-size="8" font-family="monospace" opacity="0.5">0x4F</text>
+      <text x="395" y="190" fill="#1d9e75" font-size="8" font-family="monospace" opacity="0.5">AI://</text>
+      <text x="260" y="180" fill="#ef9f27" font-size="7" font-family="monospace" opacity="0.4">DELHI.IND</text>
+
+      <line x1="0" y1="300" x2="680" y2="300" stroke="url(#glowLine)" stroke-width="1" opacity="0.8"/>
+
+      <circle cx="180" cy="220" r="40" fill="none" stroke="#4f3b8a" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="180" cy="220" r="25" fill="none" stroke="#4f3b8a" stroke-width="0.5" opacity="0.4"/>
+      <line x1="180" y1="180" x2="180" y2="260" stroke="#4f3b8a" stroke-width="0.3" opacity="0.4"/>
+      <line x1="140" y1="220" x2="220" y2="220" stroke="#4f3b8a" stroke-width="0.3" opacity="0.4"/>
+      <circle cx="180" cy="220" r="3" fill="#9b78e8" opacity="0.7"/>
+
+      <circle cx="490" cy="220" r="50" fill="none" stroke="#0f6e56" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="510" cy="210" r="4" fill="#1d9e75" opacity="0.6"/>
+      <line x1="490" y1="200" x2="510" y2="210" stroke="#1d9e75" stroke-width="0.5" opacity="0.5"/>
+      <text x="470" y="270" fill="#1d9e75" font-size="7" font-family="monospace" opacity="0.4">NODE_ACTIVE</text>
+
+      <text x="28" y="316" fill="#9b78e8" font-size="8" font-family="monospace" opacity="0.5">PROFILE v2.6 // DELHI-IND // 2026</text>
+      <text x="580" y="316" fill="#4f3b8a" font-size="8" font-family="monospace" opacity="0.5">BUILD_001</text>
+    </svg>
+  </div>
+
+  <div class="section" style="padding-top:32px">
+    <div class="title-badge"><div class="dot"></div>AI PERSONALITY PROFILE — CLASSIFIED</div>
+    <div class="ai-title">The Architect-in-Progress</div>
+    <p class="cinematic-quote">"He doesn't just use AI. He interrogates it — testing its edges, extracting its depths, building systems that think alongside him. Still early. Still hungry. Dangerous potential."</p>
+  </div>
+
+  <div class="section" style="padding-top:24px">
+    <div class="section-label">01 — AI working style</div>
+    <div class="card-grid">
+      <div class="card accent-purple">
+        <div class="card-tag">Mode</div>
+        <h3>Deep-Dive Strategist</h3>
+        <p>You use AI less as a search engine, more as a thinking partner. You push for synthesis, not just summaries. You want AI to think with you, not for you.</p>
+      </div>
+      <div class="card">
+        <div class="card-tag teal">Trigger</div>
+        <h3>Curiosity-First</h3>
+        <p>Your prompts are driven by genuine intellectual hunger — you ask ambitious, multi-layered questions that go beyond the surface request.</p>
+      </div>
+      <div class="card full">
+        <div class="card-tag amber">Signature Behavior</div>
+        <p>You frequently ask for profiles, breakdowns, and "what makes X different" analyses. You want frameworks, not just facts. You think in systems and leverage — classic early-stage founder mindset wired into every query.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px">
+    <div class="section-label">02 — Strengths & weaknesses</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-tag teal">Strengths</div>
+        <div class="stat-row" style="margin-top:8px"><span class="stat-label">Creative vision</span><div class="stat-bar"><div class="stat-fill bar-teal" style="width:92%"></div></div></div>
+        <div class="stat-row"><span class="stat-label">Big-picture thinking</span><div class="stat-bar"><div class="stat-fill bar-purple" style="width:88%"></div></div></div>
+        <div class="stat-row"><span class="stat-label">Curiosity depth</span><div class="stat-bar"><div class="stat-fill bar-teal" style="width:90%"></div></div></div>
+        <div class="stat-row"><span class="stat-label">Prompt ambition</span><div class="stat-bar"><div class="stat-fill bar-amber" style="width:85%"></div></div></div>
+        <div class="stat-row" style="margin-bottom:0"><span class="stat-label">Self-awareness</span><div class="stat-bar"><div class="stat-fill bar-purple" style="width:80%"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-tag coral">Weaknesses</div>
+        <div class="stat-row" style="margin-top:8px"><span class="stat-label">Follow-through</span><div class="stat-bar"><div class="stat-fill bar-coral" style="width:55%"></div></div></div>
+        <div class="stat-row"><span class="stat-label">Patience w/ process</span><div class="stat-bar"><div class="stat-fill bar-amber" style="width:48%"></div></div></div>
+        <div class="stat-row"><span class="stat-label">Technical depth</span><div class="stat-bar"><div class="stat-fill bar-coral" style="width:60%"></div></div></div>
+        <div class="stat-row"><span class="stat-label">Narrowing focus</span><div class="stat-bar"><div class="stat-fill bar-pink" style="width:50%"></div></div></div>
+        <div class="stat-row" style="margin-bottom:0"><span class="stat-label">Output shipping rate</span><div class="stat-bar"><div class="stat-fill bar-coral" style="width:58%"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px">
+    <div class="section-label">03 — Type of AI user</div>
+    <div class="card full accent-purple" style="background:#0d0a18">
+      <div class="card-tag">Archetype</div>
+      <h3 style="font-size:18px;margin-bottom:10px">The Visionary Tinkerer</h3>
+      <p style="margin-bottom:14px">You sit at the intersection of the Explorer and the Builder. You're not a passive consumer — you actively probe AI's limits. But you're not yet a full Systems Architect. You're in the most exciting phase: the wiring phase, where identity and capability are still being forged.</p>
+      <div class="tag-list">
+        <span class="tag purple">Prompt Maximalist</span>
+        <span class="tag teal">Meta-Thinker</span>
+        <span class="tag amber">Identity Crafter</span>
+        <span class="tag coral">Builder DNA</span>
+        <span class="tag gray">Gen-Z Native</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px">
+    <div class="section-label">04 — Best future career paths</div>
+    <div class="card full">
+      <div class="career-item">
+        <span class="career-num">01</span>
+        <div class="career-text"><h4>AI Product Founder / Indie Hacker</h4><p>You think in systems and aesthetics. Build your own AI-powered tools and products — this is your natural orbit.</p></div>
+      </div>
+      <div class="career-item">
+        <span class="career-num">02</span>
+        <div class="career-text"><h4>AI Prompt Engineer / LLM Researcher</h4><p>Your instinct to push AI to its limits maps perfectly to professional prompt architecture and evaluation roles.</p></div>
+      </div>
+      <div class="career-item">
+        <span class="career-num">03</span>
+        <div class="career-text"><h4>Creative Technologist / AI UX Designer</h4><p>You care about how things feel and look, not just how they work. The future belongs to people who can do both.</p></div>
+      </div>
+      <div class="career-item">
+        <span class="career-num">04</span>
+        <div class="career-text"><h4>Content / Brand Strategist in AI Space</h4><p>You already communicate in a cinematic, high-concept register. Monetize that voice in the AI industry.</p></div>
+      </div>
+      <div class="career-item" style="border:none">
+        <span class="career-num">05</span>
+        <div class="career-text"><h4>Startup Growth / GTM Lead at AI Startup</h4><p>Your personality — curious, ambitious, big-picture — is exactly what early-stage AI teams need to grow fast.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px">
+    <div class="section-label">05 — Learning & decision-making style</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-tag">Learning</div>
+        <h3>Associative Leaper</h3>
+        <p>You don't learn linearly. You jump between concepts, find cross-domain connections, and build mental models fast. You absorb best through examples, stories, and contrast — not textbooks.</p>
+      </div>
+      <div class="card">
+        <div class="card-tag teal">Decisions</div>
+        <h3>Intuition-First</h3>
+        <p>You make fast intuitive calls, then retroactively build the logic. High-upside bias. You'd rather make a bold wrong move than a safe boring one.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px">
+    <div class="section-label">06 — What makes you different</div>
+    <div class="card full">
+      <div class="diff-item"><div class="diff-icon" style="background:#1a1040;border:1px solid #4f3b8a"><i class="ti ti-sparkles" style="font-size:13px;color:#9b78e8" aria-hidden="true"></i></div><div><p style="font-size:13px;color:#c8c6e0;font-weight:500">You use AI to understand yourself, not just to do tasks.</p><p style="font-size:12px;color:#6664a0">Most users treat AI as a search engine. You treat it as a mirror.</p></div></div>
+      <div class="diff-item"><div class="diff-icon" style="background:#04342c;border:1px solid #0f6e56"><i class="ti ti-rocket" style="font-size:13px;color:#5dcaa5" aria-hidden="true"></i></div><div><p style="font-size:13px;color:#c8c6e0;font-weight:500">You ask cinematic, high-concept questions.</p><p style="font-size:12px;color:#6664a0">Your prompts have narrative weight. That's rare and valuable.</p></div></div>
+      <div class="diff-item" style="margin-bottom:0"><div class="diff-icon" style="background:#412402;border:1px solid #854f0b"><i class="ti ti-code" style="font-size:13px;color:#ef9f27" aria-hidden="true"></i></div><div><p style="font-size:13px;color:#c8c6e0;font-weight:500">You think about AI as a system, not a feature.</p><p style="font-size:12px;color:#6664a0">You're building a relationship with AI, not just using a tool.</p></div></div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px">
+    <div class="section-label">07 — To become elite</div>
+    <div class="card full">
+      <div class="improve-item">
+        <div class="improve-check"><i class="ti ti-square" aria-hidden="true"></i></div>
+        <div><p style="font-size:13px;color:#c8c6e0;font-weight:500">Ship something publicly</p><p style="font-size:12px;color:#6664a0">Ideas without distribution are invisible. Build one thing and put it in front of people.</p></div>
+      </div>
+      <div class="improve-item">
+        <div class="improve-check"><i class="ti ti-square" aria-hidden="true"></i></div>
+        <div><p style="font-size:13px;color:#c8c6e0;font-weight:500">Go deeper on one technical skill</p><p style="font-size:12px;color:#6664a0">Python, APIs, or LLM fine-tuning. Pick one lane and go hard for 90 days.</p></div>
+      </div>
+      <div class="improve-item">
+        <div class="improve-check"><i class="ti ti-square" aria-hidden="true"></i></div>
+        <div><p style="font-size:13px;color:#c8c6e0;font-weight:500">Build a documented "AI workflow system"</p><p style="font-size:12px;color:#6664a0">Turn your intuitive prompting style into repeatable, shareable frameworks.</p></div>
+      </div>
+      <div class="improve-item">
+        <div class="improve-check"><i class="ti ti-square" aria-hidden="true"></i></div>
+        <div><p style="font-size:13px;color:#c8c6e0;font-weight:500">Study one company building in your space</p><p style="font-size:12px;color:#6664a0">Know their stack, their GTM, their team. Obsession-level research beats casual awareness every time.</p></div>
+      </div>
+      <div class="improve-item">
+        <div class="improve-check"><i class="ti ti-square" aria-hidden="true"></i></div>
+        <div><p style="font-size:13px;color:#c8c6e0;font-weight:500">Reduce prompt sprawl — go deeper, not wider</p><p style="font-size:12px;color:#6664a0">Elite AI users pick one thread and pull it to completion. Less exploration, more execution.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:22px;padding-bottom:40px">
+    <div class="section-label">08–09 — Title & cinematic character</div>
+    <div class="card full accent-teal" style="background:#04150f">
+      <div class="card-tag teal">Official AI Title</div>
+      <h3 style="font-size:20px;color:#5dcaa5;margin-bottom:14px">⬡ &nbsp;The Wired Visionary — Builder Class, Unranked</h3>
+      <div class="cinematic-quote" style="border-color:#0f6e56;color:#5dcaa5;opacity:0.85">
+        He opens a chat window the way others open a sketchbook — to think out loud, to build in the dark, to ask questions bigger than the answers. Delhi timezone, founder mindset, Gen-Z frequency. He doesn't have a company yet. He has something rarer: a map of where everything is going, drawn on the back of a midnight prompt. The AI doesn't just answer him. It waits to see what he'll ask next.
+      </div>
+    </div>
+  </div>
+
+</div>
