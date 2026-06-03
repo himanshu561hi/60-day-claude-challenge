@@ -1,0 +1,338 @@
+
+<style>
+  :root { --teal: #1D9E75; --teal-light: #E1F5EE; --teal-dark: #085041; --coral: #D85A30; --coral-light: #FAECE7; --amber: #BA7517; --amber-light: #FAEEDA; --blue: #378ADD; --blue-light: #E6F1FB; --purple: #7F77DD; --purple-light: #EEEDFE; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); line-height: 1.7; }
+  .hero { background: var(--teal-light); border-radius: var(--border-radius-lg); padding: 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+  .hero-icon { width: 64px; height: 64px; background: var(--teal); border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hero-icon i { font-size: 32px; color: white; }
+  .hero h1 { font-size: 22px; font-weight: 500; color: var(--teal-dark); margin-bottom: 6px; }
+  .hero p { font-size: 15px; color: #0F6E56; }
+  .section { margin-bottom: 2rem; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .section-header i { font-size: 20px; color: var(--teal); }
+  .section-header h2 { font-size: 18px; font-weight: 500; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .card .card-icon { font-size: 22px; margin-bottom: 8px; }
+  .card h3 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .card p { font-size: 13px; color: var(--color-text-secondary); }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 99px; }
+  .badge-teal { background: var(--teal-light); color: var(--teal-dark); }
+  .badge-coral { background: var(--coral-light); color: #712B13; }
+  .badge-amber { background: var(--amber-light); color: #633806; }
+  .badge-blue { background: var(--blue-light); color: #0C447C; }
+  .badge-purple { background: var(--purple-light); color: #3C3489; }
+  .code-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem 1.25rem; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; margin: 0.75rem 0; overflow-x: auto; white-space: pre; }
+  .code-kw { color: var(--blue); }
+  .code-cls { color: var(--coral); }
+  .code-str { color: var(--teal); }
+  .code-cm { color: var(--color-text-secondary); font-style: italic; }
+  .step { display: flex; gap: 12px; margin-bottom: 1rem; }
+  .step-num { width: 28px; height: 28px; background: var(--teal); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; margin-top: 2px; }
+  .step-body h3 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .step-body p { font-size: 14px; color: var(--color-text-secondary); }
+  .step-body code { font-family: var(--font-mono); font-size: 12px; background: var(--color-background-secondary); padding: 1px 6px; border-radius: 4px; }
+  .use-cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .use-case { display: flex; align-items: flex-start; gap: 10px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; }
+  .use-case i { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .use-case-teal { color: var(--teal); }
+  .use-case-blue { color: var(--blue); }
+  .use-case-coral { color: var(--coral); }
+  .use-case-amber { color: var(--amber); }
+  .use-case-purple { color: var(--purple); }
+  .use-case h3 { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .use-case p { font-size: 12px; color: var(--color-text-secondary); }
+  .resources { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .resource { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .resource-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .resource a { font-size: 14px; font-weight: 500; color: var(--teal-dark); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+  .resource a:hover { text-decoration: underline; }
+  .resource .desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+  .tip { display: flex; gap: 10px; background: var(--amber-light); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; margin: 1rem 0; }
+  .tip i { color: var(--amber); font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .tip p { font-size: 13px; color: #633806; }
+  .platform-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.75rem 0; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 6px; }
+  .tab { padding: 5px 14px; font-size: 13px; border-radius: 6px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; font-family: var(--font-sans); }
+  .tab.active { background: var(--teal); color: white; border-color: var(--teal); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+
+<h2 class="sr-only">Flutter for Beginners — A complete introduction covering overview, features, setup, code samples, use cases, and resources</h2>
+
+<div class="hero">
+  <div class="hero-icon"><i class="ti ti-device-mobile-code" aria-hidden="true"></i></div>
+  <div>
+    <h1>Flutter for Beginners</h1>
+    <p>Everything you need to go from zero to your first cross-platform app</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <i class="ti ti-info-circle" aria-hidden="true"></i>
+    <h2>What is Flutter?</h2>
+  </div>
+  <p style="font-size:15px; margin-bottom:0.75rem;">Flutter is Google's open-source UI toolkit for building natively compiled apps from a <strong style="font-weight:500">single codebase</strong>. It uses <span class="badge badge-coral">Dart</span> — a fast, object-oriented language designed to feel familiar if you already know Java, JavaScript, or C#.</p>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon"><i class="ti ti-paint" style="color:var(--teal)" aria-hidden="true"></i></div>
+      <h3>Flutter</h3>
+      <p>The UI framework — handles widgets, rendering, animations, and platform APIs.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="ti ti-brand-golang" style="color:var(--blue)" aria-hidden="true"></i></div>
+      <h3>Dart</h3>
+      <p>The programming language — compiled to native ARM code or JavaScript for the web.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="ti ti-cpu" style="color:var(--coral)" aria-hidden="true"></i></div>
+      <h3>Skia / Impeller</h3>
+      <p>Flutter's own rendering engine — draws every pixel itself, no native UI components needed.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <i class="ti ti-bolt" aria-hidden="true"></i>
+    <h2>Key features</h2>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <i class="ti ti-refresh" style="font-size:20px;color:var(--teal)" aria-hidden="true"></i>
+        <h3 style="margin:0">Hot reload</h3>
+      </div>
+      <p>See UI changes instantly — sub-second, without losing app state. Speeds up iteration dramatically.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <i class="ti ti-layout-grid" style="font-size:20px;color:var(--blue)" aria-hidden="true"></i>
+        <h3 style="margin:0">Widget-based UI</h3>
+      </div>
+      <p>Everything is a widget — buttons, padding, alignment, layouts. Compose complex UIs from small pieces.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <i class="ti ti-world" style="font-size:20px;color:var(--coral)" aria-hidden="true"></i>
+        <h3 style="margin:0">Cross-platform</h3>
+      </div>
+      <p>One codebase → iOS, Android, Web, Windows, macOS, and Linux. True write-once, run-anywhere.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <i class="ti ti-rocket" style="font-size:20px;color:var(--amber)" aria-hidden="true"></i>
+        <h3 style="margin:0">Native performance</h3>
+      </div>
+      <p>Compiled to native code — 60/120fps animations with no JavaScript bridge overhead.</p>
+    </div>
+  </div>
+  <div class="platform-row">
+    <span class="badge badge-teal"><i class="ti ti-brand-apple" aria-hidden="true"></i> iOS</span>
+    <span class="badge badge-teal"><i class="ti ti-brand-android" aria-hidden="true"></i> Android</span>
+    <span class="badge badge-blue"><i class="ti ti-world" aria-hidden="true"></i> Web</span>
+    <span class="badge badge-amber"><i class="ti ti-brand-windows" aria-hidden="true"></i> Windows</span>
+    <span class="badge badge-coral"><i class="ti ti-brand-apple" aria-hidden="true"></i> macOS</span>
+    <span class="badge badge-purple"><i class="ti ti-device-desktop" aria-hidden="true"></i> Linux</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <i class="ti ti-tools" aria-hidden="true"></i>
+    <h2>Getting started</h2>
+  </div>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>Install Flutter SDK</h3>
+      <p>Download from <strong style="font-weight:500">flutter.dev/get-started</strong> and add it to your PATH. Run <code>flutter doctor</code> to check your environment is ready.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Choose an IDE</h3>
+      <p>VS Code (with Flutter extension) or Android Studio — both have excellent Flutter support, debugging, and hot reload built in.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Create your first project</h3>
+      <p>Run <code>flutter create hello_world</code>, then <code>cd hello_world</code> and <code>flutter run</code> to launch the default counter app on an emulator or device.</p>
+    </div>
+  </div>
+  <div class="tip">
+    <i class="ti ti-bulb" aria-hidden="true"></i>
+    <p>No physical device? No problem — use the Android emulator from Android Studio, or the iOS simulator on macOS. You can even run Flutter apps in a Chrome browser tab.</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <i class="ti ti-code" aria-hidden="true"></i>
+    <h2>Code samples</h2>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab active" onclick="switchTab('stateless')" role="tab" aria-selected="true">Stateless widget</button>
+    <button class="tab" onclick="switchTab('stateful')" role="tab" aria-selected="false">Stateful counter</button>
+  </div>
+
+  <div id="tab-stateless" class="tab-content active">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px">A stateless widget renders UI from its inputs alone — no internal state. Perfect for display-only components.</p>
+    <div class="code-block"><span class="code-kw">import</span> <span class="code-str">'package:flutter/material.dart'</span>;
+
+<span class="code-kw">void</span> <span class="code-cls">main</span>() {
+  runApp(<span class="code-kw">const</span> <span class="code-cls">MyApp</span>());
+}
+
+<span class="code-kw">class</span> <span class="code-cls">MyApp</span> <span class="code-kw">extends</span> <span class="code-cls">StatelessWidget</span> {
+  <span class="code-kw">const</span> <span class="code-cls">MyApp</span>({<span class="code-kw">super</span>.key});
+
+  <span class="code-cm">// build() describes what UI to display</span>
+  <span class="code-kw">@override</span>
+  <span class="code-cls">Widget</span> build(<span class="code-cls">BuildContext</span> context) {
+    <span class="code-kw">return</span> <span class="code-cls">MaterialApp</span>(
+      home: <span class="code-cls">Scaffold</span>(
+        appBar: <span class="code-cls">AppBar</span>(title: <span class="code-kw">const</span> <span class="code-cls">Text</span>(<span class="code-str">'Hello Flutter!'</span>)),
+        body: <span class="code-kw">const</span> <span class="code-cls">Center</span>(
+          child: <span class="code-cls">Text</span>(
+            <span class="code-str">'Hello, World!'</span>,
+            style: <span class="code-cls">TextStyle</span>(fontSize: <span class="code-kw">24</span>),
+          ),
+        ),
+      ),
+    );
+  }
+}</div>
+  </div>
+
+  <div id="tab-stateful" class="tab-content">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px">A stateful widget holds mutable state. Calling <code>setState()</code> tells Flutter to rebuild the widget with the new values.</p>
+    <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">CounterPage</span> <span class="code-kw">extends</span> <span class="code-cls">StatefulWidget</span> {
+  <span class="code-kw">const</span> <span class="code-cls">CounterPage</span>({<span class="code-kw">super</span>.key});
+
+  <span class="code-kw">@override</span>
+  <span class="code-cls">State</span>&lt;<span class="code-cls">CounterPage</span>&gt; createState() =&gt; _<span class="code-cls">CounterPageState</span>();
+}
+
+<span class="code-kw">class</span> _<span class="code-cls">CounterPageState</span> <span class="code-kw">extends</span> <span class="code-cls">State</span>&lt;<span class="code-cls">CounterPage</span>&gt; {
+  <span class="code-kw">int</span> _count = <span class="code-kw">0</span>; <span class="code-cm">// mutable state lives here</span>
+
+  <span class="code-kw">void</span> _increment() {
+    setState(() { _count++; }); <span class="code-cm">// triggers a rebuild</span>
+  }
+
+  <span class="code-kw">@override</span>
+  <span class="code-cls">Widget</span> build(<span class="code-cls">BuildContext</span> context) {
+    <span class="code-kw">return</span> <span class="code-cls">Scaffold</span>(
+      appBar: <span class="code-cls">AppBar</span>(title: <span class="code-kw">const</span> <span class="code-cls">Text</span>(<span class="code-str">'Counter'</span>)),
+      body: <span class="code-cls">Center</span>(
+        child: <span class="code-cls">Text</span>(<span class="code-str">'Count: $_count'</span>,
+            style: <span class="code-kw">const</span> <span class="code-cls">TextStyle</span>(fontSize: <span class="code-kw">32</span>)),
+      ),
+      floatingActionButton: <span class="code-cls">FloatingActionButton</span>(
+        onPressed: _increment,
+        child: <span class="code-kw">const</span> <span class="code-cls">Icon</span>(<span class="code-cls">Icons</span>.add),
+      ),
+    );
+  }
+}</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <i class="ti ti-target" aria-hidden="true"></i>
+    <h2>Common use cases & when to choose Flutter</h2>
+  </div>
+  <div class="use-cases">
+    <div class="use-case">
+      <i class="ti ti-shopping-cart use-case-teal" aria-hidden="true"></i>
+      <div>
+        <h3>Startups & MVPs</h3>
+        <p>Ship to iOS + Android at once with a single team — saves time and money early on.</p>
+      </div>
+    </div>
+    <div class="use-case">
+      <i class="ti ti-palette use-case-coral" aria-hidden="true"></i>
+      <div>
+        <h3>Custom UI / Design-heavy apps</h3>
+        <p>Flutter owns its renderer — pixel-perfect custom designs without platform constraints.</p>
+      </div>
+    </div>
+    <div class="use-case">
+      <i class="ti ti-building-store use-case-blue" aria-hidden="true"></i>
+      <div>
+        <h3>Consumer apps</h3>
+        <p>E-commerce, finance, social, productivity — Flutter handles them all in production at scale.</p>
+      </div>
+    </div>
+    <div class="use-case">
+      <i class="ti ti-device-desktop use-case-amber" aria-hidden="true"></i>
+      <div>
+        <h3>Desktop + mobile</h3>
+        <p>Need a companion desktop app alongside mobile? Flutter targets all 6 platforms from one repo.</p>
+      </div>
+    </div>
+    <div class="use-case">
+      <i class="ti ti-puzzle use-case-purple" aria-hidden="true"></i>
+      <div>
+        <h3>When NOT to use Flutter</h3>
+        <p>Pure web apps that need SEO, apps requiring deep platform-native integrations, or tiny scripts.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <i class="ti ti-books" aria-hidden="true"></i>
+    <h2>Resources to keep learning</h2>
+  </div>
+  <div class="resources">
+    <div class="resource">
+      <div class="resource-label">Official docs</div>
+      <a href="https://docs.flutter.dev" target="_blank">docs.flutter.dev <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i></a>
+      <div class="desc">Comprehensive guides, API reference, and codelabs — the best starting point.</div>
+    </div>
+    <div class="resource">
+      <div class="resource-label">Video course</div>
+      <a href="https://www.youtube.com/@flutterdev" target="_blank">Flutter YouTube channel <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i></a>
+      <div class="desc">Free, beginner-friendly videos from the Flutter team themselves.</div>
+    </div>
+    <div class="resource">
+      <div class="resource-label">Packages</div>
+      <a href="https://pub.dev" target="_blank">pub.dev <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i></a>
+      <div class="desc">The official package repository — thousands of plugins for everything you need.</div>
+    </div>
+    <div class="resource">
+      <div class="resource-label">Community</div>
+      <a href="https://reddit.com/r/FlutterDev" target="_blank">r/FlutterDev <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i></a>
+      <div class="desc">Active community for questions, showcases, and staying up to date.</div>
+    </div>
+    <div class="resource">
+      <div class="resource-label">Discord</div>
+      <a href="https://discord.gg/rflutter" target="_blank">Flutter Discord <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i></a>
+      <div class="desc">Real-time help from a welcoming community of Flutter developers.</div>
+    </div>
+    <div class="resource">
+      <div class="resource-label">Interactive codelabs</div>
+      <a href="https://codelabs.developers.google.com/?product=flutter" target="_blank">Google Codelabs <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i></a>
+      <div class="desc">Hands-on, step-by-step projects — perfect for building your first real apps.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
