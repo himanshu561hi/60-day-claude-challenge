@@ -67,7 +67,7 @@ To analyze the power of prompt design, I tested two approaches using a "Flutter 
 Here is the visual transition showing the plain markdown generation evolving into a highly structured frontend documentation layout:
 
 _Comparison of Output Structure:_
-![Day 2 Prompt Engineering Experiment](Day2/Day2.png)
+![Day 2 Prompt Engineering Experiment](Day2/abtalks_60days_linkedin_post.svg)
 
 ---
 
