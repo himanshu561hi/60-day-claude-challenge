@@ -1,0 +1,195 @@
+
+<style>
+  .roadmap { padding: 1rem 0; font-family: var(--font-sans); }
+  .week-header { display: flex; align-items: center; gap: 12px; margin: 1.5rem 0 0.75rem; cursor: pointer; user-select: none; }
+  .week-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .w1 .week-badge { background: #E6F1FB; color: #0C447C; }
+  .w2 .week-badge { background: #EEEDFE; color: #3C3489; }
+  .w3 .week-badge { background: #E1F5EE; color: #085041; }
+  .w4 .week-badge { background: #FAEEDA; color: #633806; }
+  .week-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .milestone { font-size: 13px; color: var(--color-text-secondary); margin-left: auto; }
+  .chevron { font-size: 16px; color: var(--color-text-secondary); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .week-body { display: none; padding-bottom: 1rem; }
+  .week-body.open { display: block; }
+  .days-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-bottom: 1rem; }
+  .day-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; }
+  .day-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .day-task { font-size: 13px; color: var(--color-text-primary); line-height: 1.4; }
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0.75rem 0 0.4rem; }
+  .resource-list, .project-list { list-style: none; padding: 0; margin: 0 0 0.5rem; display: flex; flex-wrap: wrap; gap: 6px; }
+  .resource-list li, .project-list li { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--color-text-secondary); }
+  .project-box { background: var(--color-background-secondary); border-left: 3px solid; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 10px 14px; margin-top: 0.5rem; }
+  .w1 .project-box { border-color: #378ADD; }
+  .w2 .project-box { border-color: #7F77DD; }
+  .w3 .project-box { border-color: #1D9E75; }
+  .w4 .project-box { border-color: #BA7517; }
+  .project-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .project-desc { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 0.25rem 0; }
+  .outcome-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; margin-top: 1.5rem; display: flex; gap: 16px; align-items: flex-start; }
+  .outcome-icon { font-size: 24px; color: #1D9E75; margin-top: 2px; }
+  .outcome-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .outcome-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-tag { background: #E1F5EE; color: #085041; font-size: 12px; padding: 3px 10px; border-radius: 20px; }
+  .ask-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text-secondary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 14px; cursor: pointer; margin-top: 1rem; }
+  .ask-btn:hover { background: var(--color-background-primary); }
+</style>
+
+<div class="roadmap">
+  <h2 class="sr-only">30-day web development learning roadmap for intermediate learners</h2>
+
+  <!-- Week 1 -->
+  <div class="w1">
+    <div class="week-header" onclick="toggle('w1')">
+      <span class="week-badge">Week 1</span>
+      <span class="week-title">Modern JavaScript & tooling</span>
+      <span class="milestone">Solid JS foundations</span>
+      <i class="ti ti-chevron-down chevron open" id="w1-chev" aria-hidden="true"></i>
+    </div>
+    <div class="week-body open" id="w1-body">
+      <div class="days-grid">
+        <div class="day-card"><div class="day-label">Day 1</div><div class="day-task">ES6+ syntax deep dive: destructuring, spread, optional chaining</div></div>
+        <div class="day-card"><div class="day-label">Day 2</div><div class="day-task">Async JS: Promises, async/await, error handling patterns</div></div>
+        <div class="day-card"><div class="day-label">Day 3</div><div class="day-task">Modules: ESM imports/exports, bundlers overview (Vite)</div></div>
+        <div class="day-card"><div class="day-label">Day 4</div><div class="day-task">DOM manipulation & event delegation patterns</div></div>
+        <div class="day-card"><div class="day-label">Day 5</div><div class="day-task">Fetch API, REST basics, JSON handling</div></div>
+        <div class="day-card"><div class="day-label">Day 6–7</div><div class="day-task">Build project + review weak spots</div></div>
+      </div>
+      <div class="section-label">Resources</div>
+      <ul class="resource-list">
+        <li>javascript.info</li><li>MDN Web Docs</li><li>Eloquent JavaScript (free)</li><li>Frontend Masters – JS Path</li>
+      </ul>
+      <div class="section-label">Weekend project</div>
+      <div class="project-box">
+        <div class="project-title">Weather dashboard</div>
+        <div class="project-desc">Fetch live data from a public weather API, display 5-day forecast using vanilla JS + Vite. No frameworks.</div>
+      </div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- Week 2 -->
+  <div class="w2">
+    <div class="week-header" onclick="toggle('w2')">
+      <span class="week-badge">Week 2</span>
+      <span class="week-title">React fundamentals</span>
+      <span class="milestone">Build UIs with React</span>
+      <i class="ti ti-chevron-down chevron" id="w2-chev" aria-hidden="true"></i>
+    </div>
+    <div class="week-body" id="w2-body">
+      <div class="days-grid">
+        <div class="day-card"><div class="day-label">Day 8</div><div class="day-task">JSX, components, props — mental model shift</div></div>
+        <div class="day-card"><div class="day-label">Day 9</div><div class="day-task">useState, useEffect, controlled inputs</div></div>
+        <div class="day-card"><div class="day-label">Day 10</div><div class="day-task">Component composition, lifting state, prop drilling</div></div>
+        <div class="day-card"><div class="day-label">Day 11</div><div class="day-task">useContext + custom hooks</div></div>
+        <div class="day-card"><div class="day-label">Day 12</div><div class="day-task">React Router v6 — SPA navigation</div></div>
+        <div class="day-card"><div class="day-label">Day 13–14</div><div class="day-task">Build project + polish</div></div>
+      </div>
+      <div class="section-label">Resources</div>
+      <ul class="resource-list">
+        <li>react.dev (official docs)</li><li>Scrimba React course</li><li>Jack Herrington (YouTube)</li>
+      </ul>
+      <div class="section-label">Weekend project</div>
+      <div class="project-box">
+        <div class="project-title">Movie search app</div>
+        <div class="project-desc">Multi-page React app using OMDB API. Implement search, detail page, and a favorites list saved to localStorage.</div>
+      </div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- Week 3 -->
+  <div class="w3">
+    <div class="week-header" onclick="toggle('w3')">
+      <span class="week-badge">Week 3</span>
+      <span class="week-title">Backend & APIs with Node.js</span>
+      <span class="milestone">Full-stack capable</span>
+      <i class="ti ti-chevron-down chevron" id="w3-chev" aria-hidden="true"></i>
+    </div>
+    <div class="week-body" id="w3-body">
+      <div class="days-grid">
+        <div class="day-card"><div class="day-label">Day 15</div><div class="day-task">Node.js runtime, npm, package.json essentials</div></div>
+        <div class="day-card"><div class="day-label">Day 16</div><div class="day-task">Express.js: routes, middleware, request/response</div></div>
+        <div class="day-card"><div class="day-label">Day 17</div><div class="day-task">REST API design: CRUD, status codes, error handling</div></div>
+        <div class="day-card"><div class="day-label">Day 18</div><div class="day-task">Database basics: SQL with SQLite or Postgres</div></div>
+        <div class="day-card"><div class="day-label">Day 19</div><div class="day-task">Auth fundamentals: JWT, cookies, sessions</div></div>
+        <div class="day-card"><div class="day-label">Day 20–21</div><div class="day-task">Build project + deploy</div></div>
+      </div>
+      <div class="section-label">Resources</div>
+      <ul class="resource-list">
+        <li>The Odin Project – Node path</li><li>Express.js docs</li><li>CS50 SQL (free)</li><li>Fireship (YouTube)</li>
+      </ul>
+      <div class="section-label">Weekend project</div>
+      <div class="project-box">
+        <div class="project-title">Notes API</div>
+        <div class="project-desc">Build a REST API with Express + SQLite: create/read/update/delete notes, protected routes with JWT, deploy to Railway or Render.</div>
+      </div>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <!-- Week 4 -->
+  <div class="w4">
+    <div class="week-header" onclick="toggle('w4')">
+      <span class="week-badge">Week 4</span>
+      <span class="week-title">Full-stack project & deployment</span>
+      <span class="milestone">Deployable portfolio piece</span>
+      <i class="ti ti-chevron-down chevron" id="w4-chev" aria-hidden="true"></i>
+    </div>
+    <div class="week-body" id="w4-body">
+      <div class="days-grid">
+        <div class="day-card"><div class="day-label">Day 22</div><div class="day-task">Plan capstone: wireframe, data model, API contract</div></div>
+        <div class="day-card"><div class="day-label">Day 23</div><div class="day-task">Build backend: models, routes, auth</div></div>
+        <div class="day-card"><div class="day-label">Day 24</div><div class="day-task">Build React frontend: connect to your API</div></div>
+        <div class="day-card"><div class="day-label">Day 25</div><div class="day-task">Styling + responsive layout (Tailwind CSS)</div></div>
+        <div class="day-card"><div class="day-label">Day 26</div><div class="day-task">Testing basics: unit test 2–3 key functions</div></div>
+        <div class="day-card"><div class="day-label">Day 27</div><div class="day-task">Deploy frontend (Vercel) + backend (Render)</div></div>
+        <div class="day-card"><div class="day-label">Day 28–30</div><div class="day-task">Polish, write README, add to portfolio/GitHub</div></div>
+      </div>
+      <div class="section-label">Resources</div>
+      <ul class="resource-list">
+        <li>Tailwind CSS docs</li><li>Vercel docs</li><li>Render free tier</li><li>Vitest (testing)</li>
+      </ul>
+      <div class="section-label">Capstone project</div>
+      <div class="project-box">
+        <div class="project-title">Full-stack task manager</div>
+        <div class="project-desc">React frontend + Express/Postgres backend. User auth, CRUD tasks, due dates, filters. Fully deployed and documented.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Outcome -->
+  <div class="outcome-box">
+    <i class="ti ti-trophy outcome-icon" aria-hidden="true"></i>
+    <div>
+      <div class="outcome-title">After 30 days you'll have</div>
+      <div class="outcome-skills">
+        <span class="skill-tag">Modern JS</span>
+        <span class="skill-tag">React</span>
+        <span class="skill-tag">Node.js + Express</span>
+        <span class="skill-tag">REST APIs</span>
+        <span class="skill-tag">SQL basics</span>
+        <span class="skill-tag">Auth (JWT)</span>
+        <span class="skill-tag">Tailwind CSS</span>
+        <span class="skill-tag">Deployment</span>
+        <span class="skill-tag">3 portfolio projects</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="ask-btn" onclick="sendPrompt('Give me a more detailed breakdown for Week 1 of the web dev roadmap ↗')">
+    <i class="ti ti-zoom-in" aria-hidden="true"></i> Expand any week in detail ↗
+  </button>
+</div>
+
+<script>
+  function toggle(id) {
+    const body = document.getElementById(id + '-body');
+    const chev = document.getElementById(id + '-chev');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chev.classList.toggle('open', !isOpen);
+  }
+</script>

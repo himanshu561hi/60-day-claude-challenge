@@ -1,0 +1,257 @@
+
+<style>
+  .roadmap-root { padding: 1.5rem 0; font-family: var(--font-sans); }
+  .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+  .stat-label { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 4px; }
+  .stat-val { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .week-tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .week-tab { padding: 6px 16px; border-radius: 99px; font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); transition: all 0.15s; }
+  .week-tab.active { background: #534AB7; color: #EEEDFE; border-color: #534AB7; }
+  .week-panel { display: none; }
+  .week-panel.active { display: block; }
+  .week-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .week-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; }
+  .week-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .week-milestone { font-size: 13px; color: var(--color-text-secondary); margin: 0 0 1.25rem; padding: 10px 14px; background: var(--color-background-secondary); border-left: 3px solid #7F77DD; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .day-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+  .day-label { font-size: 11px; font-weight: 500; min-width: 28px; padding-top: 2px; color: var(--color-text-secondary); }
+  .day-task { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+  .res-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--color-text-primary); }
+  .res-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .project-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+  .project-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .project-desc { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.5; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; margin-right: 4px; margin-top: 6px; font-weight: 500; }
+  .outcome-box { background: #EEEDFE; border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; margin-top: 1rem; border: 0.5px solid #AFA9EC; }
+  .outcome-title { font-size: 14px; font-weight: 500; color: #3C3489; margin: 0 0 8px; }
+  .outcome-list { margin: 0; padding-left: 1.25rem; }
+  .outcome-list li { font-size: 13px; color: #534AB7; margin-bottom: 6px; line-height: 1.5; }
+  @media (prefers-color-scheme: dark) {
+    .outcome-box { background: #26215C; border-color: #534AB7; }
+    .outcome-title { color: #CECBF6; }
+    .outcome-list li { color: #AFA9EC; }
+    .week-milestone { border-left-color: #AFA9EC; }
+  }
+</style>
+
+<div class="roadmap-root">
+  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">30-day full stack web development roadmap for intermediate B.Tech student</h2>
+
+  <div class="top-stats">
+    <div class="stat-card"><p class="stat-label">Duration</p><p class="stat-val">30 days</p></div>
+    <div class="stat-card"><p class="stat-label">Daily time</p><p class="stat-val">2+ hrs</p></div>
+    <div class="stat-card"><p class="stat-label">Projects</p><p class="stat-val">4 builds</p></div>
+    <div class="stat-card"><p class="stat-label">Goal</p><p class="stat-val">Full Stack</p></div>
+  </div>
+
+  <div class="week-tabs">
+    <div class="week-tab active" onclick="showWeek(0)">Week 1 — Frontend</div>
+    <div class="week-tab" onclick="showWeek(1)">Week 2 — Backend</div>
+    <div class="week-tab" onclick="showWeek(2)">Week 3 — Database + API</div>
+    <div class="week-tab" onclick="showWeek(3)">Week 4 — Full Stack Build</div>
+    <div class="week-tab" onclick="showWeek(4)">🏁 Outcome</div>
+  </div>
+
+  <!-- WEEK 1 -->
+  <div class="week-panel active" id="panel-0">
+    <div class="week-header">
+      <span class="week-badge" style="background:#EEEDFE;color:#3C3489;">Week 1</span>
+      <p class="week-title">HTML, CSS &amp; JavaScript Foundations</p>
+    </div>
+    <p class="week-milestone">Milestone: Build a responsive personal portfolio page with HTML/CSS and add interactivity with vanilla JS</p>
+    <div class="two-col">
+      <div class="card">
+        <p class="card-title">Daily tasks</p>
+        <div class="day-row"><span class="day-label">D1</span><span class="day-task">HTML structure, semantic tags, forms — build a profile page skeleton</span></div>
+        <div class="day-row"><span class="day-label">D2</span><span class="day-task">CSS Flexbox + Grid — style your profile page responsively</span></div>
+        <div class="day-row"><span class="day-label">D3</span><span class="day-task">CSS animations, transitions, media queries — mobile-first tweaks</span></div>
+        <div class="day-row"><span class="day-label">D4</span><span class="day-task">JS fundamentals — DOM manipulation, event listeners, console exercises</span></div>
+        <div class="day-row"><span class="day-label">D5</span><span class="day-task">JS arrays, objects, fetch API — dynamic content with mock data</span></div>
+        <div class="day-row"><span class="day-label">D6</span><span class="day-task">Project work — wire up JS to your portfolio, add a "projects" section</span></div>
+        <div class="day-row"><span class="day-label">D7</span><span class="day-task">Review + deploy portfolio on GitHub Pages</span></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Resources</p>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>The Odin Project — HTML/CSS path (free, project-based)</div>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>MDN Web Docs — HTML &amp; CSS reference</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>JavaScript.info — modern JS tutorial (read chapters 1–8)</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>Flexbox Froggy + Grid Garden — interactive CSS games (30 min)</div>
+        <div class="res-item"><span class="res-dot" style="background:#BA7517;"></span>YouTube: Traversy Media — Flexbox crash course (video)</div>
+        <p class="card-title" style="margin-top:1rem;">Week 1 project</p>
+        <div class="project-card" style="margin-bottom:0;background:var(--color-background-secondary);">
+          <p class="project-name">Responsive Portfolio Site</p>
+          <p class="project-desc">Personal site with About, Projects, and Contact sections. Deployed live on GitHub Pages.</p>
+          <span class="tag" style="background:#EEEDFE;color:#3C3489;">HTML</span>
+          <span class="tag" style="background:#E1F5EE;color:#085041;">CSS Grid</span>
+          <span class="tag" style="background:#FAEEDA;color:#633806;">JS DOM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 2 -->
+  <div class="week-panel" id="panel-1">
+    <div class="week-header">
+      <span class="week-badge" style="background:#E1F5EE;color:#085041;">Week 2</span>
+      <p class="week-title">React + Node.js / Express</p>
+    </div>
+    <p class="week-milestone">Milestone: Build a React frontend that fetches data from your own Express server</p>
+    <div class="two-col">
+      <div class="card">
+        <p class="card-title">Daily tasks</p>
+        <div class="day-row"><span class="day-label">D8</span><span class="day-task">React intro — components, JSX, props. Convert your portfolio to React</span></div>
+        <div class="day-row"><span class="day-label">D9</span><span class="day-task">React state, useState, useEffect — build a todo list</span></div>
+        <div class="day-row"><span class="day-label">D10</span><span class="day-task">React Router — multi-page SPA navigation</span></div>
+        <div class="day-row"><span class="day-label">D11</span><span class="day-task">Node.js basics — modules, file system, npm. Set up Express project</span></div>
+        <div class="day-row"><span class="day-label">D12</span><span class="day-task">Express routes, middleware, REST concepts — build CRUD endpoints</span></div>
+        <div class="day-row"><span class="day-label">D13</span><span class="day-task">Connect React to Express — fetch data, handle loading/error states</span></div>
+        <div class="day-row"><span class="day-label">D14</span><span class="day-task">Polish + document your React+Express mini-app</span></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Resources</p>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>React official docs — react.dev (new beta docs, best intro)</div>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>Scrimba — React course (interactive, free tier)</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>Express.js official docs — expressjs.com</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>YouTube: Fireship — "React in 100 seconds" + Express crash course</div>
+        <div class="res-item"><span class="res-dot" style="background:#BA7517;"></span>Postman (tool) — test your API endpoints</div>
+        <p class="card-title" style="margin-top:1rem;">Week 2 project</p>
+        <div class="project-card" style="margin-bottom:0;background:var(--color-background-secondary);">
+          <p class="project-name">Notes App (React + Express)</p>
+          <p class="project-desc">Create, read, update, delete notes. React frontend communicates with a local Express REST API.</p>
+          <span class="tag" style="background:#EEEDFE;color:#3C3489;">React</span>
+          <span class="tag" style="background:#E1F5EE;color:#085041;">Express</span>
+          <span class="tag" style="background:#FAEEDA;color:#633806;">REST API</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 3 -->
+  <div class="week-panel" id="panel-2">
+    <div class="week-header">
+      <span class="week-badge" style="background:#FAEEDA;color:#633806;">Week 3</span>
+      <p class="week-title">MongoDB + Authentication + Deployment</p>
+    </div>
+    <p class="week-milestone">Milestone: Add a real database and JWT login to your app, then deploy to the internet</p>
+    <div class="two-col">
+      <div class="card">
+        <p class="card-title">Daily tasks</p>
+        <div class="day-row"><span class="day-label">D15</span><span class="day-task">MongoDB + Mongoose — schemas, models, connect to Atlas (free cloud DB)</span></div>
+        <div class="day-row"><span class="day-label">D16</span><span class="day-task">CRUD with MongoDB — replace in-memory store in your Express app</span></div>
+        <div class="day-row"><span class="day-label">D17</span><span class="day-task">Authentication — bcrypt password hashing, user schema</span></div>
+        <div class="day-row"><span class="day-label">D18</span><span class="day-task">JWT auth — generate tokens, protected routes middleware</span></div>
+        <div class="day-row"><span class="day-label">D19</span><span class="day-task">React auth flow — login/signup forms, store token, protected pages</span></div>
+        <div class="day-row"><span class="day-label">D20</span><span class="day-task">Deployment — Render (backend) + Vercel (frontend), environment variables</span></div>
+        <div class="day-row"><span class="day-label">D21</span><span class="day-task">End-to-end test, fix bugs, write a README</span></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Resources</p>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>MongoDB University — M001 free course (official, beginner-friendly)</div>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>Mongoose docs — mongoosejs.com</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>YouTube: Web Dev Simplified — JWT Auth from scratch</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>Render.com &amp; Vercel.com — both free-tier deployments</div>
+        <div class="res-item"><span class="res-dot" style="background:#BA7517;"></span>dotenv npm package — managing environment secrets</div>
+        <p class="card-title" style="margin-top:1rem;">Week 3 project</p>
+        <div class="project-card" style="margin-bottom:0;background:var(--color-background-secondary);">
+          <p class="project-name">Auth-enabled Notes App (deployed)</p>
+          <p class="project-desc">MongoDB-backed notes with user registration, login, and live URL. Share the link on LinkedIn!</p>
+          <span class="tag" style="background:#EEEDFE;color:#3C3489;">MongoDB</span>
+          <span class="tag" style="background:#E1F5EE;color:#085041;">JWT Auth</span>
+          <span class="tag" style="background:#FAEEDA;color:#633806;">Deployed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 4 -->
+  <div class="week-panel" id="panel-3">
+    <div class="week-header">
+      <span class="week-badge" style="background:#FAECE7;color:#4A1B0C;">Week 4</span>
+      <p class="week-title">Capstone — Full Stack App</p>
+    </div>
+    <p class="week-milestone">Milestone: Ship a complete, deployed, portfolio-ready full stack project from scratch</p>
+    <div class="two-col">
+      <div class="card">
+        <p class="card-title">Daily tasks</p>
+        <div class="day-row"><span class="day-label">D22</span><span class="day-task">Plan your capstone — wireframes, data models, feature list (keep it scoped!)</span></div>
+        <div class="day-row"><span class="day-label">D23</span><span class="day-task">Set up monorepo (client + server), initialize DB schema, configure env</span></div>
+        <div class="day-row"><span class="day-label">D24</span><span class="day-task">Backend — build all API routes, test with Postman</span></div>
+        <div class="day-row"><span class="day-label">D25</span><span class="day-task">Frontend — layout, routing, connect to API, handle auth</span></div>
+        <div class="day-row"><span class="day-label">D26</span><span class="day-task">Polish UI — responsive design, loading states, error messages</span></div>
+        <div class="day-row"><span class="day-label">D27</span><span class="day-task">Deploy full stack — test on production URL, fix any cross-origin issues</span></div>
+        <div class="day-row"><span class="day-label">D28–30</span><span class="day-task">Write README + case study, add to portfolio, share on GitHub + LinkedIn</span></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Capstone ideas (pick one)</p>
+        <div class="project-card" style="background:var(--color-background-secondary);">
+          <p class="project-name">Job Tracker</p>
+          <p class="project-desc">Track job applications with status columns (applied, interview, offer). Auth + CRUD + filters.</p>
+        </div>
+        <div class="project-card" style="background:var(--color-background-secondary);">
+          <p class="project-name">Dev Blog Platform</p>
+          <p class="project-desc">Markdown blog with user accounts, post creation, and public reading view.</p>
+        </div>
+        <div class="project-card" style="background:var(--color-background-secondary);margin-bottom:0;">
+          <p class="project-name">Expense Splitter</p>
+          <p class="project-desc">Split bills between friends with group management and balance calculations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTCOME -->
+  <div class="week-panel" id="panel-4">
+    <div class="week-header">
+      <span class="week-badge" style="background:#E1F5EE;color:#085041;">Day 30</span>
+      <p class="week-title">What you'll walk away with</p>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <p class="card-title">Skills unlocked</p>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>HTML, CSS (Flexbox, Grid, responsive design)</div>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>JavaScript (DOM, async/await, fetch)</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>React (components, hooks, routing)</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>Node.js + Express (REST APIs, middleware)</div>
+        <div class="res-item"><span class="res-dot" style="background:#BA7517;"></span>MongoDB + Mongoose (schemas, CRUD)</div>
+        <div class="res-item"><span class="res-dot" style="background:#D85A30;"></span>JWT Authentication end-to-end</div>
+        <div class="res-item"><span class="res-dot" style="background:#E24B4A;"></span>Deployment (Vercel + Render)</div>
+        <div class="res-item"><span class="res-dot" style="background:#888780;"></span>Git + GitHub + README writing</div>
+      </div>
+      <div class="card">
+        <p class="card-title">Portfolio deliverables</p>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>Live portfolio site (Week 1)</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>Full-stack Notes App with auth (Week 3)</div>
+        <div class="res-item"><span class="res-dot" style="background:#BA7517;"></span>Capstone project — live URL + GitHub (Week 4)</div>
+        <p class="card-title" style="margin-top:1rem;">Next steps after day 30</p>
+        <div class="res-item"><span class="res-dot" style="background:#534AB7;"></span>Learn TypeScript (add to your stack)</div>
+        <div class="res-item"><span class="res-dot" style="background:#1D9E75;"></span>Explore Next.js for SSR</div>
+        <div class="res-item"><span class="res-dot" style="background:#BA7517;"></span>Start applying for internships / freelance gigs</div>
+      </div>
+    </div>
+    <div class="outcome-box">
+      <p class="outcome-title">Final outcome</p>
+      <ul class="outcome-list">
+        <li>You can build, deploy, and explain a complete MERN stack web application</li>
+        <li>You have 3 live projects to show in placements, internships, or freelance pitches</li>
+        <li>You understand how the frontend, backend, and database connect end-to-end</li>
+        <li>You're ready to dive into Next.js, TypeScript, or system design as your next track</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showWeek(index) {
+  document.querySelectorAll('.week-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.week-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === index);
+  });
+}
+</script>
