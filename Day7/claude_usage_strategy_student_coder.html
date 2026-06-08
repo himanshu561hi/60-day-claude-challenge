@@ -1,0 +1,217 @@
+
+<style>
+  .strategy-wrap { font-family: var(--font-sans); padding: 1.5rem 0; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-tertiary); margin: 0 0 8px; }
+  .hero-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 16px; }
+  .hero-icon { width: 52px; height: 52px; border-radius: var(--border-radius-lg); background: #EEEDFE; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hero-icon i { font-size: 26px; color: #534AB7; }
+  .hero-title { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .hero-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0; }
+  .model-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .model-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .model-card.featured { border: 2px solid #534AB7; }
+  .model-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--border-radius-md); margin-bottom: 8px; }
+  .badge-haiku { background: #EAF3DE; color: #3B6D11; }
+  .badge-sonnet { background: #EEEDFE; color: #3C3489; }
+  .badge-opus { background: #FAECE7; color: #993C1D; }
+  .badge-primary { background: #EEEDFE; color: #3C3489; font-size: 10px; padding: 2px 8px; border-radius: var(--border-radius-md); }
+  .model-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .model-desc { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 10px; line-height: 1.5; }
+  .model-use { font-size: 12px; color: var(--color-text-secondary); padding-left: 0; margin: 0; list-style: none; }
+  .model-use li { padding: 2px 0; display: flex; gap: 6px; }
+  .model-use li::before { content: "→"; color: var(--color-text-tertiary); flex-shrink: 0; }
+  .effort-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .effort-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+  .effort-label { font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .effort-freq { font-size: 11px; margin: 0 0 6px; }
+  .freq-rare { color: #993C1D; }
+  .freq-sometimes { color: #BA7517; }
+  .freq-often { color: #185FA5; }
+  .freq-main { color: #0F6E56; }
+  .effort-example { font-size: 11px; color: var(--color-text-secondary); margin: 0; line-height: 1.5; }
+  .table-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+  thead tr { background: var(--color-background-secondary); }
+  th { padding: 10px 12px; text-align: left; font-weight: 500; color: var(--color-text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 10px 12px; color: var(--color-text-primary); border-top: 0.5px solid var(--color-border-tertiary); vertical-align: top; line-height: 1.5; }
+  tr:hover td { background: var(--color-background-secondary); }
+  .pill { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .pill-haiku { background: #EAF3DE; color: #27500A; }
+  .pill-sonnet { background: #EEEDFE; color: #3C3489; }
+  .pill-opus { background: #FAECE7; color: #712B13; }
+  .pill-low { background: #E6F1FB; color: #0C447C; }
+  .pill-std { background: #EAF3DE; color: #27500A; }
+  .pill-high { background: #FAEEDA; color: #633806; }
+  .pill-max { background: #FAECE7; color: #712B13; }
+  .mistakes-list { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .mistake-item { display: flex; gap: 10px; padding: 8px 0; border-top: 0.5px solid var(--color-border-tertiary); font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+  .mistake-item:first-child { border-top: none; padding-top: 0; }
+  .mistake-num { width: 22px; height: 22px; border-radius: 50%; background: #FAECE7; color: #993C1D; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .final-card { background: #EEEDFE; border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; display: flex; gap: 16px; align-items: flex-start; }
+  .final-icon { font-size: 24px; color: #534AB7; flex-shrink: 0; margin-top: 2px; }
+  .final-title { font-size: 15px; font-weight: 500; color: #26215C; margin: 0 0 4px; }
+  .final-body { font-size: 13px; color: #3C3489; margin: 0; line-height: 1.6; }
+  h2 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 10px; }
+</style>
+
+<div class="strategy-wrap">
+  <h2 style="sr-only">My Claude Usage Strategy — Student Coder</h2>
+
+  <p class="section-label">Recommended primary model</p>
+  <div class="hero-card">
+    <div class="hero-icon"><i class="ti ti-code" aria-hidden="true"></i></div>
+    <div>
+      <p class="hero-title">Claude Sonnet 4.6 <span class="badge-primary">Primary pick</span></p>
+      <p class="hero-sub">The ideal balance of coding intelligence, speed, and cost for a daily-use student writing and debugging code.</p>
+    </div>
+  </div>
+
+  <p class="section-label">Model breakdown — when to use each</p>
+  <div class="model-grid">
+    <div class="model-card">
+      <span class="model-badge badge-haiku">Haiku 4.5</span>
+      <p class="model-name">Quick & light</p>
+      <p class="model-desc">Fastest, cheapest. Great for simple lookups when you don't need deep reasoning.</p>
+      <ul class="model-use">
+        <li>Quick syntax lookups</li>
+        <li>Short error messages explained</li>
+        <li>Simple "what does X mean?"</li>
+        <li>Boilerplate snippets</li>
+      </ul>
+    </div>
+    <div class="model-card featured">
+      <span class="model-badge badge-sonnet">Sonnet 4.6 ★</span>
+      <p class="model-name">Your daily driver</p>
+      <p class="model-desc">Strong reasoning + fast response. Handles the bulk of real coding work with ease.</p>
+      <ul class="model-use">
+        <li>Writing functions & classes</li>
+        <li>Debugging & error tracing</li>
+        <li>Code review & refactoring</li>
+        <li>Explaining concepts deeply</li>
+      </ul>
+    </div>
+    <div class="model-card">
+      <span class="model-badge badge-opus">Opus 4.6</span>
+      <p class="model-name">Deep & powerful</p>
+      <p class="model-desc">Most capable. Reserve for genuinely hard problems that Sonnet can't crack.</p>
+      <ul class="model-use">
+        <li>Complex algorithm design</li>
+        <li>Hard-to-trace multi-file bugs</li>
+        <li>System architecture decisions</li>
+        <li>Data structures / CS theory</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="section-label">Effort level guide</p>
+  <div class="effort-grid">
+    <div class="effort-card">
+      <p class="effort-label">Low</p>
+      <p class="effort-freq freq-rare">Use: rarely</p>
+      <p class="effort-example">Fast factual lookups. "What's the syntax for a list comprehension?"</p>
+    </div>
+    <div class="effort-card">
+      <p class="effort-label">Standard</p>
+      <p class="effort-freq freq-main">Use: most of the time</p>
+      <p class="effort-example">Everyday coding tasks — writing, explaining, fixing small bugs.</p>
+    </div>
+    <div class="effort-card">
+      <p class="effort-label">High</p>
+      <p class="effort-freq freq-often">Use: for hard problems</p>
+      <p class="effort-example">Debugging complex errors, understanding unfamiliar codebases, exam prep.</p>
+    </div>
+    <div class="effort-card">
+      <p class="effort-label">Max</p>
+      <p class="effort-freq freq-sometimes">Use: sparingly</p>
+      <p class="effort-example">Final project architecture, tricky algorithmic challenges, research papers.</p>
+    </div>
+  </div>
+
+  <p class="section-label">Personalized workflow table</p>
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col style="width: 26%">
+        <col style="width: 18%">
+        <col style="width: 18%">
+        <col style="width: 38%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Best model</th>
+          <th>Effort</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Quick syntax questions</td>
+          <td><span class="pill pill-haiku">Haiku</span></td>
+          <td><span class="pill pill-low">Low</span></td>
+          <td>Instant factual lookup — no deep reasoning needed</td>
+        </tr>
+        <tr>
+          <td>Writing new functions</td>
+          <td><span class="pill pill-sonnet">Sonnet</span></td>
+          <td><span class="pill pill-std">Standard</span></td>
+          <td>Sonnet writes clean, well-commented code at speed</td>
+        </tr>
+        <tr>
+          <td>Debugging errors</td>
+          <td><span class="pill pill-sonnet">Sonnet</span></td>
+          <td><span class="pill pill-high">High</span></td>
+          <td>Needs careful trace-through; extra effort pays off</td>
+        </tr>
+        <tr>
+          <td>Code review & refactoring</td>
+          <td><span class="pill pill-sonnet">Sonnet</span></td>
+          <td><span class="pill pill-std">Standard</span></td>
+          <td>Pattern recognition — Sonnet excels here at standard effort</td>
+        </tr>
+        <tr>
+          <td>Learning a new concept</td>
+          <td><span class="pill pill-sonnet">Sonnet</span></td>
+          <td><span class="pill pill-high">High</span></td>
+          <td>Deep explanations + analogies benefit from more thinking</td>
+        </tr>
+        <tr>
+          <td>Complex algorithm design</td>
+          <td><span class="pill pill-opus">Opus</span></td>
+          <td><span class="pill pill-high">High</span></td>
+          <td>Opus handles multi-step logic and trade-offs better</td>
+        </tr>
+        <tr>
+          <td>Project architecture planning</td>
+          <td><span class="pill pill-opus">Opus</span></td>
+          <td><span class="pill pill-max">Max</span></td>
+          <td>High-stakes decisions need the most thorough analysis</td>
+        </tr>
+        <tr>
+          <td>Exam / interview prep</td>
+          <td><span class="pill pill-sonnet">Sonnet</span></td>
+          <td><span class="pill pill-high">High</span></td>
+          <td>Generating practice problems + detailed explanations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="section-label">Biggest mistakes to avoid</p>
+  <div class="mistakes-list">
+    <div class="mistake-item"><span class="mistake-num">1</span><span>Using Opus for every task — it's slower and overkill for routine coding. Save it for genuinely hard problems.</span></div>
+    <div class="mistake-item"><span class="mistake-num">2</span><span>Pasting code with no context. Always say what the code should do, what's going wrong, and what you've already tried.</span></div>
+    <div class="mistake-item"><span class="mistake-num">3</span><span>Accepting the first answer without testing it. Claude can be confidently wrong — always run the code.</span></div>
+    <div class="mistake-item"><span class="mistake-num">4</span><span>Using Max effort for simple tasks — it wastes time and your usage limits without meaningful quality gain.</span></div>
+    <div class="mistake-item"><span class="mistake-num">5</span><span>Not asking "why" — don't just copy solutions. Ask Claude to explain the logic so you actually learn and grow.</span></div>
+  </div>
+
+  <p class="section-label">Final recommendation</p>
+  <div class="final-card">
+    <i class="ti ti-star final-icon" aria-hidden="true"></i>
+    <div>
+      <p class="final-title">One model, one setting: Sonnet 4.6 at Standard effort</p>
+      <p class="final-body">For a student coding daily, Sonnet 4.6 on Standard effort covers ~80% of your needs — fast enough to not break your flow, smart enough to handle real code. Upgrade effort to High when you're stuck on a bug or learning something new. Only reach for Opus on your hardest algorithmic or architecture challenges.</p>
+    </div>
+  </div>
+</div>
