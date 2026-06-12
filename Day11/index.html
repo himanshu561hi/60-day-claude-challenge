@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ATS Resume Optimizer — Rewrite your resume for maximum ATS alignment and recruiter relevance while maintaining 100% factual accuracy.">
+    <title>ATS Resume Optimizer & Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════
+           DESIGN SYSTEM — TOKENS & VARIABLES
+        ═══════════════════════════════════════════ */
+        :root {
+            /* Colors */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(20, 20, 32, 0.7);
+            --bg-card-hover: rgba(28, 28, 44, 0.8);
+            --bg-input: rgba(16, 16, 28, 0.9);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-focus: rgba(99, 102, 241, 0.5);
+            --text-primary: #f0f0f5;
+            --text-secondary: #9898b0;
+            --text-muted: #5c5c78;
+            --accent-indigo: #6366f1;
+            --accent-indigo-light: #818cf8;
+            --accent-violet: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --gradient-hero: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            --gradient-card: linear-gradient(145deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+            --gradient-score-high: linear-gradient(135deg, #10b981, #06b6d4);
+            --gradient-score-mid: linear-gradient(135deg, #f59e0b, #f97316);
+            --gradient-score-low: linear-gradient(135deg, #f43f5e, #e11d48);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-glow-indigo: 0 0 30px rgba(99, 102, 241, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ═══════════════════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════
+           ANIMATED BACKGROUND
+        ═══════════════════════════════════════════ */
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bg-mesh::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+            top: -200px;
+            right: -100px;
+            animation: float1 20s ease-in-out infinite;
+        }
+
+        .bg-mesh::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            bottom: -150px;
+            left: -100px;
+            animation: float2 25s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, 80px) scale(1.1); }
+            66% { transform: translate(-30px, 40px) scale(0.95); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-60px, -40px) scale(1.05); }
+            66% { transform: translate(40px, -80px) scale(0.9); }
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════
+           LAYOUT
+        ═══════════════════════════════════════════ */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 24px 80px;
+        }
+
+        /* ═══════════════════════════════════════════
+           HEADER / HERO
+        ═══════════════════════════════════════════ */
+        .hero {
+            text-align: center;
+            padding: 48px 0 40px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 999px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-indigo-light);
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+            letter-spacing: -0.03em;
+        }
+
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════
+           CARD / GLASS PANEL
+        ═══════════════════════════════════════════ */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            transition: border-color var(--transition-medium), box-shadow var(--transition-medium);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .section-title .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .section-title .icon.indigo { background: rgba(99, 102, 241, 0.15); }
+        .section-title .icon.violet { background: rgba(139, 92, 246, 0.15); }
+        .section-title .icon.cyan   { background: rgba(6, 182, 212, 0.15); }
+        .section-title .icon.emerald{ background: rgba(16, 185, 129, 0.15); }
+        .section-title .icon.amber  { background: rgba(245, 158, 11, 0.15); }
+        .section-title .icon.rose   { background: rgba(244, 63, 94, 0.15); }
+
+        /* ═══════════════════════════════════════════
+           INPUT AREAS
+        ═══════════════════════════════════════════ */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .input-grid { grid-template-columns: 1fr; }
+        }
+
+        .input-panel textarea {
+            width: 100%;
+            min-height: 320px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            resize: vertical;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            outline: none;
+        }
+
+        .input-panel textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-panel textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-panel .helper-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* ═══════════════════════════════════════════
+           BUTTONS
+        ═══════════════════════════════════════════ */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 36px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-primary {
+            background: var(--gradient-hero);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(99, 102, 241, 0.45);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: none;
+        }
+
+        .btn.loading .spinner { display: block; }
+        .btn.loading .btn-text { opacity: 0.6; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ═══════════════════════════════════════════
+           RESULTS AREA
+        ═══════════════════════════════════════════ */
+        .results-wrapper {
+            margin-top: 36px;
+            display: none;
+            animation: fadeUp 0.6s ease-out;
+        }
+
+        .results-wrapper.visible { display: block; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Score Ring ── */
+        .score-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .score-ring-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 16px;
+        }
+
+        .score-ring-container svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .score-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 10;
+        }
+
+        .score-ring-fill {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
+        }
+
+        .score-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-value .number {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        .score-value .label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        .score-section .score-desc {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* ── Gap Analysis ── */
+        .gap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .gap-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: border-color var(--transition-medium), transform var(--transition-medium);
+        }
+
+        .gap-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .gap-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gap-card .count-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+        }
+
+        .gap-card .count-badge.amber {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+        }
+
+        .gap-card .count-badge.emerald {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+        }
+
+        .gap-list {
+            list-style: none;
+        }
+
+        .gap-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .gap-list li:last-child { border-bottom: none; }
+
+        .gap-list li .bullet {
+            flex-shrink: 0;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-top: 8px;
+        }
+
+        .gap-list li .bullet.rose    { background: var(--accent-rose); }
+        .gap-list li .bullet.amber   { background: var(--accent-amber); }
+        .gap-list li .bullet.emerald { background: var(--accent-emerald); }
+
+        .gap-empty {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-style: italic;
+            padding: 8px 0;
+        }
+
+        /* ── Matched Keywords ── */
+        .matched-keywords {
+            margin-bottom: 32px;
+        }
+
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .keyword-tag {
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: transform var(--transition-fast);
+        }
+
+        .keyword-tag:hover { transform: scale(1.05); }
+
+        .keyword-tag.matched {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: var(--accent-emerald);
+        }
+
+        .keyword-tag.missing {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            color: var(--accent-rose);
+        }
+
+        /* ── Optimized Resume ── */
+        .resume-output-card {
+            position: relative;
+        }
+
+        .resume-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .resume-actions .btn {
+            padding: 10px 22px;
+            font-size: 0.85rem;
+        }
+
+        .resume-content {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .resume-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .resume-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .resume-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .resume-content h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .resume-content .contact-line {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 16px;
+        }
+
+        .resume-content h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--accent-indigo-light);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+            padding-bottom: 6px;
+            margin: 24px 0 12px;
+        }
+
+        .resume-content h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 14px 0 4px;
+        }
+
+        .resume-content p {
+            color: var(--text-secondary);
+            margin: 4px 0;
+        }
+
+        .resume-content ul {
+            padding-left: 20px;
+            color: var(--text-secondary);
+        }
+
+        .resume-content ul li {
+            margin: 4px 0;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(16, 185, 129, 0.95);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: transform var(--transition-medium);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer a {
+            color: var(--accent-indigo-light);
+            text-decoration: none;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+        /* ── Progress Steps ── */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin: 28px 0 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .progress-step .step-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 2px solid var(--border-subtle);
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            transition: all var(--transition-medium);
+        }
+
+        .progress-step .step-line {
+            width: 60px;
+            height: 2px;
+            background: var(--border-subtle);
+            transition: background var(--transition-medium);
+        }
+
+        .progress-step.active .step-circle {
+            border-color: var(--accent-indigo);
+            color: var(--accent-indigo-light);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .progress-step.done .step-circle {
+            border-color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+        }
+
+        .progress-step.done .step-line,
+        .progress-step.active .step-line {
+            background: var(--accent-indigo);
+        }
+
+        .step-labels {
+            display: flex;
+            justify-content: center;
+            gap: 46px;
+            margin-bottom: 28px;
+        }
+
+        .step-labels span {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .step-labels span.active { color: var(--accent-indigo-light); }
+        .step-labels span.done   { color: var(--accent-emerald); }
+
+        /* ═══════════════════════════════════════════
+           PRINT STYLES
+        ═══════════════════════════════════════════ */
+        @media print {
+            body { background: #fff; color: #000; }
+            .bg-mesh, .bg-grid, .hero, .input-grid, .btn-container,
+            .gap-grid, .matched-keywords, .score-section,
+            .resume-actions, .footer, .progress-bar, .step-labels,
+            .toast { display: none !important; }
+            .results-wrapper { display: block !important; }
+            .glass-card { background: none; border: none; box-shadow: none; padding: 0; }
+            .resume-content {
+                background: none;
+                border: none;
+                max-height: none;
+                padding: 0;
+                color: #000;
+            }
+            .resume-content h1 { color: #000; }
+            .resume-content h2 { color: #222; border-color: #333; }
+            .resume-content h3 { color: #111; }
+            .resume-content p, .resume-content ul { color: #333; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Animated Background -->
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<div class="app-container">
+
+    <!-- ═══════ HERO ═══════ -->
+    <header class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            ATS-Optimized • 100% Factual
+        </div>
+        <h1>ATS Resume Optimizer<br>& Generator</h1>
+        <p>Rewrite your resume for maximum ATS alignment and recruiter relevance — while maintaining complete factual accuracy. Never invents experience, only optimizes.</p>
+    </header>
+
+    <!-- ═══════ PROGRESS BAR ═══════ -->
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-step active" data-step="1">
+            <span class="step-circle">1</span>
+            <span class="step-line"></span>
+        </div>
+        <div class="progress-step" data-step="2">
+            <span class="step-circle">2</span>
+            <span class="step-line"></span>
+        </div>
+        <div class="progress-step" data-step="3">
+            <span class="step-circle">3</span>
+        </div>
+    </div>
+    <div class="step-labels">
+        <span class="active">Input</span>
+        <span>Analyze</span>
+        <span>Results</span>
+    </div>
+
+    <!-- ═══════ INPUT SECTION ═══════ -->
+    <div class="input-grid">
+        <div class="input-panel glass-card">
+            <div class="section-title">
+                <span class="icon indigo">📄</span>
+                Your Current Resume
+            </div>
+            <textarea
+                id="resumeInput"
+                placeholder="Paste your existing resume here...
+
+Example:
+John Doe
+john@email.com | (555) 123-4567
+
+EXPERIENCE
+Software Engineer at TechCorp (2021–Present)
+• Built REST APIs using Node.js and Express
+• Reduced page load time by 40%
+• Collaborated with cross-functional teams
+
+SKILLS
+JavaScript, Python, React, Node.js, SQL
+
+EDUCATION
+B.S. Computer Science, State University (2021)"
+                spellcheck="false"
+            ></textarea>
+            <div class="helper-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                Paste your complete resume — all sections will be preserved.
+            </div>
+        </div>
+
+        <div class="input-panel glass-card">
+            <div class="section-title">
+                <span class="icon violet">🎯</span>
+                Target Job Description
+            </div>
+            <textarea
+                id="jdInput"
+                placeholder="Paste the job description here...
+
+Example:
+Senior Frontend Engineer — Acme Inc.
+
+We are looking for a Senior Frontend Engineer with 3+ years of experience building scalable web applications.
+
+Requirements:
+• Proficiency in React, TypeScript, Next.js
+• Experience with RESTful APIs and GraphQL
+• Strong understanding of CI/CD pipelines
+• Knowledge of cloud platforms (AWS, GCP)
+• Excellent communication skills
+
+Nice to have:
+• Experience with micro-frontend architecture
+• Familiarity with design systems"
+                spellcheck="false"
+            ></textarea>
+            <div class="helper-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                Paste the full JD for the best keyword analysis.
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ ACTION BUTTON ═══════ -->
+    <div class="btn-container">
+        <button class="btn btn-primary" id="optimizeBtn" onclick="optimizeResume()">
+            <span class="spinner"></span>
+            <span class="btn-text">🚀 Optimize Resume</span>
+        </button>
+        <button class="btn btn-secondary" id="clearBtn" onclick="clearAll()">
+            🗑️ Clear All
+        </button>
+    </div>
+
+    <!-- ═══════ RESULTS ═══════ -->
+    <div class="results-wrapper" id="resultsWrapper">
+
+        <!-- ATS Match Score -->
+        <div class="glass-card score-section">
+            <div class="section-title" style="justify-content:center;">
+                <span class="icon emerald">📊</span>
+                ATS Match Score
+            </div>
+            <div class="score-ring-container">
+                <svg viewBox="0 0 120 120">
+                    <circle class="score-ring-bg" cx="60" cy="60" r="52"/>
+                    <circle class="score-ring-fill" id="scoreRing" cx="60" cy="60" r="52"
+                        stroke-dasharray="326.73"
+                        stroke-dashoffset="326.73"/>
+                </svg>
+                <div class="score-value">
+                    <span class="number" id="scoreNumber">0</span>
+                    <span class="label">ATS Score</span>
+                </div>
+            </div>
+            <p class="score-desc" id="scoreDesc"></p>
+        </div>
+
+        <!-- Keyword Match Visualization -->
+        <div class="glass-card matched-keywords">
+            <div class="section-title">
+                <span class="icon cyan">🔑</span>
+                Keyword Match Overview
+            </div>
+            <div class="keyword-tags" id="keywordTags"></div>
+        </div>
+
+        <!-- Gap Analysis -->
+        <div class="gap-grid" id="gapGrid">
+            <div class="gap-card" id="missingKeywordsCard">
+                <h3>
+                    <span>🔍 Missing Keywords</span>
+                    <span class="count-badge" id="missingKeywordsCount">0</span>
+                </h3>
+                <ul class="gap-list" id="missingKeywordsList"></ul>
+            </div>
+            <div class="gap-card" id="missingSkillsCard">
+                <h3>
+                    <span>⚡ Missing Skills</span>
+                    <span class="count-badge amber" id="missingSkillsCount">0</span>
+                </h3>
+                <ul class="gap-list" id="missingSkillsList"></ul>
+            </div>
+            <div class="gap-card" id="improvementsCard">
+                <h3>
+                    <span>💡 Improvement Opportunities</span>
+                    <span class="count-badge emerald" id="improvementsCount">0</span>
+                </h3>
+                <ul class="gap-list" id="improvementsList"></ul>
+            </div>
+        </div>
+
+        <!-- Optimized Resume -->
+        <div class="glass-card resume-output-card">
+            <div class="section-title">
+                <span class="icon indigo">✨</span>
+                Optimized Resume
+            </div>
+            <div class="resume-actions">
+                <button class="btn btn-secondary" onclick="copyResume()">📋 Copy to Clipboard</button>
+                <button class="btn btn-secondary" onclick="downloadResume()">⬇️ Download as .txt</button>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Print / PDF</button>
+            </div>
+            <div class="resume-content" id="resumeOutput"></div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        Day 11 — 60-Day Claude Challenge &nbsp;•&nbsp; ATS Resume Optimizer &amp; Generator
+    </footer>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   ATS RESUME OPTIMIZER — ENGINE
+═══════════════════════════════════════════════════════ */
+
+// ── Stop-words to exclude from keyword extraction ──
+const STOP_WORDS = new Set([
+    'a','an','the','and','or','but','in','on','at','to','for','of','with','by','from',
+    'is','are','was','were','be','been','being','have','has','had','having','do','does',
+    'did','will','would','shall','should','may','might','must','can','could','need',
+    'about','above','after','again','all','also','am','any','as','because','before',
+    'below','between','both','during','each','few','further','get','got','he','her',
+    'here','hers','herself','him','himself','his','how','i','if','into','it','its',
+    'itself','just','know','let','like','me','mine','more','most','my','myself','no',
+    'nor','not','now','off','once','only','other','our','ours','ourselves','out','over',
+    'own','per','same','she','so','some','such','than','that','their','theirs','them',
+    'themselves','then','there','these','they','this','those','through','too','under',
+    'until','up','us','very','we','what','when','where','which','while','who','whom',
+    'why','you','your','yours','yourself','yourselves','able','across','along','already',
+    'another','around','become','becomes','began','begin','begun','behind','besides',
+    'best','better','beyond','come','coming','consider','could','day','doesn','don',
+    'down','either','else','end','enough','even','every','find','first','going','gone',
+    'good','great','help','however','include','including','instead','keep','last','less',
+    'long','look','looking','lot','make','making','many','much','new','next','often',
+    'one','part','people','place','point','put','rather','really','right','see','seem',
+    'several','since','something','still','sure','take','tell','thing','think','thought',
+    'three','time','today','together','told','two','upon','used','using','want','way',
+    'well','went','whether','within','without','work','working','world','year','years',
+    'yet','job','role','team','join','company','position','candidate','ideal','required',
+    'requirements','responsibilities','responsibility','qualifications','qualification',
+    'minimum','preferred','preferred','etc','e.g','i.e','via','www','com','org','http',
+    'https','ability','strong','proven','excellent','experience','experienced','based',
+    'description','apply','application','opportunity','benefits','salary','equal',
+    'employer','employment','report','reporting','responsible','demonstrates',
+    'demonstrated','ensure','high','key','level','manage','management','multiple',
+    'perform','provide','provides','providing','related','skills','skill','support',
+    'supporting','understanding','various','will','working','environment','detail',
+    'details','detailed','knowledge','knowledgeable','plus','familiarity','familiar'
+]);
+
+// ── Known technical skills dictionary ──
+const TECH_SKILLS = [
+    'javascript','typescript','python','java','c\\+\\+','c#','ruby','go','golang','rust',
+    'swift','kotlin','php','scala','r','matlab','perl','sql','nosql','html','css','sass',
+    'less','react','reactjs','react.js','angular','angularjs','vue','vuejs','vue.js',
+    'next.js','nextjs','nuxt','nuxt.js','svelte','gatsby','remix','node.js','nodejs',
+    'node','express','express.js','django','flask','fastapi','spring','spring boot',
+    'springboot','.net','asp.net','rails','ruby on rails','laravel','nestjs','nest.js',
+    'graphql','rest','restful','api','apis','microservices','micro-frontend',
+    'aws','amazon web services','gcp','google cloud','azure','cloud','docker',
+    'kubernetes','k8s','terraform','ansible','jenkins','ci/cd','ci cd','github actions',
+    'gitlab','circleci','travis','devops','linux','unix','bash','shell',
+    'mongodb','mysql','postgresql','postgres','redis','elasticsearch','dynamodb',
+    'cassandra','firebase','supabase','sqlite','oracle','sql server',
+    'git','github','gitlab','bitbucket','jira','confluence','slack','figma',
+    'agile','scrum','kanban','tdd','bdd','oop','functional programming',
+    'machine learning','ml','deep learning','ai','artificial intelligence',
+    'nlp','natural language processing','computer vision','tensorflow','pytorch',
+    'keras','scikit-learn','pandas','numpy','data science','data engineering',
+    'data analysis','data analytics','etl','spark','hadoop','kafka','airflow',
+    'tableau','power bi','looker',
+    'webpack','vite','rollup','babel','eslint','prettier','jest','mocha','chai',
+    'cypress','selenium','playwright','testing','unit testing','integration testing',
+    'e2e','end-to-end','storybook','design system','design systems',
+    'oauth','jwt','authentication','authorization','security','encryption',
+    'responsive design','mobile','ios','android','react native','flutter',
+    'electron','pwa','progressive web app','seo',
+    'communication','leadership','problem solving','problem-solving',
+    'collaboration','teamwork','mentoring','stakeholder','stakeholders',
+    'project management','product management','cross-functional'
+];
+
+/**
+ * Extract meaningful keywords from text
+ */
+function extractKeywords(text) {
+    const lower = text.toLowerCase();
+    const found = new Set();
+
+    // First pass: extract multi-word technical skills
+    for (const skill of TECH_SKILLS) {
+        const regex = new RegExp('\\b' + skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+        if (regex.test(lower)) {
+            found.add(skill.replace(/\\\+/g, '+'));
+        }
+    }
+
+    // Second pass: single-word extraction (nouns, technical terms)
+    const words = lower.match(/[a-z][a-z0-9#+./-]{1,}/g) || [];
+    for (const w of words) {
+        const clean = w.replace(/[^a-z0-9#+]/g, '');
+        if (clean.length > 2 && !STOP_WORDS.has(clean)) {
+            found.add(clean);
+        }
+    }
+
+    return found;
+}
+
+/**
+ * Extract hard / technical skills specifically
+ */
+function extractSkills(text) {
+    const lower = text.toLowerCase();
+    const skills = new Set();
+    for (const skill of TECH_SKILLS) {
+        const regex = new RegExp('\\b' + skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+        if (regex.test(lower)) {
+            skills.add(skill.replace(/\\\+/g, '+'));
+        }
+    }
+    return skills;
+}
+
+/**
+ * Parse resume into structured sections
+ */
+function parseResume(text) {
+    const lines = text.split('\n');
+    const sections = {
+        name: '',
+        contact: '',
+        summary: '',
+        skills: '',
+        experience: '',
+        projects: '',
+        education: '',
+        certifications: '',
+        achievements: '',
+        other: ''
+    };
+
+    const sectionPatterns = [
+        { key: 'summary',        regex: /^(professional\s*summary|summary|profile|objective|about)/i },
+        { key: 'skills',         regex: /^(skills|technical\s*skills|core\s*competencies|technologies|tech\s*stack)/i },
+        { key: 'experience',     regex: /^(experience|work\s*experience|professional\s*experience|employment|work\s*history)/i },
+        { key: 'projects',       regex: /^(projects|personal\s*projects|key\s*projects|notable\s*projects|side\s*projects)/i },
+        { key: 'education',      regex: /^(education|academic|academics|degree)/i },
+        { key: 'certifications', regex: /^(certifications?|licenses?|credentials?)/i },
+        { key: 'achievements',   regex: /^(achievements?|awards?|honors?|accomplishments?|publications?)/i },
+    ];
+
+    let currentSection = 'other';
+    let nameFound = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Try to detect name (first non-empty line that's not a section header)
+        if (!nameFound && line.length > 0) {
+            let isSection = false;
+            for (const sp of sectionPatterns) {
+                if (sp.regex.test(line.replace(/[#\-=_*]/g, '').trim())) {
+                    isSection = true;
+                    break;
+                }
+            }
+            if (!isSection) {
+                // Check if it looks like a name (not too long, no special format)
+                const cleanLine = line.replace(/[#*_]/g, '').trim();
+                if (cleanLine.length < 60 && !/[@|•·,]/.test(cleanLine) && /^[A-Z]/.test(cleanLine)) {
+                    sections.name = cleanLine;
+                    nameFound = true;
+                    continue;
+                }
+            }
+        }
+
+        // Detect contact info
+        if (nameFound && !sections.contact && /[@|•·]/.test(line) && (line.includes('@') || /\d{3}/.test(line) || /linkedin|github/i.test(line))) {
+            sections.contact = line.replace(/[#*_]/g, '').trim();
+            continue;
+        }
+
+        // Detect section headers
+        const cleanedLine = line.replace(/[#\-=_*:]/g, '').trim();
+        let matched = false;
+        for (const sp of sectionPatterns) {
+            if (sp.regex.test(cleanedLine)) {
+                currentSection = sp.key;
+                matched = true;
+                break;
+            }
+        }
+
+        if (!matched) {
+            sections[currentSection] += line + '\n';
+        }
+    }
+
+    // Clean up
+    for (const key of Object.keys(sections)) {
+        sections[key] = sections[key].trim();
+    }
+
+    return sections;
+}
+
+/**
+ * Generate improvement opportunities
+ */
+function generateImprovements(resumeText, jdText, resumeSections) {
+    const improvements = [];
+
+    // Check for action verbs
+    const actionVerbs = ['led','built','developed','designed','implemented','created','launched','managed',
+        'optimized','reduced','increased','improved','delivered','architected','automated','streamlined',
+        'spearheaded','orchestrated','pioneered','transformed','accelerated','established','mentored'];
+    const hasActionVerbs = actionVerbs.some(v => resumeText.toLowerCase().includes(v));
+    if (!hasActionVerbs) {
+        improvements.push('Start bullet points with strong action verbs (e.g., "Built", "Led", "Optimized", "Reduced") to demonstrate impact.');
+    }
+
+    // Check for metrics
+    const hasMetrics = /\d+%|\$\d|reduced|increased|improved\s+by|savings?|revenue|growth/i.test(resumeText);
+    if (!hasMetrics) {
+        improvements.push('Quantify achievements with metrics (e.g., "Reduced load time by 40%", "Managed $500K budget") to show measurable impact.');
+    }
+
+    // Check for summary
+    if (!resumeSections.summary) {
+        improvements.push('Add a Professional Summary section — a 2-3 sentence pitch tailored to the target role.');
+    }
+
+    // Check for skills section
+    if (!resumeSections.skills) {
+        improvements.push('Add a dedicated Skills section listing key technologies and competencies aligned with the JD.');
+    }
+
+    // Check for projects section
+    if (!resumeSections.projects && /projects?/i.test(jdText)) {
+        improvements.push('Consider adding a Projects section to showcase relevant work beyond your employment history.');
+    }
+
+    // Check for certifications if JD mentions them
+    if (!resumeSections.certifications && /certif/i.test(jdText)) {
+        improvements.push('The JD mentions certifications — consider adding a Certifications section if you have any relevant ones.');
+    }
+
+    // Check formatting
+    if (resumeText.length < 300) {
+        improvements.push('Your resume appears very brief. Expand each role with 3-5 bullet points describing your contributions and impact.');
+    }
+
+    // Check for keyword density
+    const jdKeywords = extractKeywords(jdText);
+    const resumeKeywords = extractKeywords(resumeText);
+    const matchRate = [...jdKeywords].filter(k => resumeKeywords.has(k)).length / (jdKeywords.size || 1);
+    if (matchRate < 0.4) {
+        improvements.push('Keyword density is low. Naturally integrate more JD-relevant terms into your experience descriptions.');
+    }
+
+    // Check for ATS formatting issues
+    if (/[│┃┆┇║╔╗╚╝═]|[\u2500-\u257F]/.test(resumeText)) {
+        improvements.push('Remove special box-drawing characters — ATS systems may not parse them correctly.');
+    }
+
+    if (/\t/.test(resumeText)) {
+        improvements.push('Replace tabs with spaces for consistent ATS-friendly formatting.');
+    }
+
+    return improvements;
+}
+
+/**
+ * Build the optimized resume text
+ */
+function buildOptimizedResume(sections, jdKeywords, jdSkills, resumeSkills) {
+    const allResumeSkills = [...resumeSkills];
+
+    // Organize skills into categories
+    const skillCategories = {
+        'Languages': [],
+        'Frameworks & Libraries': [],
+        'Databases': [],
+        'Cloud & DevOps': [],
+        'Tools & Platforms': [],
+        'Methodologies': [],
+        'Soft Skills': []
+    };
+
+    const langPatterns = /^(javascript|typescript|python|java|c\+\+|c#|ruby|go|golang|rust|swift|kotlin|php|scala|r|matlab|perl|sql|nosql|html|css|sass|less|bash|shell)$/i;
+    const frameworkPatterns = /^(react|reactjs|react\.js|angular|angularjs|vue|vuejs|vue\.js|next\.js|nextjs|nuxt|svelte|gatsby|remix|node\.js|nodejs|node|express|express\.js|django|flask|fastapi|spring|spring boot|\.net|asp\.net|rails|ruby on rails|laravel|nestjs|nest\.js|graphql|rest|restful|api|microservices|micro-frontend|webpack|vite|rollup|babel|jquery|bootstrap|tailwind|material ui|storybook|design system|react native|flutter|electron)$/i;
+    const dbPatterns = /^(mongodb|mysql|postgresql|postgres|redis|elasticsearch|dynamodb|cassandra|firebase|supabase|sqlite|oracle|sql server)$/i;
+    const cloudPatterns = /^(aws|amazon web services|gcp|google cloud|azure|cloud|docker|kubernetes|k8s|terraform|ansible|jenkins|ci\/cd|ci cd|github actions|gitlab|circleci|travis|devops|linux|unix)$/i;
+    const toolPatterns = /^(git|github|gitlab|bitbucket|jira|confluence|slack|figma|tableau|power bi|looker|jest|mocha|chai|cypress|selenium|playwright|eslint|prettier|spark|hadoop|kafka|airflow|tensorflow|pytorch|keras|scikit-learn|pandas|numpy)$/i;
+    const methodPatterns = /^(agile|scrum|kanban|tdd|bdd|oop|functional programming|testing|unit testing|integration testing|e2e|end-to-end|seo|etl|data science|data engineering|data analysis|machine learning|ml|deep learning|ai|nlp|computer vision|responsive design|pwa|oauth|jwt|authentication|security)$/i;
+    const softPatterns = /^(communication|leadership|problem solving|problem-solving|collaboration|teamwork|mentoring|stakeholder|stakeholders|project management|product management|cross-functional)$/i;
+
+    for (const skill of allResumeSkills) {
+        if (langPatterns.test(skill)) skillCategories['Languages'].push(skill);
+        else if (frameworkPatterns.test(skill)) skillCategories['Frameworks & Libraries'].push(skill);
+        else if (dbPatterns.test(skill)) skillCategories['Databases'].push(skill);
+        else if (cloudPatterns.test(skill)) skillCategories['Cloud & DevOps'].push(skill);
+        else if (toolPatterns.test(skill)) skillCategories['Tools & Platforms'].push(skill);
+        else if (methodPatterns.test(skill)) skillCategories['Methodologies'].push(skill);
+        else if (softPatterns.test(skill)) skillCategories['Soft Skills'].push(skill);
+        else skillCategories['Tools & Platforms'].push(skill);
+    }
+
+    // Capitalize skill names nicely
+    function capitalize(s) {
+        const specialCases = {
+            'javascript': 'JavaScript', 'typescript': 'TypeScript', 'nodejs': 'Node.js',
+            'node.js': 'Node.js', 'node': 'Node.js', 'reactjs': 'React.js', 'react.js': 'React.js',
+            'react': 'React', 'vuejs': 'Vue.js', 'vue.js': 'Vue.js', 'vue': 'Vue',
+            'angularjs': 'AngularJS', 'angular': 'Angular', 'nextjs': 'Next.js', 'next.js': 'Next.js',
+            'nuxt': 'Nuxt.js', 'nuxt.js': 'Nuxt.js', 'expressjs': 'Express.js', 'express.js': 'Express.js',
+            'express': 'Express', 'nestjs': 'NestJS', 'nest.js': 'NestJS', 'graphql': 'GraphQL',
+            'restful': 'RESTful', 'rest': 'REST', 'api': 'API', 'apis': 'APIs',
+            'aws': 'AWS', 'gcp': 'GCP', 'sql': 'SQL', 'nosql': 'NoSQL', 'css': 'CSS',
+            'html': 'HTML', 'sass': 'SASS', 'less': 'LESS', 'php': 'PHP',
+            'ci/cd': 'CI/CD', 'ci cd': 'CI/CD', 'tdd': 'TDD', 'bdd': 'BDD', 'oop': 'OOP',
+            'mongodb': 'MongoDB', 'mysql': 'MySQL', 'postgresql': 'PostgreSQL',
+            'postgres': 'PostgreSQL', 'redis': 'Redis', 'elasticsearch': 'Elasticsearch',
+            'dynamodb': 'DynamoDB', 'firebase': 'Firebase', 'supabase': 'Supabase',
+            'sqlite': 'SQLite', 'docker': 'Docker', 'kubernetes': 'Kubernetes',
+            'k8s': 'Kubernetes', 'terraform': 'Terraform', 'ansible': 'Ansible',
+            'jenkins': 'Jenkins', 'github actions': 'GitHub Actions', 'gitlab': 'GitLab',
+            'github': 'GitHub', 'bitbucket': 'Bitbucket', 'jira': 'Jira',
+            'figma': 'Figma', 'linux': 'Linux', 'unix': 'Unix', 'bash': 'Bash',
+            'git': 'Git', 'jwt': 'JWT', 'oauth': 'OAuth', 'seo': 'SEO',
+            'pwa': 'PWA', 'etl': 'ETL', 'ml': 'ML', 'ai': 'AI', 'nlp': 'NLP',
+            'devops': 'DevOps', 'golang': 'Go', 'go': 'Go', 'rust': 'Rust',
+            'swift': 'Swift', 'kotlin': 'Kotlin', 'scala': 'Scala', 'ruby': 'Ruby',
+            'python': 'Python', 'java': 'Java', 'c#': 'C#', 'c++': 'C++',
+            'r': 'R', 'perl': 'Perl', 'matlab': 'MATLAB',
+            'jest': 'Jest', 'mocha': 'Mocha', 'chai': 'Chai', 'cypress': 'Cypress',
+            'selenium': 'Selenium', 'playwright': 'Playwright',
+            'webpack': 'Webpack', 'vite': 'Vite', 'rollup': 'Rollup', 'babel': 'Babel',
+            'eslint': 'ESLint', 'prettier': 'Prettier',
+            'tensorflow': 'TensorFlow', 'pytorch': 'PyTorch', 'keras': 'Keras',
+            'scikit-learn': 'Scikit-learn', 'pandas': 'Pandas', 'numpy': 'NumPy',
+            'spark': 'Apache Spark', 'hadoop': 'Hadoop', 'kafka': 'Apache Kafka',
+            'airflow': 'Apache Airflow', 'tableau': 'Tableau', 'power bi': 'Power BI',
+            'looker': 'Looker', 'confluence': 'Confluence', 'slack': 'Slack',
+            'agile': 'Agile', 'scrum': 'Scrum', 'kanban': 'Kanban',
+            'micro-frontend': 'Micro-Frontend', 'microservices': 'Microservices',
+            'svelte': 'Svelte', 'gatsby': 'Gatsby', 'remix': 'Remix',
+            'django': 'Django', 'flask': 'Flask', 'fastapi': 'FastAPI',
+            'spring': 'Spring', 'spring boot': 'Spring Boot', '.net': '.NET',
+            'asp.net': 'ASP.NET', 'rails': 'Rails', 'ruby on rails': 'Ruby on Rails',
+            'laravel': 'Laravel', 'react native': 'React Native', 'flutter': 'Flutter',
+            'electron': 'Electron', 'storybook': 'Storybook',
+            'amazon web services': 'Amazon Web Services', 'google cloud': 'Google Cloud',
+            'azure': 'Azure', 'oracle': 'Oracle', 'sql server': 'SQL Server',
+            'cassandra': 'Cassandra', 'shell': 'Shell Scripting',
+            'responsive design': 'Responsive Design',
+            'machine learning': 'Machine Learning', 'deep learning': 'Deep Learning',
+            'artificial intelligence': 'Artificial Intelligence',
+            'natural language processing': 'Natural Language Processing',
+            'computer vision': 'Computer Vision',
+            'data science': 'Data Science', 'data engineering': 'Data Engineering',
+            'data analysis': 'Data Analysis', 'data analytics': 'Data Analytics',
+            'functional programming': 'Functional Programming',
+            'unit testing': 'Unit Testing', 'integration testing': 'Integration Testing',
+            'end-to-end': 'End-to-End Testing', 'e2e': 'E2E Testing',
+            'design system': 'Design Systems', 'design systems': 'Design Systems',
+            'progressive web app': 'Progressive Web App',
+            'authentication': 'Authentication', 'authorization': 'Authorization',
+            'security': 'Security', 'encryption': 'Encryption',
+            'communication': 'Communication', 'leadership': 'Leadership',
+            'problem solving': 'Problem Solving', 'problem-solving': 'Problem Solving',
+            'collaboration': 'Collaboration', 'teamwork': 'Teamwork',
+            'mentoring': 'Mentoring', 'cross-functional': 'Cross-Functional',
+            'project management': 'Project Management',
+            'product management': 'Product Management',
+            'stakeholder': 'Stakeholder Management', 'stakeholders': 'Stakeholder Management',
+            'cloud': 'Cloud Computing', 'mobile': 'Mobile Development',
+            'ios': 'iOS', 'android': 'Android',
+            'testing': 'Testing', 'circleci': 'CircleCI', 'travis': 'Travis CI'
+        };
+        return specialCases[s.toLowerCase()] || s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    // Build HTML
+    let html = '';
+
+    // Name
+    html += `<h1>${escapeHtml(sections.name || 'YOUR NAME')}</h1>\n`;
+
+    // Contact
+    html += `<div class="contact-line">${escapeHtml(sections.contact || 'Phone | Email | LinkedIn | GitHub')}</div>\n`;
+
+    // Professional Summary
+    html += `<h2>PROFESSIONAL SUMMARY</h2>\n`;
+    if (sections.summary) {
+        html += `<p>${enhanceText(sections.summary, jdKeywords)}</p>\n`;
+    } else {
+        // Generate a basic summary from experience
+        html += `<p>${generateSummary(sections, jdKeywords)}</p>\n`;
+    }
+
+    // Skills
+    html += `<h2>SKILLS</h2>\n`;
+    let hasSkillContent = false;
+    for (const [category, items] of Object.entries(skillCategories)) {
+        if (items.length > 0) {
+            hasSkillContent = true;
+            const uniqueItems = [...new Set(items.map(i => capitalize(i)))];
+            html += `<p><strong>${category}:</strong> ${uniqueItems.join(', ')}</p>\n`;
+        }
+    }
+    if (!hasSkillContent && sections.skills) {
+        html += `<p>${escapeHtml(sections.skills)}</p>\n`;
+    } else if (!hasSkillContent) {
+        html += `<p><em>Add your skills here aligned with the job description.</em></p>\n`;
+    }
+
+    // Experience
+    html += `<h2>EXPERIENCE</h2>\n`;
+    if (sections.experience) {
+        html += formatExperienceSection(sections.experience, jdKeywords);
+    } else {
+        html += `<p><em>Add your work experience here.</em></p>\n`;
+    }
+
+    // Projects
+    html += `<h2>PROJECTS</h2>\n`;
+    if (sections.projects) {
+        html += formatExperienceSection(sections.projects, jdKeywords);
+    } else {
+        html += `<p><em>Add relevant projects here.</em></p>\n`;
+    }
+
+    // Education
+    html += `<h2>EDUCATION</h2>\n`;
+    if (sections.education) {
+        html += `<p>${escapeHtml(sections.education).replace(/\n/g, '<br>')}</p>\n`;
+    } else {
+        html += `<p><em>Add your education here.</em></p>\n`;
+    }
+
+    // Certifications
+    html += `<h2>CERTIFICATIONS</h2>\n`;
+    if (sections.certifications) {
+        html += `<p>${escapeHtml(sections.certifications).replace(/\n/g, '<br>')}</p>\n`;
+    } else {
+        html += `<p><em>Add relevant certifications here.</em></p>\n`;
+    }
+
+    // Achievements
+    html += `<h2>ACHIEVEMENTS</h2>\n`;
+    if (sections.achievements) {
+        html += `<p>${escapeHtml(sections.achievements).replace(/\n/g, '<br>')}</p>\n`;
+    } else if (sections.other && sections.other.length > 20) {
+        html += `<p>${escapeHtml(sections.other).replace(/\n/g, '<br>')}</p>\n`;
+    } else {
+        html += `<p><em>Add notable achievements here.</em></p>\n`;
+    }
+
+    return html;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function enhanceText(text, jdKeywords) {
+    let enhanced = escapeHtml(text);
+    // Clean up bullet chars
+    enhanced = enhanced.replace(/^[•\-\*]\s*/gm, '');
+    return enhanced;
+}
+
+function generateSummary(sections, jdKeywords) {
+    const exp = sections.experience || '';
+    const skills = sections.skills || '';
+    const keySkills = [...extractSkills(skills + ' ' + exp)].slice(0, 5);
+
+    if (keySkills.length > 0) {
+        return `Results-driven professional with expertise in ${keySkills.slice(0, 3).join(', ')}. Proven ability to deliver high-quality solutions and collaborate effectively with cross-functional teams. Seeking to leverage technical skills and experience to drive impactful outcomes.`;
+    }
+    return `Motivated professional seeking to leverage skills and experience in a challenging role. Proven ability to deliver results and collaborate effectively with teams.`;
+}
+
+function formatExperienceSection(text, jdKeywords) {
+    const lines = text.split('\n');
+    let html = '';
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        // Check if it's a role/company line (typically contains "at", dates, or company markers)
+        if (/\b(at|@)\b/i.test(trimmed) && /\d{4}/.test(trimmed) ||
+            /\(\d{4}/.test(trimmed) ||
+            /\d{4}\s*[-–—]\s*(present|\d{4})/i.test(trimmed)) {
+            html += `<h3>${escapeHtml(trimmed)}</h3>\n`;
+        } else if (/^[•\-\*▪▸►]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)) {
+            // Bullet point
+            const bullet = trimmed.replace(/^[•\-\*▪▸►\d.]+\s*/, '');
+            html += `<ul><li>${enhanceText(bullet, jdKeywords)}</li></ul>\n`;
+        } else if (trimmed.length < 80 && /^[A-Z]/.test(trimmed) && !/[.!?]$/.test(trimmed)) {
+            // Likely a title/company line
+            html += `<h3>${escapeHtml(trimmed)}</h3>\n`;
+        } else {
+            html += `<p>${enhanceText(trimmed, jdKeywords)}</p>\n`;
+        }
+    }
+    return html;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN OPTIMIZATION FUNCTION
+═══════════════════════════════════════════════════════ */
+
+function optimizeResume() {
+    const resumeText = document.getElementById('resumeInput').value.trim();
+    const jdText = document.getElementById('jdInput').value.trim();
+
+    if (!resumeText || !jdText) {
+        showToast('⚠️ Please paste both your resume and the job description.');
+        return;
+    }
+
+    const btn = document.getElementById('optimizeBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    // Simulate processing delay for UX
+    setTimeout(() => {
+        try {
+            performAnalysis(resumeText, jdText);
+        } catch (e) {
+            console.error(e);
+            showToast('❌ An error occurred. Please check your input.');
+        }
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }, 1200);
+}
+
+function performAnalysis(resumeText, jdText) {
+    // ── Step 1: Parse ──
+    const sections = parseResume(resumeText);
+
+    // ── Step 2: Extract keywords & skills ──
+    const jdKeywords = extractKeywords(jdText);
+    const resumeKeywords = extractKeywords(resumeText);
+    const jdSkills = extractSkills(jdText);
+    const resumeSkills = extractSkills(resumeText);
+
+    // ── Step 3: Calculate matches ──
+    const matchedKeywords = [...jdKeywords].filter(k => resumeKeywords.has(k));
+    const missingKeywords = [...jdKeywords].filter(k => !resumeKeywords.has(k));
+    const matchedSkills = [...jdSkills].filter(s => resumeSkills.has(s));
+    const missingSkills = [...jdSkills].filter(s => !resumeSkills.has(s));
+
+    // ── Step 4: Calculate ATS Score ──
+    const keywordScore = jdKeywords.size > 0 ? (matchedKeywords.length / jdKeywords.size) : 0;
+    const skillScore = jdSkills.size > 0 ? (matchedSkills.length / jdSkills.size) : 0;
+    const hasSummary = sections.summary ? 1 : 0;
+    const hasSkillsSection = sections.skills ? 1 : 0;
+    const hasMetrics = /\d+%|\$\d+|reduced|increased|improved\s+by/i.test(resumeText) ? 1 : 0;
+    const hasActionVerbs = /\b(built|developed|designed|implemented|created|launched|managed|optimized|led|reduced|increased|delivered|architected|automated|streamlined)\b/i.test(resumeText) ? 1 : 0;
+
+    // Weighted score
+    const rawScore = (keywordScore * 0.35) + (skillScore * 0.30) + (hasSummary * 0.10) +
+                     (hasSkillsSection * 0.08) + (hasMetrics * 0.09) + (hasActionVerbs * 0.08);
+    const atsScore = Math.min(Math.round(rawScore * 100), 100);
+
+    // ── Step 5: Improvements ──
+    const improvements = generateImprovements(resumeText, jdText, sections);
+
+    // ── Step 6: Build optimized resume ──
+    const optimizedHtml = buildOptimizedResume(sections, jdKeywords, jdSkills, resumeSkills);
+
+    // ── Render ──
+    renderResults(atsScore, matchedKeywords, missingKeywords, missingSkills, improvements, optimizedHtml);
+
+    // Update progress
+    updateProgress(3);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDERING
+═══════════════════════════════════════════════════════ */
+
+function renderResults(score, matched, missingKw, missingSk, improvements, resumeHtml) {
+    const wrapper = document.getElementById('resultsWrapper');
+    wrapper.classList.add('visible');
+
+    // ── Score Ring ──
+    animateScore(score);
+
+    // Score description
+    const desc = document.getElementById('scoreDesc');
+    if (score >= 80) {
+        desc.textContent = `Excellent! Your resume is well-aligned with this job description. Minor tweaks can push it even higher.`;
+    } else if (score >= 60) {
+        desc.textContent = `Good match. Your resume covers many key areas. Review the gap analysis below to boost your score.`;
+    } else if (score >= 40) {
+        desc.textContent = `Moderate match. There are significant gaps between your resume and the JD. Focus on the improvements below.`;
+    } else {
+        desc.textContent = `Low match. Your resume needs substantial optimization for this role. Follow the gap analysis closely.`;
+    }
+
+    // ── Keyword Tags ──
+    const tagsContainer = document.getElementById('keywordTags');
+    tagsContainer.innerHTML = '';
+    matched.sort().forEach(kw => {
+        const tag = document.createElement('span');
+        tag.className = 'keyword-tag matched';
+        tag.textContent = `✓ ${kw}`;
+        tagsContainer.appendChild(tag);
+    });
+    missingKw.slice(0, 25).sort().forEach(kw => {
+        const tag = document.createElement('span');
+        tag.className = 'keyword-tag missing';
+        tag.textContent = `✗ ${kw}`;
+        tagsContainer.appendChild(tag);
+    });
+
+    // ── Gap Analysis ──
+    renderGapList('missingKeywordsList', 'missingKeywordsCount', missingKw.slice(0, 15), 'rose');
+    renderGapList('missingSkillsList', 'missingSkillsCount', missingSk, 'amber');
+    renderGapList('improvementsList', 'improvementsCount', improvements, 'emerald', true);
+
+    // ── Optimized Resume ──
+    document.getElementById('resumeOutput').innerHTML = resumeHtml;
+
+    // Scroll to results
+    setTimeout(() => {
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+}
+
+function renderGapList(listId, countId, items, colorClass, isImprovement = false) {
+    const list = document.getElementById(listId);
+    const count = document.getElementById(countId);
+    list.innerHTML = '';
+    count.textContent = items.length;
+
+    if (items.length === 0) {
+        list.innerHTML = `<li class="gap-empty">None found — great job! 🎉</li>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="bullet ${colorClass}"></span><span>${escapeHtml(item)}</span>`;
+        list.appendChild(li);
+    });
+}
+
+function animateScore(targetScore) {
+    const ring = document.getElementById('scoreRing');
+    const numberEl = document.getElementById('scoreNumber');
+    const circumference = 2 * Math.PI * 52; // r = 52
+
+    // Set color based on score
+    let strokeColor;
+    if (targetScore >= 75) strokeColor = 'url(#gradHigh)';
+    else if (targetScore >= 50) strokeColor = 'url(#gradMid)';
+    else strokeColor = 'url(#gradLow)';
+
+    // Add gradient defs if not present
+    const svg = ring.closest('svg');
+    if (!svg.querySelector('defs')) {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = `
+            <linearGradient id="gradHigh" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#10b981"/>
+                <stop offset="100%" style="stop-color:#06b6d4"/>
+            </linearGradient>
+            <linearGradient id="gradMid" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f59e0b"/>
+                <stop offset="100%" style="stop-color:#f97316"/>
+            </linearGradient>
+            <linearGradient id="gradLow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f43f5e"/>
+                <stop offset="100%" style="stop-color:#e11d48"/>
+            </linearGradient>
+        `;
+        svg.prepend(defs);
+    }
+
+    ring.style.stroke = strokeColor;
+    const offset = circumference - (targetScore / 100) * circumference;
+    ring.style.strokeDashoffset = circumference; // Reset
+
+    // Set number color
+    if (targetScore >= 75) numberEl.style.color = '#10b981';
+    else if (targetScore >= 50) numberEl.style.color = '#f59e0b';
+    else numberEl.style.color = '#f43f5e';
+
+    // Animate
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            ring.style.strokeDashoffset = offset;
+        }, 50);
+    });
+
+    // Animate number
+    let current = 0;
+    const step = Math.max(1, Math.floor(targetScore / 40));
+    const interval = setInterval(() => {
+        current += step;
+        if (current >= targetScore) {
+            current = targetScore;
+            clearInterval(interval);
+        }
+        numberEl.textContent = current;
+    }, 30);
+}
+
+function updateProgress(activeStep) {
+    const steps = document.querySelectorAll('.progress-step');
+    const labels = document.querySelectorAll('.step-labels span');
+
+    steps.forEach((s, i) => {
+        s.classList.remove('active', 'done');
+        labels[i].classList.remove('active', 'done');
+
+        if (i + 1 < activeStep) {
+            s.classList.add('done');
+            labels[i].classList.add('done');
+        } else if (i + 1 === activeStep) {
+            s.classList.add('active');
+            labels[i].classList.add('active');
+        }
+    });
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILITY FUNCTIONS
+═══════════════════════════════════════════════════════ */
+
+function copyResume() {
+    const content = document.getElementById('resumeOutput');
+    // Get plain text version
+    const plainText = getPlainTextResume(content);
+    navigator.clipboard.writeText(plainText).then(() => {
+        showToast('✅ Resume copied to clipboard!');
+    }).catch(() => {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = plainText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('✅ Resume copied to clipboard!');
+    });
+}
+
+function downloadResume() {
+    const content = document.getElementById('resumeOutput');
+    const plainText = getPlainTextResume(content);
+
+    const blob = new Blob([plainText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'optimized-resume.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('⬇️ Resume downloaded!');
+}
+
+function getPlainTextResume(element) {
+    let text = '';
+    const nodes = element.childNodes;
+
+    for (const node of nodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            text += node.textContent;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            const tag = node.tagName.toLowerCase();
+            if (tag === 'h1') {
+                text += node.textContent.toUpperCase() + '\n';
+            } else if (tag === 'h2') {
+                text += '\n' + '═'.repeat(50) + '\n';
+                text += node.textContent + '\n';
+                text += '═'.repeat(50) + '\n';
+            } else if (tag === 'h3') {
+                text += '\n' + node.textContent + '\n';
+            } else if (tag === 'div' && node.classList.contains('contact-line')) {
+                text += node.textContent + '\n';
+            } else if (tag === 'p') {
+                text += node.textContent + '\n';
+            } else if (tag === 'ul') {
+                const items = node.querySelectorAll('li');
+                items.forEach(li => {
+                    text += '  • ' + li.textContent + '\n';
+                });
+            } else if (tag === 'em') {
+                text += node.textContent;
+            } else {
+                text += node.textContent + '\n';
+            }
+        }
+    }
+
+    return text.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function clearAll() {
+    document.getElementById('resumeInput').value = '';
+    document.getElementById('jdInput').value = '';
+    document.getElementById('resultsWrapper').classList.remove('visible');
+    updateProgress(1);
+    showToast('🗑️ Cleared!');
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    updateProgress(1);
+
+    // Auto-advance progress when user types
+    document.getElementById('resumeInput').addEventListener('input', () => {
+        const jd = document.getElementById('jdInput').value.trim();
+        updateProgress(jd ? 2 : 1);
+    });
+
+    document.getElementById('jdInput').addEventListener('input', () => {
+        const resume = document.getElementById('resumeInput').value.trim();
+        updateProgress(resume ? 2 : 1);
+    });
+});
+</script>
+
+</body>
+</html>
