@@ -40,10 +40,7 @@ To build a comprehensive, ATS-optimized job search and personal branding system 
 
 ## 📸 Proof of Execution
 
-*(Insert your workspace or Claude generation screenshots here)*
-
-![Claude Generation Workflow](./screenshots/claude_generation.png)
-![ATS Analysis & Templates](./screenshots/toolkit_output.png)
+![ATS Analysis & Templates](./toolkit_output.pages)
 
 ---
 

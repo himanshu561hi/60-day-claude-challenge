@@ -1,0 +1,233 @@
+
+<h2 class="sr-only">Job discovery and analysis dashboard for Himanshu Gupta, showing top job matches, skill gaps, and market insights</h2>
+
+<style>
+.tag { font-size: 11px; padding: 3px 8px; border-radius: 99px; font-family: var(--font-sans); }
+.tag-green { background: #EAF3DE; color: #27500A; }
+.tag-amber { background: #FAEEDA; color: #633806; }
+.tag-red { background: #FCEBEB; color: #791F1F; }
+.tag-blue { background: #E6F1FB; color: #0C447C; }
+.tag-purple { background: #EEEDFE; color: #3C3489; }
+.sec-label { font-size: 11px; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 10px; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+</style>
+
+<div style="padding: 1rem 0; font-family: var(--font-sans);">
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem;">
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center;">
+      <p style="font-size: 24px; font-weight: 500; margin: 0; color: var(--color-text-primary);">4</p>
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0;">jobs found</p>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center;">
+      <p style="font-size: 24px; font-weight: 500; margin: 0; color: var(--color-text-primary);">78%</p>
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0;">avg match score</p>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center;">
+      <p style="font-size: 24px; font-weight: 500; margin: 0; color: var(--color-text-primary);">₹50K</p>
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0;">best CTC seen</p>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center;">
+      <p style="font-size: 24px; font-weight: 500; margin: 0; color: var(--color-text-primary);">1</p>
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0;">remote role</p>
+    </div>
+  </div>
+
+  <p class="sec-label">Top job matches</p>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem;">
+
+    <div class="card" style="border: 2px solid var(--color-border-info);">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+            <span style="font-size: 11px; padding: 3px 10px; border-radius: var(--border-radius-md); background: var(--color-background-info); color: var(--color-text-info);">Top pick</span>
+            <span class="tag tag-green">85% match</span>
+          </div>
+          <a href="https://to.indeed.com/aa9kjfjnqx7z" style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); text-decoration: none;">Full Stack Developer (MERN) — Savo Technologies</a>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 3px 0 6px;">Indore, MP · Onsite · Posted May 27, 2026 · ₹20K–50K/mo</p>
+          <p style="font-size: 12px; color: var(--color-text-primary); margin: 0;">Exact MERN stack match, 1+ yr experience req (you qualify), clear salary range within target, tech product company with 4.8★ rating.</p>
+        </div>
+      </div>
+      <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px;">
+        <span class="tag tag-purple">React.js</span><span class="tag tag-purple">Node.js</span><span class="tag tag-purple">MongoDB</span><span class="tag tag-purple">Express.js</span><span class="tag tag-purple">REST APIs</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span class="tag tag-green">80% match</span>
+            <span class="tag tag-blue">Remote</span>
+          </div>
+          <a href="https://to.indeed.com/aayvmdqrstp9" style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); text-decoration: none;">Full Stack Developer (Node.js + React.js) — Xeroadss Pvt Ltd</a>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 3px 0 6px;">Remote · Full-time · Posted June 8, 2026 · Up to ₹1.5L/yr (~₹12.5K/mo)</p>
+          <p style="font-size: 12px; color: var(--color-text-primary); margin: 0;">Stack aligns well (React, Node), freshest posting. Asks 3+ yrs + AWS/PostgreSQL/Redis — partial gap, but strong project portfolio can compensate.</p>
+        </div>
+      </div>
+      <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px;">
+        <span class="tag tag-purple">React.js</span><span class="tag tag-purple">Node.js</span><span class="tag tag-amber">PostgreSQL</span><span class="tag tag-amber">Redis</span><span class="tag tag-amber">AWS</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span class="tag tag-green">75% match</span>
+          </div>
+          <a href="https://to.indeed.com/aadxt42jv9d9" style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); text-decoration: none;">Full Stack Developer (MEAN/MERN) — Byndr</a>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 3px 0 6px;">India (flexible) · Full-time · Posted Feb 26, 2026 · CTC not disclosed</p>
+          <p style="font-size: 12px; color: var(--color-text-primary); margin: 0;">MERN-aligned, flexible location. Asks 2–4 yrs — slight gap, but AI projects strengthen candidacy significantly.</p>
+        </div>
+      </div>
+      <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px;">
+        <span class="tag tag-purple">React.js</span><span class="tag tag-purple">Node.js</span><span class="tag tag-purple">MongoDB</span><span class="tag tag-amber">Agile/Scrum</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span class="tag tag-amber">70% match</span>
+          </div>
+          <a href="https://to.indeed.com/aa2rcgv6gygc" style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); text-decoration: none;">MERN Stack Developer — Walkwel Technology</a>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 3px 0 6px;">Mohali, Punjab · Full-time · Posted Feb 26, 2026 · CTC not disclosed</p>
+          <p style="font-size: 12px; color: var(--color-text-primary); margin: 0;">MERN-specific, but requires 2+ yrs + TypeScript + Firebase/AWS. Core stack matches; cloud and TS are gaps. Salary satisfaction rated low by employees.</p>
+        </div>
+      </div>
+      <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px;">
+        <span class="tag tag-purple">React.js</span><span class="tag tag-purple">Node.js</span><span class="tag tag-amber">TypeScript</span><span class="tag tag-amber">Firebase/AWS</span><span class="tag tag-red">Ionic/React Native</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem;">
+
+    <div class="card">
+      <p class="sec-label">Skills in demand across all roles</p>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>React.js</span><span style="color: var(--color-text-secondary);">4/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 100%; height: 100%; border-radius: 99px; background: #534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>Node.js</span><span style="color: var(--color-text-secondary);">4/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 100%; height: 100%; border-radius: 99px; background: #534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>MongoDB / Express</span><span style="color: var(--color-text-secondary);">3/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 75%; height: 100%; border-radius: 99px; background: #534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>REST APIs</span><span style="color: var(--color-text-secondary);">3/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 75%; height: 100%; border-radius: 99px; background: #534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>Git / GitHub</span><span style="color: var(--color-text-secondary);">3/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 75%; height: 100%; border-radius: 99px; background: #534AB7;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>AWS / Cloud</span><span style="color: var(--color-text-secondary);">2/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 50%; height: 100%; border-radius: 99px; background: #EF9F27;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>TypeScript</span><span style="color: var(--color-text-secondary);">2/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 50%; height: 100%; border-radius: 99px; background: #EF9F27;"></div></div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-primary); margin-bottom: 3px;"><span>PostgreSQL / Redis</span><span style="color: var(--color-text-secondary);">1/4</span></div>
+          <div style="height: 5px; border-radius: 99px; background: var(--color-border-tertiary);"><div style="width: 25%; height: 100%; border-radius: 99px; background: #E24B4A;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="sec-label">Your skill gap analysis</p>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div>
+          <p style="font-size: 12px; font-weight: 500; margin: 0 0 5px; color: var(--color-text-primary);">Strong coverage</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            <span class="tag tag-green">React.js</span>
+            <span class="tag tag-green">Node.js</span>
+            <span class="tag tag-green">MongoDB</span>
+            <span class="tag tag-green">Express.js</span>
+            <span class="tag tag-green">REST APIs</span>
+            <span class="tag tag-green">Git</span>
+            <span class="tag tag-green">AI APIs</span>
+          </div>
+        </div>
+        <div style="border-top: 0.5px solid var(--color-border-tertiary); padding-top: 8px;">
+          <p style="font-size: 12px; font-weight: 500; margin: 0 0 5px; color: var(--color-text-primary);">Gaps to address</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            <span class="tag tag-amber">TypeScript</span>
+            <span class="tag tag-amber">AWS basics</span>
+            <span class="tag tag-amber">PostgreSQL</span>
+            <span class="tag tag-red">Redis</span>
+            <span class="tag tag-red">Microservices</span>
+          </div>
+        </div>
+        <div style="border-top: 0.5px solid var(--color-border-tertiary); padding-top: 8px;">
+          <p style="font-size: 12px; font-weight: 500; margin: 0 0 5px; color: var(--color-text-primary);">Unique strengths</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            <span class="tag tag-purple">OpenAI API</span>
+            <span class="tag tag-purple">Gemini API</span>
+            <span class="tag tag-purple">Vapi AI</span>
+            <span class="tag tag-purple">Supabase</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-bottom: 1rem;">
+    <p class="sec-label">Recommendations to improve interview chances</p>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <i class="ti ti-certificate" aria-hidden="true" style="font-size: 18px; color: #534AB7; flex-shrink: 0; margin-top: 1px;"></i>
+        <div>
+          <p style="font-size: 13px; font-weight: 500; margin: 0 0 2px; color: var(--color-text-primary);">Add TypeScript to your projects</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">2 of 4 roles mention TypeScript. Migrate one existing project (e.g. AI Career Coach) to TS — it's a quick win that covers a recurring ask.</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <i class="ti ti-cloud" aria-hidden="true" style="font-size: 18px; color: #534AB7; flex-shrink: 0; margin-top: 1px;"></i>
+        <div>
+          <p style="font-size: 13px; font-weight: 500; margin: 0 0 2px; color: var(--color-text-primary);">Get AWS Cloud Practitioner certified</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">Cloud knowledge gap is blocking senior roles. AWS Free Tier + Cloud Practitioner exam (~₹8,000) significantly lifts your profile.</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <i class="ti ti-robot" aria-hidden="true" style="font-size: 18px; color: #0F6E56; flex-shrink: 0; margin-top: 1px;"></i>
+        <div>
+          <p style="font-size: 13px; font-weight: 500; margin: 0 0 2px; color: var(--color-text-primary);">Lead with AI integration experience</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">Your OpenAI + Gemini + Vapi AI projects are rare for freshers. This is a genuine differentiator — mention it in your summary and first interview line.</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <i class="ti ti-brand-github" aria-hidden="true" style="font-size: 18px; color: #0F6E56; flex-shrink: 0; margin-top: 1px;"></i>
+        <div>
+          <p style="font-size: 13px; font-weight: 500; margin: 0 0 2px; color: var(--color-text-primary);">Polish your GitHub READMEs</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">Recruiters check GitHub. Add demo GIFs, tech stack badges, and architecture notes to all 3 major projects — especially the AI Career Coach.</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <i class="ti ti-chart-line" aria-hidden="true" style="font-size: 18px; color: #BA7517; flex-shrink: 0; margin-top: 1px;"></i>
+        <div>
+          <p style="font-size: 13px; font-weight: 500; margin: 0 0 2px; color: var(--color-text-primary);">Calibrate salary expectations</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">Your ₹40K–60K target is ambitious for a fresher but reachable. The Savo role offers up to ₹50K — a realistic ceiling for now. Target ₹30K–50K for faster callbacks.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem; display: flex; align-items: center; gap: 12px;">
+    <i class="ti ti-info-circle" aria-hidden="true" style="font-size: 20px; color: #185FA5; flex-shrink: 0;"></i>
+    <p style="font-size: 13px; color: var(--color-text-primary); margin: 0;">Overall fit: your MERN core is solid and AI project experience is a standout. The main friction is the experience gap (most roles ask 2–3 yrs). Target roles that say "1+ yr" or "fresher welcome" and compensate with live demos and a strong portfolio link in every application.</p>
+  </div>
+
+</div>
