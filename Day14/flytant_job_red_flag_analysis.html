@@ -1,0 +1,163 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.score-row{display:flex;align-items:center;gap:20px;margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)}
+.score-num{font-size:48px;font-weight:500;line-height:1;color:#EF9F27}
+.score-label{font-size:13px;color:var(--color-text-secondary);margin-bottom:4px}
+.score-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.meter{flex:1;height:10px;background:var(--color-background-secondary);border-radius:5px;overflow:hidden}
+.meter-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#639922 0%,#EF9F27 50%,#E24B4A 100%);width:38%}
+.section-title{font-size:14px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin:1.5rem 0 .75rem}
+.flags-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
+.flag-card{padding:.85rem 1rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)}
+.flag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.flag-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sev{font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px}
+.sev-high{background:var(--color-background-danger);color:var(--color-text-danger)}
+.sev-med{background:var(--color-background-warning);color:var(--color-text-warning)}
+.sev-low{background:var(--color-background-success);color:var(--color-text-success)}
+.flag-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.positives{display:flex;flex-direction:column;gap:8px}
+.pos-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--color-text-primary);padding:.6rem .85rem;background:var(--color-background-success);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)}
+.pos-item i{color:var(--color-text-success);font-size:15px;margin-top:1px;flex-shrink:0}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+th{text-align:left;padding:.6rem 1rem;font-weight:500;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+td{padding:.65rem 1rem;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+tr:last-child td{border-bottom:none}
+.risk-bar{display:flex;align-items:center;gap:8px}
+.rbar{height:7px;border-radius:4px;min-width:4px}
+.risk-label{font-size:12px;font-weight:500}
+.verdict-card{padding:1rem 1.25rem;border-radius:var(--border-radius-lg);border-left:3px solid #EF9F27;background:var(--color-background-warning);margin-bottom:1.5rem}
+.verdict-head{font-size:16px;font-weight:500;color:var(--color-text-warning);margin-bottom:6px}
+.verdict-body{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.iq-list{display:flex;flex-direction:column;gap:8px}
+.iq-item{display:flex;align-items:flex-start;gap:10px;padding:.75rem 1rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);cursor:pointer;transition:background .15s}
+.iq-item:hover{background:var(--color-background-secondary)}
+.iq-num{font-size:12px;font-weight:500;color:var(--color-text-info);flex-shrink:0;width:18px;padding-top:1px}
+.iq-text{font-size:13px;color:var(--color-text-primary);line-height:1.5}
+.iq-arr{font-size:12px;color:var(--color-text-tertiary);flex-shrink:0;padding-top:1px;margin-left:auto}
+</style>
+<h2 class="sr-only">Red Flag Analysis for Flytant MERN Stack Web Developer job posting</h2>
+<div class="wrap">
+
+  <div class="score-row">
+    <div>
+      <div class="score-label">Overall Risk Score</div>
+      <div class="score-num">38</div>
+      <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">out of 100</div>
+    </div>
+    <div style="flex:1">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px"><span>Low risk</span><span>High risk</span></div>
+      <div class="meter"><div class="meter-fill"></div></div>
+      <div style="font-size:13px;font-weight:500;color:#EF9F27;margin-top:6px">Moderate — Apply with Caution ⚠️</div>
+    </div>
+  </div>
+
+  <div class="section-title">Top Red Flags</div>
+  <div class="flags-grid">
+    <div class="flag-card">
+      <div class="flag-header"><span class="flag-name">Early-stage startup risk</span><span class="sev sev-high">Severity 8/10</span></div>
+      <div class="flag-desc">Founded 2020, only one undisclosed seed round (~$88K). Very small funding base with ₹3.46Cr annual revenue — job security is uncertain.</div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-header"><span class="flag-name">Internship + full-time ambiguity</span><span class="sev sev-high">Severity 7/10</span></div>
+      <div class="flag-desc">"Job Types: Full-time, Internship" listed together. No clarity on which you're actually being hired for — conversion is performance-dependent, not guaranteed.</div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-header"><span class="flag-name">Broad tech scope for salary level</span><span class="sev sev-med">Severity 5/10</span></div>
+      <div class="flag-desc">Expects MERN + Next.js + TypeScript + REST APIs + Git + UI/UX understanding. Wide scope for ₹50–60K/mo at a seed startup.</div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-header"><span class="flag-name">No team size or structure info</span><span class="sev sev-med">Severity 5/10</span></div>
+      <div class="flag-desc">No mention of engineering team size, reporting structure, or how many developers currently work there. Could mean a tiny 2–3 person team.</div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-header"><span class="flag-name">Location discrepancy</span><span class="sev sev-med">Severity 4/10</span></div>
+      <div class="flag-desc">Registered address is in Patna/Bihar (PitchBook); job says Noida. Headquarters inconsistency across public records is a mild flag.</div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-header"><span class="flag-name">No benefits mentioned</span><span class="sev sev-low">Severity 3/10</span></div>
+      <div class="flag-desc">No mention of health insurance, leave policy, PF/ESI, WFH flexibility, or growth roadmap. Common omission at early startups but worth clarifying.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Positive Signals</div>
+  <div class="positives">
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i><span>Salary is clearly stated upfront (₹50K–₹60K/mo) — transparent compared to many startup postings</span></div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i><span>Requirements are realistic for a junior/mid dev — "basic to intermediate" MERN knowledge, no 5+ years demanded</span></div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i><span>Mentorship and production-level exposure explicitly offered — good for early-career growth</span></div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i><span>Flytant has real traction: 600K+ registered influencers, 1,800+ brand partnerships, and a seed round secured in 2024</span></div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i><span>No "rockstar", "ninja", "hustle", or "wear many hats" language — culture signals are neutral</span></div>
+    <div class="pos-item"><i class="ti ti-check" aria-hidden="true"></i><span>Modern, relevant tech stack (MERN + Next.js + TypeScript) adds strong resume value regardless of outcome</span></div>
+  </div>
+
+  <div class="section-title">Risk Breakdown</div>
+  <table>
+    <thead><tr><th>Category</th><th>Risk Level</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Requirements</td>
+        <td><div class="risk-bar"><div class="rbar" style="width:32px;background:#639922"></div><span class="risk-label" style="color:#639922">Low</span></div></td>
+        <td style="font-size:12px;color:var(--color-text-secondary)">Skills asked are fair for the role level. Max 2 years experience is reasonable.</td>
+      </tr>
+      <tr>
+        <td>Culture</td>
+        <td><div class="risk-bar"><div class="rbar" style="width:32px;background:#639922"></div><span class="risk-label" style="color:#639922">Low</span></div></td>
+        <td style="font-size:12px;color:var(--color-text-secondary)">No burnout keywords. Tone is collaborative and learning-focused.</td>
+      </tr>
+      <tr>
+        <td>Remote / Location</td>
+        <td><div class="risk-bar"><div class="rbar" style="width:56px;background:#EF9F27"></div><span class="risk-label" style="color:#EF9F27">Medium</span></div></td>
+        <td style="font-size:12px;color:var(--color-text-secondary)">Clearly in-person (Noida). Address discrepancy vs registered Patna HQ is a minor flag.</td>
+      </tr>
+      <tr>
+        <td>Hiring Practices</td>
+        <td><div class="risk-bar"><div class="rbar" style="width:56px;background:#EF9F27"></div><span class="risk-label" style="color:#EF9F27">Medium</span></div></td>
+        <td style="font-size:12px;color:var(--color-text-secondary)">Internship/full-time ambiguity is the key concern here. Conversion is not guaranteed.</td>
+      </tr>
+      <tr>
+        <td>Company Stability</td>
+        <td><div class="risk-bar"><div class="rbar" style="width:80px;background:#E24B4A"></div><span class="risk-label" style="color:#E24B4A">High</span></div></td>
+        <td style="font-size:12px;color:var(--color-text-secondary)">Seed stage, undisclosed small raise, ₹3.46Cr revenue. Startup risk is real and should be weighed carefully.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Final Verdict</div>
+  <div class="verdict-card">
+    <div class="verdict-head">⚠️ Apply with Caution</div>
+    <div class="verdict-body">This is a legitimate early-stage startup with a real product and real users — not a scam posting. The JD is honest, the salary is fair for the level, and the tech stack is marketable. The main risks are company stability (very small funding base) and the unclear full-time vs internship status. If you're early in your career and prioritise learning over job security, this can be a good bet. Go in with eyes open: treat it as a growth opportunity, not a long-term anchor.</div>
+  </div>
+
+  <div class="section-title">5 Smart Interview Questions</div>
+  <div class="iq-list">
+    <div class="iq-item" onclick="sendPrompt('Help me prepare a follow-up to this question: Is this role a full-time position or an internship — and if it\'s an internship, what are the specific criteria and timeline for conversion to full-time?')">
+      <span class="iq-num">Q1</span>
+      <span class="iq-text">Is this a full-time role or an internship — and if internship, what are the specific criteria and timeline for converting to full-time?</span>
+      <span class="iq-arr">↗</span>
+    </div>
+    <div class="iq-item" onclick="sendPrompt('Help me think through how to interpret the answer to: How large is the engineering team right now, and who will I be reporting to directly?')">
+      <span class="iq-num">Q2</span>
+      <span class="iq-text">How large is the current engineering team, and who would I be reporting to directly?</span>
+      <span class="iq-arr">↗</span>
+    </div>
+    <div class="iq-item" onclick="sendPrompt('Help me think through how to interpret the answer to: What is the company\'s current runway and funding situation — are there plans for a Series A?')">
+      <span class="iq-num">Q3</span>
+      <span class="iq-text">What is the company's current runway, and are there plans for a next funding round?</span>
+      <span class="iq-arr">↗</span>
+    </div>
+    <div class="iq-item" onclick="sendPrompt('Help me think through: Can you walk me through a recent production project I\'d be contributing to — what does the current codebase look like?')">
+      <span class="iq-num">Q4</span>
+      <span class="iq-text">Can you walk me through a live production project I'd be contributing to — what does the current codebase look like?</span>
+      <span class="iq-arr">↗</span>
+    </div>
+    <div class="iq-item" onclick="sendPrompt('Help me prepare for the answer to: What does a typical week look like for a developer here — what are the on-call expectations and how are priorities set?')">
+      <span class="iq-num">Q5</span>
+      <span class="iq-text">What does a typical week look like for a developer here — how are priorities set and what are the on-call or after-hours expectations?</span>
+      <span class="iq-arr">↗</span>
+    </div>
+  </div>
+
+</div>
