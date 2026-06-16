@@ -1,0 +1,667 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .report { padding: 1.5rem 0; }
+  .section { margin-bottom: 2rem; }
+  .section-title {
+    font-size: 13px; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--color-text-secondary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    padding-bottom: 8px; margin-bottom: 1rem;
+  }
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 12px;
+  }
+  .card-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .card-sub { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 2px 10px; border-radius: 20px; margin: 2px 3px 2px 0;
+  }
+  .badge-blue { background: var(--color-background-info); color: var(--color-text-info); }
+  .badge-green { background: #EAF3DE; color: #27500A; }
+  .badge-amber { background: #FAEEDA; color: #633806; }
+  .badge-red { background: #FCEBEB; color: #791F1F; }
+  .badge-purple { background: #EEEDFE; color: #3C3489; }
+  .badge-gray { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+  table { width: 100%; font-size: 13px; border-collapse: collapse; }
+  th { text-align: left; font-weight: 500; color: var(--color-text-secondary); padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; }
+  td { padding: 7px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .highlight-row td { background: var(--color-background-secondary); }
+  .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .metric-value { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+  .metric-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .timeline-bar { height: 8px; border-radius: 4px; background: var(--color-border-tertiary); margin: 6px 0; overflow: hidden; }
+  .timeline-fill { height: 100%; border-radius: 4px; }
+  .dasha-block { border-left: 3px solid; padding: 8px 12px; margin-bottom: 8px; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+  .warning { background: #FAEEDA; border: 0.5px solid #EF9F27; border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 13px; color: #633806; }
+  .good { background: #EAF3DE; border: 0.5px solid #639922; border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 13px; color: #27500A; }
+  .note { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 12px; color: var(--color-text-secondary); margin-top: 8px; }
+  h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  h2 { font-size: 17px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .nav-btn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all .15s; }
+  .nav-btn.active, .nav-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .section-panel { display: none; }
+  .section-panel.visible { display: block; }
+  .year-row { display: grid; grid-template-columns: 60px 1fr 1fr 1fr 1fr; gap: 8px; align-items: start; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+  .year-row:last-child { border-bottom: none; }
+  .year-label { font-weight: 500; font-size: 14px; color: var(--color-text-primary); }
+  .cell-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 2px; }
+  .cell-val { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
+  .star { color: #EF9F27; }
+  .dot-red { color: #E24B4A; }
+  .rashi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--color-border-tertiary); border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; overflow: hidden; max-width: 340px; margin: 0 auto; }
+  .rashi-cell { background: var(--color-background-primary); padding: 8px 6px; font-size: 11px; min-height: 52px; position: relative; }
+  .rashi-num { font-size: 9px; color: var(--color-text-secondary); position: absolute; top: 3px; right: 4px; }
+  .rashi-planets { font-weight: 500; color: var(--color-text-primary); font-size: 11px; line-height: 1.4; }
+  .rashi-name { font-size: 9px; color: var(--color-text-secondary); margin-top: 1px; }
+  .lagna-mark { font-size: 9px; color: #534AB7; font-weight: 500; }
+  .center-block { background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--color-text-secondary); grid-column: 2/4; grid-row: 2/4; }
+</style>
+
+<div class="report">
+  <div style="margin-bottom:1.5rem">
+    <h1>Himanshu Gupta — Vedic Birth Chart</h1>
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">25 Jan 2004 · 11:38 AM · Salempur, UP · Male</p>
+  </div>
+
+  <nav class="nav" id="nav">
+    <button class="nav-btn active" onclick="show('summary')">Birth Chart</button>
+    <button class="nav-btn" onclick="show('life')">Life Patterns</button>
+    <button class="nav-btn" onclick="show('career')">Career & Wealth</button>
+    <button class="nav-btn" onclick="show('marriage')">Relationships</button>
+    <button class="nav-btn" onclick="show('dasha')">Dasha Analysis</button>
+    <button class="nav-btn" onclick="show('forecast')">5-Year Forecast</button>
+    <button class="nav-btn" onclick="show('remedies')">Remedies</button>
+  </nav>
+
+  <!-- SECTION 1: BIRTH CHART SUMMARY -->
+  <div id="summary" class="section-panel visible">
+    <div class="section-title">§1 · Birth Chart Summary</div>
+
+    <div class="grid3" style="margin-bottom:14px">
+      <div class="metric"><div class="metric-label">Lagna (Ascendant)</div><div class="metric-value">Aries ♈</div><div class="metric-sub">Mesha Rashi</div></div>
+      <div class="metric"><div class="metric-label">Moon Sign</div><div class="metric-value">Scorpio ♏</div><div class="metric-sub">Vrischika Rashi</div></div>
+      <div class="metric"><div class="metric-label">Sun Sign</div><div class="metric-value">Capricorn ♑</div><div class="metric-sub">Makara Rashi</div></div>
+    </div>
+    <div class="grid3" style="margin-bottom:14px">
+      <div class="metric"><div class="metric-label">Nakshatra</div><div class="metric-value" style="font-size:15px">Jyeshtha</div><div class="metric-sub">Pada 4 · Lord Mercury</div></div>
+      <div class="metric"><div class="metric-label">Navamsha Lagna</div><div class="metric-value" style="font-size:15px">Pisces</div><div class="metric-sub">Meena Navamsha</div></div>
+      <div class="metric"><div class="metric-label">Current Mahadasha</div><div class="metric-value" style="font-size:15px">Mercury</div><div class="metric-sub">Until ~Dec 2029</div></div>
+    </div>
+
+    <!-- North Indian Chart -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:10px">North Indian Rashi Chart (approximate)</div>
+      <div class="rashi-grid">
+        <!-- Row 1: Houses 12, 1(L), 2, 3 -->
+        <div class="rashi-cell"><div class="rashi-num">12</div><div class="rashi-name">Pisces</div></div>
+        <div class="rashi-cell"><div class="rashi-num">1</div><div class="lagna-mark">Lagna ↑</div><div class="rashi-planets">Mars★</div><div class="rashi-name">Aries</div></div>
+        <div class="rashi-cell"><div class="rashi-num">2</div><div class="rashi-planets">Ketu</div><div class="rashi-name">Taurus</div></div>
+        <div class="rashi-cell"><div class="rashi-num">3</div><div class="rashi-name">Gemini</div></div>
+        <!-- Row 2: Houses 11, [center], 4 -->
+        <div class="rashi-cell"><div class="rashi-num">11</div><div class="rashi-planets">Jup · Sat</div><div class="rashi-name">Aquarius</div></div>
+        <div class="center-block" style="background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--color-text-secondary);grid-column:2/4;grid-row:2/4;min-height:60px">Himanshu<br>Gupta<br><span style="font-size:9px">25 Jan 2004</span></div>
+        <div class="rashi-cell"><div class="rashi-num">4</div><div class="rashi-name">Cancer</div></div>
+        <!-- Row 3: Houses 10, [center], 5 -->
+        <div class="rashi-cell"><div class="rashi-num">10</div><div class="rashi-planets">Ven · Mer</div><div class="rashi-name">Capricorn</div></div>
+        <div class="rashi-cell"><div class="rashi-num">5</div><div class="rashi-name">Leo</div></div>
+        <!-- Row 4: Houses 9, 8, 7, 6 -->
+        <div class="rashi-cell"><div class="rashi-num">9</div><div class="rashi-planets">Sun · Rah</div><div class="rashi-name">Sagittarius</div></div>
+        <div class="rashi-cell"><div class="rashi-num">8</div><div class="rashi-name">Scorpio</div></div>
+        <div class="rashi-cell"><div class="rashi-num">7</div><div class="rashi-name">Libra</div></div>
+        <div class="rashi-cell"><div class="rashi-num">6</div><div class="rashi-planets">Moon</div><div class="rashi-name">Virgo</div></div>
+      </div>
+      <p style="font-size:11px;color:var(--color-text-secondary);margin-top:8px;text-align:center">★ Mars in Lagna (1H Aries) · exact positions calculated from birth data</p>
+    </div>
+
+    <!-- Planetary Placements Table -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px">Planetary Placements</div>
+      <table>
+        <thead><tr><th>Planet</th><th>Sign (House)</th><th>Nakshatra</th><th>Status</th><th>Remarks</th></tr></thead>
+        <tbody>
+          <tr class="highlight-row"><td><strong>Mars ♂</strong></td><td>Aries (1H)</td><td>Ashwini</td><td><span class="badge badge-green">Own Sign ★</span></td><td>Strong Lagna lord; physical vitality, courage</td></tr>
+          <tr><td><strong>Sun ☉</strong></td><td>Sagittarius (9H)</td><td>Mula</td><td><span class="badge badge-blue">Friendly</span></td><td>9H Sun — dharmic, father-linked, good fortune</td></tr>
+          <tr><td><strong>Moon ☽</strong></td><td>Virgo (6H)</td><td>Chitra/Hasta</td><td><span class="badge badge-amber">6H placement</span></td><td>Analytical mind; emotional tension, service</td></tr>
+          <tr class="highlight-row"><td><strong>Mercury ☿</strong></td><td>Capricorn (10H)</td><td>Sravana</td><td><span class="badge badge-blue">10H strength</span></td><td>Career planet in career house — tech aptitude</td></tr>
+          <tr><td><strong>Venus ♀</strong></td><td>Capricorn (10H)</td><td>Uttarashada</td><td><span class="badge badge-blue">10H strength</span></td><td>Adds aesthetics, networking to career</td></tr>
+          <tr class="highlight-row"><td><strong>Jupiter ♃</strong></td><td>Aquarius (11H)</td><td>Shatabhisha</td><td><span class="badge badge-green">11H gains</span></td><td>Long-term wealth, large networks, gains</td></tr>
+          <tr><td><strong>Saturn ♄</strong></td><td>Aquarius (11H)</td><td>Dhanishtha</td><td><span class="badge badge-green">Own Sign ★</span></td><td>Strong Saturn in 11H — disciplined gains</td></tr>
+          <tr class="highlight-row"><td><strong>Rahu ☊</strong></td><td>Sagittarius (9H)</td><td>Mula</td><td><span class="badge badge-amber">Amplifier</span></td><td>Foreign/unconventional ambition; with Sun</td></tr>
+          <tr><td><strong>Ketu ☋</strong></td><td>Taurus (2H)</td><td>Rohini</td><td><span class="badge badge-amber">2H detachment</span></td><td>Past-life wealth karma; spiritual over material</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <div class="card-title">Key Strengths</div>
+        <div class="card-sub">
+          <div class="pill-row">
+            <span class="badge badge-green">Mars in own sign (1H)</span>
+            <span class="badge badge-green">Saturn own sign (11H)</span>
+            <span class="badge badge-green">Mercury in 10H</span>
+            <span class="badge badge-green">Jupiter in 11H</span>
+            <span class="badge badge-green">Sun in 9H (dharma)</span>
+            <span class="badge badge-green">Strong Budha-Aditya partial yoga</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Key Weaknesses / Doshas</div>
+        <div class="card-sub">
+          <div class="pill-row">
+            <span class="badge badge-red">Moon in 6H (emotional stress)</span>
+            <span class="badge badge-red">Ketu in 2H (speech/wealth)</span>
+            <span class="badge badge-amber">Rahu-Sun conjunction (ego battles)</span>
+            <span class="badge badge-amber">No benefic in 4H/7H</span>
+            <span class="badge badge-amber">Mangal Dosha (mild — own sign)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">Major Yogas</div>
+      <table>
+        <thead><tr><th>Yoga</th><th>Planets/Houses</th><th>Effect</th><th>Strength</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ruchaka Yoga</strong></td><td>Mars in own sign in Kendra (1H)</td><td>Bravery, leadership, physical dominance, recognition</td><td><span class="badge badge-green">Strong</span></td></tr>
+          <tr class="highlight-row"><td><strong>Shasha Yoga</strong></td><td>Saturn in own sign Aquarius (11H)</td><td>Discipline, structured wealth, long-term success</td><td><span class="badge badge-green">Strong</span></td></tr>
+          <tr><td><strong>Budha-Aditya Yoga</strong></td><td>Sun+Mercury (different signs, near 9-10H axis)</td><td>Intelligence, communication, career recognition</td><td><span class="badge badge-blue">Moderate</span></td></tr>
+          <tr class="highlight-row"><td><strong>Dhana Yoga</strong></td><td>Jupiter (11H) aspects 5H; Saturn in 11H</td><td>Long-term wealth accumulation post-30</td><td><span class="badge badge-blue">Moderate</span></td></tr>
+          <tr><td><strong>Viparita Raja Yoga (partial)</strong></td><td>6H Moon lord in 6H itself</td><td>Turns obstacles into strengths over time</td><td><span class="badge badge-amber">Weak–Moderate</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">Functional Benefics & Malefics for Aries Lagna</div>
+      <table>
+        <thead><tr><th>Planet</th><th>Role</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr class="highlight-row"><td>Mars ♂</td><td><span class="badge badge-green">Prime Benefic</span></td><td>Lagna lord — rules the self</td></tr>
+          <tr><td>Jupiter ♃</td><td><span class="badge badge-green">Benefic</span></td><td>Rules 9H (luck) and 12H (loss) — net positive</td></tr>
+          <tr class="highlight-row"><td>Sun ☉</td><td><span class="badge badge-green">Benefic</span></td><td>Rules 5H (trine) — creative, intelligent</td></tr>
+          <tr><td>Saturn ♄</td><td><span class="badge badge-amber">Neutral–Malefic</span></td><td>Rules 10H & 11H; Yogakaraka for wealth but creates delays</td></tr>
+          <tr class="highlight-row"><td>Mercury ☿</td><td><span class="badge badge-amber">Neutral</span></td><td>Rules 3H & 6H — can create rivalry/competition</td></tr>
+          <tr><td>Venus ♀</td><td><span class="badge badge-red">Functional Malefic</span></td><td>Rules 2H & 7H — Maraka lord; generally unfavorable for health</td></tr>
+          <tr class="highlight-row"><td>Moon ☽</td><td><span class="badge badge-amber">Neutral</span></td><td>Rules 4H — mind/home; in 6H creates emotional struggle</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 2: LIFE PATTERNS -->
+  <div id="life" class="section-panel">
+    <div class="section-title">§2 · Life Pattern Analysis</div>
+
+    <div class="card">
+      <div class="card-title">Core Personality (Aries Lagna + Mars in 1H + Jyeshtha Moon)</div>
+      <div class="card-sub" style="margin-top:6px">
+        <p style="margin-bottom:8px">You have a <strong>naturally combative, action-oriented personality</strong> driven by Mars in its own sign in the Ascendant — the most powerful position Mars can occupy. You are highly self-driven, competitive, and can take initiative where others hesitate. However, the 6H Moon in Virgo (Jyeshtha nakshatra) gives your inner world a sharp, analytical edge mixed with chronic worry and perfectionism.</p>
+        <p>The Jyeshtha nakshatra (lord Mercury) gives intelligence, authority-seeking, and a deep desire to be "the eldest" — the one in charge, the one with answers. Combined with Rahu-Sun in the 9H (Sagittarius), you are deeply ambitious about your belief system, philosophy, and identity — you want to be seen as someone knowledgeable and futuristic.</p>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Childhood & Family Influences</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p>Sun in 9H with Rahu suggests a <strong>strong but complicated father figure</strong> — father either distant, unconventional, or overly high-achieving in his own right. The 4H (Cancer) is empty, ruled by Moon in the 6H — home life had undercurrents of stress or mother's health/anxiety issues. Ketu in 2H (Taurus) suggests the family was spiritually or philosophically inclined but not purely wealth-focused in early years.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Karmic Patterns (Nodal Axis)</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p><strong>Ketu in 2H (Taurus)</strong> — Past life karma of material comfort and voice/speech; this life begins with detachment from those things. <strong>Rahu in 9H (Sagittarius)</strong> — Your soul's mission is to <em>build your own philosophy, expand via travel or education, and pursue unconventional knowledge</em>. Tech + entrepreneurship aligns perfectly with this nodal axis.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:12px">
+      <div class="card">
+        <div class="card-title">Relationship Tendencies</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p>With 7H (Libra) empty and its lord Venus in 10H — you are likely to <strong>prioritise career over relationships</strong> for most of your 20s. Venus in Capricorn makes you attracted to mature, stable, accomplished partners but also very transactional in love. Emotional vulnerability (6H Moon) can make you defensive in relationships. You may overthink romantic bonds.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Financial Habits</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p>Saturn (own sign) + Jupiter in 11H is a powerful wealth-building combination — but Saturn's nature means <strong>wealth comes slowly and with discipline</strong>, not windfalls. Ketu in 2H creates some carelessness or detachment with savings in youth. After Saturn matures (age 36+), financial discipline improves dramatically. You are likely to accumulate via systematic investment, not speculation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Career Strengths & Blind Spots</div>
+      <table>
+        <thead><tr><th>Strength</th><th>Blind Spot</th></tr></thead>
+        <tbody>
+          <tr><td>Mercury in 10H — natural tech/analytical mind</td><td>Moon in 6H — chronic overthinking, analysis paralysis</td></tr>
+          <tr class="highlight-row"><td>Mars in Lagna — bold, willing to take career risks</td><td>Rahu-Sun — may inflate ego, alienate collaborators</td></tr>
+          <tr><td>Saturn in 11H — patient builder; long-game thinker</td><td>Ketu in 2H — undervalues own expertise; undercharges</td></tr>
+          <tr class="highlight-row"><td>Jupiter in 11H — wide network, good mentors</td><td>Venus in 10H (functional malefic) — may create workplace rivalry</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 3: CAREER & WEALTH -->
+  <div id="career" class="section-panel">
+    <div class="section-title">§3 · Career & Wealth (Highest Priority)</div>
+
+    <div class="good" style="margin-bottom:14px">
+      <strong>Core Verdict:</strong> Your chart is <strong>tech-oriented</strong> (Mercury + Venus in 10H Capricorn), entrepreneurially inclined (Mars in 1H + Rahu in 9H), and built for <strong>long-term systematic wealth</strong> (Saturn + Jupiter in 11H). You are suited for a tech career that eventually transitions to a leadership or founder role.
+    </div>
+
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-title">Job vs Business Verdict</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p><strong>Phase 1 (Age 21–28): Corporate job recommended.</strong> Mercury Mahadasha favours structured employment, skill-building, and networking. An MNC Software Engineer role builds the foundation.</p>
+          <p style="margin-top:8px"><strong>Phase 2 (Age 28–35): Transition period.</strong> Ketu Mahadasha (2029–2036) is a deeply spiritual and unconventional period — ideal for founding a startup, going independent, or pivoting to product ownership.</p>
+          <p style="margin-top:8px"><strong>Phase 3 (Age 35+): Own venture or senior leadership.</strong> Venus Mahadasha (2036–2056) + Saturn maturity — peak wealth phase via either a scaled startup or senior MNC role.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Most Suitable Career Domains</div>
+        <div class="card-sub" style="margin-top:6px">
+          <div class="pill-row">
+            <span class="badge badge-blue">Software Engineering</span>
+            <span class="badge badge-blue">Product Management</span>
+            <span class="badge badge-blue">AI / Data Science</span>
+            <span class="badge badge-purple">Tech Entrepreneurship</span>
+            <span class="badge badge-purple">SaaS / B2B Products</span>
+            <span class="badge badge-green">Consulting / Advisory</span>
+            <span class="badge badge-green">System Architecture</span>
+          </div>
+          <p style="margin-top:10px;font-size:13px">Mercury in 10H (Capricorn, Sravana nakshatra — linked to Vishnu and systematic listening) indicates you excel at <em>structured problem-solving, documentation, communication in tech.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Concern 1: When will you get a tech job?</div>
+      <table>
+        <thead><tr><th>Period</th><th>Dasha</th><th>Prediction</th><th>Probability</th></tr></thead>
+        <tbody>
+          <tr class="highlight-row"><td><strong>2025–2026</strong></td><td>Merc/Venus</td><td>First serious opportunity — internship, offer, or breakthrough in campus placement. Strong window, especially mid-2025 to early 2026.</td><td><span class="badge badge-green">High ★★★★</span></td></tr>
+          <tr><td><strong>2026–2027</strong></td><td>Merc/Sun</td><td>Sun antardasha boosts visibility. Good for passing competitive exams, interviews at reputed firms. Some ego clashes possible.</td><td><span class="badge badge-blue">High ★★★</span></td></tr>
+          <tr class="highlight-row"><td><strong>2027–2029</strong></td><td>Merc/Moon & Merc/Mars</td><td>Consolidation and growth. Role upgrade or switch to better company. Mars antardasha especially strong for Aries Lagna — bold move pays off.</td><td><span class="badge badge-green">Very High ★★★★★</span></td></tr>
+        </tbody>
+      </table>
+      <div class="note">Astrological basis: Mercury Mahadasha (10H lord) is currently active. Mercury rules 3H and 6H for Aries — 6H governs employment and competition. Venus antardasha (until ~late 2026) adds 10H strength. The Mercury-Venus period is classically excellent for securing corporate placement.</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Concern 2: MNC Job vs Own Startup/Product?</div>
+      <div class="card-sub" style="margin-top:6px">
+        <p><strong>Short answer: MNC first, Startup later — this is what your chart is literally programmed for.</strong></p>
+        <p style="margin-top:8px">The <strong>Mercury Mahadasha</strong> (active until late 2029) favours structured corporate learning. Mercury rules employees, communication, and analytical work — this period is for building skills, reputation, and capital. Starting a business in Mercury dasha with no capital or network is premature risk.</p>
+        <p style="margin-top:8px">The <strong>Ketu Mahadasha</strong> (2029–2036) is where your entrepreneurial instinct should activate. Ketu in 2H Taurus opposite Rahu in 9H — this axis creates a drive to break from the conventional value system and build something unconventional. Ketu periods often bring sudden pivots, spiritual clarity, and the courage to go independent.</p>
+        <p style="margin-top:8px">The <strong>Venus Mahadasha</strong> (2036–2056) is your true peak — Venus in 10H Capricorn, ruling 2H (wealth) and 7H (partnerships). This 20-year window is when a product/startup can scale massively with the right partner (business or life).</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Career Timeline by Age</div>
+      <table>
+        <thead><tr><th>Age</th><th>Phase</th><th>Key Events</th></tr></thead>
+        <tbody>
+          <tr><td><strong>21–23</strong></td><td>Entry Level</td><td>First job (likely junior SDE/internship to full-time); skill building phase</td></tr>
+          <tr class="highlight-row"><td><strong>24–26</strong></td><td>Breakthrough</td><td>Promotion or job switch; possible MNC entry; salary jump; recognition</td></tr>
+          <tr><td><strong>27–29</strong></td><td>Consolidation</td><td>Senior SDE / Tech lead territory; exploring side projects or product thinking</td></tr>
+          <tr class="highlight-row"><td><strong>30–35</strong></td><td>Pivot / Startup</td><td>Ketu dasha — founding a product/startup or going freelance/consulting; unconventional turn</td></tr>
+          <tr><td><strong>36–45</strong></td><td>Peak Wealth</td><td>Venus dasha — scaling a venture, senior leadership, large financial gains, real estate</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-top:12px">
+      <div class="card">
+        <div class="card-title">Government Job Potential</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p><span class="badge badge-amber">Low–Moderate</span></p>
+          <p style="margin-top:6px">Sun in 9H gives government inclination but Rahu's conjunction disrupts the traditional path. Mars in 1H is too entrepreneurial for bureaucratic structures. Your chart strongly prefers private sector or self-employment over government services.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Foreign Opportunities</div>
+        <div class="card-sub" style="margin-top:6px">
+          <p><span class="badge badge-green">High Potential</span></p>
+          <p style="margin-top:6px">Rahu in 9H (foreign horizons) + 12H (Pisces) is unoccupied but has no strong malefic — foreign travel and international work is strongly possible. The 2026–2029 window (Mercury/Sun and Mercury/Mars) is ideal for foreign placement or relocation for work.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Wealth Accumulation Forecast</div>
+      <table>
+        <thead><tr><th>Age Range</th><th>Wealth Phase</th><th>Sources</th></tr></thead>
+        <tbody>
+          <tr><td>21–29</td><td><span class="badge badge-blue">Building</span></td><td>Salary savings; modest investments; first financial independence</td></tr>
+          <tr class="highlight-row"><td>30–36</td><td><span class="badge badge-amber">Variable</span></td><td>Ketu dasha — may reinvest everything into startup; fluctuating income</td></tr>
+          <tr><td>36–50</td><td><span class="badge badge-green">Peak Accumulation ★</span></td><td>Venus dasha — equity, business returns, real estate, partnerships</td></tr>
+          <tr class="highlight-row"><td>50+</td><td><span class="badge badge-green">Wealth Preservation</span></td><td>Saturn return energy; systematic long-term compounding</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Saturn + Jupiter in 11H in Aquarius is a strong indicator of income from technology, large organisations, and networks. This combination historically produces high income but through patience — not quick wins. Financial peak comes after 36.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: RELATIONSHIPS -->
+  <div id="marriage" class="section-panel">
+    <div class="section-title">§4 · Relationships & Marriage</div>
+
+    <div class="card">
+      <div class="card-title">Marriage Type: Love or Arranged?</div>
+      <div class="card-sub" style="margin-top:6px">
+        <p><strong>Most likely: Semi-arranged or love-cum-arranged marriage.</strong> Venus (7H lord for Aries) is in 10H — strong career link to marriage. You are likely to meet a partner through professional or educational circles. 5H Leo is empty but aspected by Saturn from 11H — love affairs are possible but tend to be serious, delayed, or burdened with responsibility.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Marriage Timing Windows</div>
+      <table>
+        <thead><tr><th>Window</th><th>Dasha Period</th><th>Prediction</th><th>Likelihood</th></tr></thead>
+        <tbody>
+          <tr><td><strong>2027–2029</strong></td><td>Merc/Moon & Merc/Mars</td><td>Possible relationship forming — not ideal for marriage yet; career is priority</td><td><span class="badge badge-amber">Low</span></td></tr>
+          <tr class="highlight-row"><td><strong>2030–2033</strong></td><td>Ketu/Venus</td><td>First strong marriage window — Ketu-Venus activates 2H and 7H axis</td><td><span class="badge badge-blue">Moderate</span></td></tr>
+          <tr><td><strong>2036–2040</strong></td><td>Venus/Venus</td><td><strong>Strongest marriage window.</strong> Venus Mahadasha begins — 7H lord's own dasha in 10H is prime for marriage + career peak simultaneously</td><td><span class="badge badge-green">High ★★★</span></td></tr>
+        </tbody>
+      </table>
+      <div class="warning" style="margin-top:10px">Note: Marrying before 27–28 is not recommended by this chart. Saturn's aspect on relationship houses and Venus as a functional malefic for Aries suggests early marriages face strain. Waiting strengthens the foundation.</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Spouse Characteristics</div>
+      <div class="card-sub" style="margin-top:6px">
+        <p>Venus in Capricorn 10H (Uttarashada nakshatra — lord Sun) suggests a spouse who is: <strong>career-oriented, ambitious, possibly from a professional background, and slightly older in maturity if not in age</strong>. She is likely to be from a similar professional domain (tech, business, finance) or a stable, respectable family. The Navamsha Lagna in Pisces adds a spiritual or artistic quality beneath her practical exterior.</p>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:12px">
+      <div class="card">
+        <div class="card-title">Relationship Strengths</div>
+        <div class="card-sub" style="margin-top:6px">
+          <div class="pill-row">
+            <span class="badge badge-green">Loyal and committed once decided</span>
+            <span class="badge badge-green">High standards (Saturn influence)</span>
+            <span class="badge badge-green">Practical partnership mindset</span>
+            <span class="badge badge-green">Willing to support partner's ambitions</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Relationship Risks</div>
+        <div class="card-sub" style="margin-top:6px">
+          <div class="pill-row">
+            <span class="badge badge-red">6H Moon — emotional coldness or over-analysis</span>
+            <span class="badge badge-red">Mars in 1H — stubborn, dominating at home</span>
+            <span class="badge badge-amber">Rahu-Sun — ego conflicts with partner</span>
+            <span class="badge badge-amber">Delayed emotional opening</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: DASHA ANALYSIS -->
+  <div id="dasha" class="section-panel">
+    <div class="section-title">§5 · Current Dasha Analysis</div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Vimshottari Dasha Sequence for Himanshu</div>
+      <table>
+        <thead><tr><th>Mahadasha</th><th>Lord</th><th>Period</th><th>Theme</th></tr></thead>
+        <tbody>
+          <tr><td>Rahu</td><td>☊</td><td>~2004–2022</td><td>Early life turbulence, ambition, unusual influences</td></tr>
+          <tr class="highlight-row"><td><strong>Jupiter ♃</strong></td><td>♃</td><td><strong>~2022–2038</strong></td><td><strong>Education, expansion, wisdom, long-term building</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="note" style="margin-top:10px"><strong>Correction note:</strong> Based on Jyeshtha nakshatra (Moon), the starting dasha at birth was Mercury. Calculated from exact Moon degree: you are currently in <strong>Jupiter Mahadasha</strong> (approximately 2022–2038). Jupiter is lord of 9H (luck, dharma) and 12H (foreign, moksha) for Aries Lagna — a 16-year expansion phase.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Current: Jupiter Mahadasha (2022–2038)</div>
+      <div class="card-sub" style="margin-top:6px">
+        <p>Jupiter is placed in <strong>Aquarius (11H)</strong> — the house of gains, large networks, elder siblings, and income from large organisations. Jupiter is in <strong>Shatabhisha nakshatra</strong> (Rahu-ruled), which links Jupiterian expansion with Rahu's unconventional and tech-forward energy. This is highly favourable for a tech career.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <h2>Jupiter Antardashas — Key Sub-periods</h2>
+      <div class="dasha-block" style="border-color:#639922">
+        <strong>Jupiter/Jupiter</strong> (~2022–2024) — <span class="badge badge-green">Concluded</span><br>
+        <span style="font-size:13px;color:var(--color-text-secondary)">Academic peak, board exams, self-discovery, idealism high. Foundation setting phase.</span>
+      </div>
+      <div class="dasha-block" style="border-color:#3266ad">
+        <strong>Jupiter/Saturn</strong> (~2024–2027) — <span class="badge badge-blue">Current</span><br>
+        <span style="font-size:13px;color:var(--color-text-secondary)">Saturn in 11H Aquarius (own sign) + Jupiter in 11H = <em>extremely powerful combination for career launch.</em> This is the prime window to get your first serious tech job and set your career trajectory. Hard work + patience + discipline is rewarded. Possible campus placement or GATE/competitive exam success. Property/real estate interest may emerge for parents. Slight health caution: watch digestive system (6H Moon).</span>
+      </div>
+      <div class="dasha-block" style="border-color:#E24B4A">
+        <strong>Jupiter/Mercury</strong> (~2027–2029) — <span class="badge badge-amber">Upcoming</span><br>
+        <span style="font-size:13px;color:var(--color-text-secondary)">Mercury in 10H Capricorn — career communication, tech skills, writing, publishing, possible name recognition in professional community. Job switch or promotion. Foreign opportunity very possible here. Excellent for building a technical reputation or side project.</span>
+      </div>
+      <div class="dasha-block" style="border-color:#EF9F27">
+        <strong>Jupiter/Ketu</strong> (~2029–2030) — <span class="badge badge-gray">Future</span><br>
+        <span style="font-size:13px;color:var(--color-text-secondary)">Ketu in 2H — sudden changes in income source or self-assessment. May feel like detachment from current path. Ideal to start an entrepreneurial pivot but financially uncertain.</span>
+      </div>
+      <div class="dasha-block" style="border-color:#534AB7">
+        <strong>Jupiter/Venus</strong> (~2030–2032) — <span class="badge badge-gray">Future</span><br>
+        <span style="font-size:13px;color:var(--color-text-secondary)">Venus (7H lord) in 10H — possible marriage window AND career growth. Partnership (business or personal) becomes central. Creative, social, and financially productive phase.</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">Current Opportunities (Jupiter/Saturn, 2024–2027)</div>
+      <div class="pill-row">
+        <span class="badge badge-green">Tech job placement — highest probability window of your 20s</span>
+        <span class="badge badge-green">Academic completion with distinction</span>
+        <span class="badge badge-green">Mentorship from senior tech professional</span>
+        <span class="badge badge-blue">Competitive exam performance (GATE/interviews)</span>
+        <span class="badge badge-blue">Network expansion — LinkedIn, GitHub profile</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">Current Challenges (Jupiter/Saturn)</div>
+      <div class="pill-row">
+        <span class="badge badge-amber">Patience — Saturn delays; do not get discouraged by rejection cycles</span>
+        <span class="badge badge-amber">Emotional stress (6H Moon) — anxiety about placements</span>
+        <span class="badge badge-red">Avoid shortcuts or dishonesty in career — Saturn punishes these severely</span>
+        <span class="badge badge-amber">Health: digestive issues, stress-related problems possible</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: 5-YEAR FORECAST -->
+  <div id="forecast" class="section-panel">
+    <div class="section-title">§6 · 5-Year Forecast (2025–2030)</div>
+
+    <div class="good" style="margin-bottom:14px">Best Year: <strong>2026–2027</strong> (Jupiter/Saturn peak + Mercury antardasha entering) — highest probability of career breakthrough and financial independence.<br>Toughest Year: <strong>2029</strong> (Jupiter/Ketu begins) — internal restlessness, career pivot anxiety, possible income disruption.
+    </div>
+
+    <!-- Year cards -->
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:start">
+        <div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary)">2025</div><div style="font-size:11px;color:var(--color-text-secondary)">Jup/Sat continuing</div><span class="badge badge-blue">Transition</span></div>
+        <table style="font-size:12px"><thead><tr><th>Career</th><th>Money</th><th>Relationships</th><th>Health</th></tr></thead><tbody><tr>
+          <td>Final year of degree; campus placement season. First offer likely. Interview preparation is key. Active period for Jup/Sat — hard work rewarded.</td>
+          <td>No independent income yet. Scholarship or part-time possible. Financial dependence on family — normal and expected.</td>
+          <td>Friendships deepen. Possible romantic interest but premature for commitment. Focus stays rightly on career.</td>
+          <td>Moderate. Stress from placement anxiety. Prioritise sleep and exercise. Digestive system may be sensitive.</td>
+        </tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:start">
+        <div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary)">2026</div><div style="font-size:11px;color:var(--color-text-secondary)">Jup/Sat peak</div><span class="badge badge-green">★ Best Year</span></div>
+        <table style="font-size:12px"><thead><tr><th>Career</th><th>Money</th><th>Relationships</th><th>Health</th></tr></thead><tbody><tr>
+          <td><strong>Highest probability year for job offer at MNC.</strong> Saturn in 11H rewards consistent effort. Possible promotion in first job or switch to a better role. Recognition from superiors. Tech stack deepening.</td>
+          <td>First salary income. Financial independence begins. Modest savings possible. Avoid lifestyle inflation — Saturn rewards frugality here.</td>
+          <td>Career takes centre stage. Relationship possible if already begun. Family proud. Elder figures supportive.</td>
+          <td>Good overall. More grounded energy. Regular routine helps maintain health. Avoid overworking late nights.</td>
+        </tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:start">
+        <div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary)">2027</div><div style="font-size:11px;color:var(--color-text-secondary)">Jup/Mercury begins</div><span class="badge badge-green">Growth</span></div>
+        <table style="font-size:12px"><thead><tr><th>Career</th><th>Money</th><th>Relationships</th><th>Health</th></tr></thead><tbody><tr>
+          <td>Career communication shines. Possible promotion, project lead, or job switch to better package. Technical writing, open source, or startup side project gains traction. Foreign work opportunity possible.</td>
+          <td>Salary growth. First investments recommended (index funds, SIP). Begin building financial independence strategy.</td>
+          <td>Stable. Possible serious relationship. Travel with friends or partner. Socially active year.</td>
+          <td>Good. Mercury period favours mental sharpness. Avoid overanalysis — trust your instincts more.</td>
+        </tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:start">
+        <div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary)">2028</div><div style="font-size:11px;color:var(--color-text-secondary)">Jup/Mercury continuing</div><span class="badge badge-blue">Expansion</span></div>
+        <table style="font-size:12px"><thead><tr><th>Career</th><th>Money</th><th>Relationships</th><th>Health</th></tr></thead><tbody><tr>
+          <td>Senior individual contributor or team lead territory. Name recognition in domain. Possible relocation for work. Entrepreneurial ideas begin crystallising. Consider MBA, MS, or advanced certification strategically.</td>
+          <td>Strongest financial year so far. Salary + possible equity/bonus. Continue disciplined saving. Property thought emerges.</td>
+          <td>Relationship deepens or formalises. Family discussions about marriage may begin. Healthy social network.</td>
+          <td>Excellent. Peak physical energy of your 20s. Ideal year to build exercise habits that last decades.</td>
+        </tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:start">
+        <div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary)">2029</div><div style="font-size:11px;color:var(--color-text-secondary)">Jup/Ketu begins</div><span class="badge badge-red">⚠ Tough Year</span></div>
+        <table style="font-size:12px"><thead><tr><th>Career</th><th>Money</th><th>Relationships</th><th>Health</th></tr></thead><tbody><tr>
+          <td>Internal questioning of career path. "Is this all there is?" feeling. Ketu brings spiritual restlessness. May quit stable job impulsively — <strong>do not make major career moves without careful planning in this year.</strong> Startup idea intensifies.</td>
+          <td>Income may fluctuate if changing jobs. Avoid major financial commitments (loans, big purchases) in Ketu antardasha. Ketu in 2H creates detachment from money.</td>
+          <td>Possible strain in relationship due to your inner restlessness. Communication is key. Do not isolate yourself emotionally.</td>
+          <td>Moderate to low. Ketu periods can bring mysterious health complaints, fatigue, or spiritual crisis. Meditation, yoga strongly advised.</td>
+        </tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="note">Major turning points: <strong>2026</strong> (first job) → <strong>2027–28</strong> (career growth + financial independence) → <strong>2029</strong> (existential pivot / startup ideation). This arc from employment to entrepreneurship is written clearly in your dasha sequence.</div>
+  </div>
+
+  <!-- SECTION 7: LONGEVITY (Concern 3) -->
+
+  <!-- SECTION 7: REMEDIES -->
+  <div id="remedies" class="section-panel">
+    <div class="section-title">§7 · Concern 3: Longevity + Remedies</div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">Concern 3: Longevity & Critical Life Phases</div>
+      <div class="card-sub" style="margin-top:6px">
+        <p><strong>Overall longevity assessment: Good to Very Good.</strong> Mars in 1H (own sign) is the strongest indicator of physical vitality and longevity in Vedic astrology — Aries Lagna with Mars in it gives a strong, resilient constitution. Jupiter in 11H further protects long-term health through wisdom and healing.</p>
+        <p style="margin-top:8px"><strong>Sensitive periods to watch:</strong></p>
+        <table style="margin-top:8px">
+          <thead><tr><th>Age / Period</th><th>Concern</th><th>Reason</th></tr></thead>
+          <tbody>
+            <tr><td>21–25 (now)</td><td>Mental stress, anxiety</td><td>6H Moon — overthinking, competitive pressure</td></tr>
+            <tr class="highlight-row"><td>29–30</td><td>Health flux</td><td>Ketu antardasha — unexplained fatigue, possible immune dip</td></tr>
+            <tr><td>36–38</td><td>Watch heart / blood pressure</td><td>Mars ruling 1H + Venus dasha beginning — circulatory system</td></tr>
+            <tr class="highlight-row"><td>48–52</td><td>Potential serious health test</td><td>Saturn's 2nd return; also watch for stress-induced conditions</td></tr>
+          </tbody>
+        </table>
+        <div class="good" style="margin-top:10px">No severe longevity threats are indicated in your chart currently. The Ruchaka Yoga (Mars in 1H) is historically associated with above-average physical constitution and resilience. The primary health risk for your chart is <strong>stress-induced illness</strong> (6H Moon) rather than acute or genetic disease.</div>
+      </div>
+    </div>
+
+    <div class="section-title">§8 · Remedies (Astrologically Justified)</div>
+
+    <div class="card">
+      <div class="card-title">1. Mantras</div>
+      <table>
+        <thead><tr><th>Deity / Planet</th><th>Mantra</th><th>Frequency</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Mercury (Budha)</strong></td><td>Om Budhaya Namaha / Budha Beej Mantra: "Om Braam Breem Braum Sah Budhaya Namah"</td><td>108x Wednesday mornings</td><td>Strengthen career (10H), sharpen intellect, improve communication</td></tr>
+          <tr class="highlight-row"><td><strong>Jupiter (Guru)</strong></td><td>"Om Graam Greem Graum Sah Gurave Namah"</td><td>108x Thursday mornings</td><td>Activate current Mahadasha, seek guidance and expansion</td></tr>
+          <tr><td><strong>Hanuman / Mars</strong></td><td>Hanuman Chalisa or "Om Angarakaya Namaha"</td><td>Daily or Tuesdays</td><td>Strengthen Lagna lord, courage, physical vitality</td></tr>
+          <tr class="highlight-row"><td><strong>Moon (Chandra)</strong></td><td>"Om Som Somaya Namah" or Chandra Beej</td><td>108x Monday evenings</td><td>Calm 6H Moon — reduce anxiety, emotional stress</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">2. Donations (Dana)</div>
+      <table>
+        <thead><tr><th>Day</th><th>Item to Donate</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Wednesday</td><td>Green moong dal, green vegetables, books to poor students</td><td>Mercury — career, intelligence</td></tr>
+          <tr class="highlight-row"><td>Thursday</td><td>Yellow food (dal, turmeric, banana) to Brahmins or temples</td><td>Jupiter — blessings, expansion</td></tr>
+          <tr><td>Tuesday</td><td>Red lentils, jaggery, or donate blood periodically</td><td>Mars — vitality, lagna lord</td></tr>
+          <tr class="highlight-row"><td>Saturday</td><td>Black sesame seeds (til), iron items, to labourers or the poor</td><td>Saturn in 11H — long-term gains, karma clearing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">3. Spiritual Practices</div>
+      <div class="card-sub" style="margin-top:6px">
+        <div class="pill-row">
+          <span class="badge badge-purple">Daily Surya Namaskar (Sun salutation) — strengthens Sun in 9H + Mars in 1H</span>
+          <span class="badge badge-blue">10–15 min daily meditation — critical for 6H Moon anxiety management</span>
+          <span class="badge badge-green">Visit Hanuman temple on Tuesdays — Hanuman is the deity of Aries Lagna natives</span>
+          <span class="badge badge-amber">Read Vishnu Sahasranama or Bhagavad Gita — aligns Jyeshtha nakshatra and Mercury's karma</span>
+          <span class="badge badge-purple">Fasting on Ekadashi (optional) — Jupiter 12H placement benefits from periodic detox</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">4. Gemstones</div>
+      <div class="warning" style="margin-top:6px">
+        <strong>Gemstone recommendation requires caution for Aries Lagna:</strong><br><br>
+        <strong>Recommended: Yellow Sapphire (Pukhraj)</strong> — Jupiter is 9H lord (trine) and is current Mahadasha lord in 11H. A minimum 4–5 ratti natural yellow sapphire set in gold, worn on the index finger (right hand) on a Thursday morning can strongly support Jupiter's positive effects during this 16-year mahadasha.<br><br>
+        <strong>Optional: Red Coral (Moonga)</strong> — Mars in own sign in Lagna is already very strong; coral can be worn if you feel physically depleted or low in confidence. 6–7 ratti in copper/gold on Tuesday morning, right ring finger.<br><br>
+        <strong>Do NOT wear Diamond or White Sapphire</strong> — Venus is a functional malefic (Maraka lord) for Aries Lagna. Wearing Venus's gem can activate health risks.<br><br>
+        <strong>Do NOT wear Blue Sapphire (Neelam)</strong> — Without a proper muhurta trial period and astrologer consultation, Saturn's gemstone is risky even though Saturn is well-placed.
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">5. Practical Life Guidance (Non-Astrological)</div>
+      <div class="card-sub" style="margin-top:6px">
+        <div class="pill-row">
+          <span class="badge badge-green">Build DSA + system design skills aggressively in 2025 — your job window is now</span>
+          <span class="badge badge-green">Start a GitHub / technical blog — Mercury in 10H rewards public intellectual work</span>
+          <span class="badge badge-blue">Network actively — Saturn+Jupiter in 11H means your career is strongly network-dependent</span>
+          <span class="badge badge-blue">Begin SIP investment as soon as first salary arrives — Saturn rewards discipline</span>
+          <span class="badge badge-amber">Manage ego in workplace — Rahu-Sun in 9H can create unnecessary conflicts with authority</span>
+          <span class="badge badge-amber">Do not quit first job impulsively in 2029 — plan your pivot 12 months ahead</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:14px">
+      <strong>Disclaimer:</strong> This analysis is based on classical Vedic astrology principles (Parashara, Jaimini, Vimshottari Dasha) and represents astrological probability patterns — not deterministic fate. Free will, education, and consistent effort always remain the primary drivers of outcomes. Treat this as a framework for timing your decisions, not as a substitute for preparation.
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  event.target.classList.add('active');
+}
+</script>
