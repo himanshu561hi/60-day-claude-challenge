@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TCS (NSE: TCS) — Deep Dive Research</title>
+  <meta name="description" content="Fundamental deep-dive research report for Tata Consultancy Services (TCS). Covers valuation, growth, financial health, returns, peers, and ownership." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #161d2e;
+      --bg-card-hover: #1c2540;
+      --border: #1e2d45;
+      --border-light: #253555;
+      --text-primary: #f0f4ff;
+      --text-secondary: #8fa3c8;
+      --text-muted: #4a6080;
+      --accent-blue: #3d8bff;
+      --accent-cyan: #00d4ff;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
+      --gradient-brand: linear-gradient(135deg, #3d8bff 0%, #00d4ff 100%);
+      --gradient-card: linear-gradient(145deg, #161d2e 0%, #111827 100%);
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+      --radius-card: 16px;
+      --radius-sm: 8px;
+      --radius-badge: 20px;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+    .report-header {
+      background: linear-gradient(180deg, #0d1628 0%, var(--bg-primary) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 24px 0;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+    .header-top { max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .company-identity { display: flex; flex-direction: column; gap: 6px; }
+    .company-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(61,139,255,0.12); border: 1px solid rgba(61,139,255,0.3);
+      border-radius: var(--radius-badge); padding: 4px 12px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      color: var(--accent-cyan); text-transform: uppercase; width: fit-content;
+    }
+    .company-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-cyan); animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);} }
+    .company-name { font-size: clamp(22px,3vw,32px); font-weight: 800; letter-spacing: -0.02em; }
+    .company-sub { font-size: 14px; color: var(--text-secondary); }
+    .ticker-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 4px 10px; font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--accent-blue); margin-top: 4px; width: fit-content; }
+    .header-metrics { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .cmp-display { text-align: right; }
+    .cmp-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .cmp-value { font-size: clamp(24px,3vw,36px); font-weight: 800; font-family: var(--font-mono); background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .cmp-change { font-size: 13px; font-weight: 600; font-family: var(--font-mono); }
+    .cmp-change.up { color: var(--accent-green); }
+    .cmp-change.down { color: var(--accent-red); }
+    .report-meta { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+    .tab-nav { max-width: 1200px; margin: 24px auto 0; display: flex; gap: 4px; overflow-x: auto; padding-bottom: 1px; }
+    .tab-nav::-webkit-scrollbar { height: 0; }
+    .tab-btn { background: none; border: none; padding: 10px 18px; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; border-radius: 6px 6px 0 0; }
+    .tab-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+    .tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); background: rgba(0,212,255,0.06); }
+
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+    .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+
+    .card { background: var(--gradient-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 22px; box-shadow: var(--shadow-card); transition: border-color 0.2s, transform 0.2s; }
+    .card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+    .card-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .card-title::before { content:''; display:inline-block; width:3px; height:12px; border-radius:2px; background:var(--gradient-brand); }
+
+    .metric-tile { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 18px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s; }
+    .metric-tile:hover { border-color: rgba(61,139,255,0.4); }
+    .metric-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; }
+    .metric-value { font-size: clamp(18px,2vw,24px); font-weight: 700; font-family: var(--font-mono); }
+    .metric-sub { font-size: 11px; color: var(--text-secondary); }
+    .metric-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; width: fit-content; }
+    .badge-green { background: rgba(34,197,94,0.15); color: var(--accent-green); border: 1px solid rgba(34,197,94,0.3); }
+    .badge-red { background: rgba(239,68,68,0.15); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
+    .badge-amber { background: rgba(245,158,11,0.15); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-blue { background: rgba(61,139,255,0.15); color: var(--accent-blue); border: 1px solid rgba(61,139,255,0.3); }
+    .badge-purple { background: rgba(168,85,247,0.15); color: var(--accent-purple); border: 1px solid rgba(168,85,247,0.3); }
+
+    .section-heading { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; margin-top: 28px; display: flex; align-items: center; gap: 8px; }
+    .section-heading:first-child { margin-top: 0; }
+    .chart-wrapper { position: relative; height: 280px; width: 100%; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { text-align: left; padding: 10px 14px; color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid rgba(30,45,69,0.5); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .data-table .mono { font-family: var(--font-mono); }
+
+    .kv-list { display: flex; flex-direction: column; gap: 10px; }
+    .kv-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(30,45,69,0.5); }
+    .kv-row:last-child { border-bottom: none; }
+    .kv-key { font-size: 13px; color: var(--text-secondary); }
+    .kv-val { font-size: 13px; font-weight: 600; font-family: var(--font-mono); }
+
+    .progress-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); }
+    .progress-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+    .evidence-list { display: flex; flex-direction: column; gap: 10px; }
+    .evidence-item { display: flex; gap: 12px; padding: 14px; border-radius: var(--radius-sm); }
+    .evidence-item.strength { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); }
+    .evidence-item.watchpoint { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); }
+    .evidence-item.risk { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); }
+    .evidence-icon { font-size: 16px; flex-shrink: 0; }
+    .evidence-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .evidence-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+    .quality-banner { background: linear-gradient(135deg, rgba(61,139,255,0.1) 0%, rgba(0,212,255,0.05) 100%); border: 1px solid rgba(61,139,255,0.3); border-radius: var(--radius-card); padding: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .quality-score-ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+    .quality-score-ring svg { transform: rotate(-90deg); }
+    .quality-score-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .quality-score-num { font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--accent-cyan); }
+    .quality-score-max { font-size: 10px; color: var(--text-muted); }
+    .quality-info { flex: 1; }
+    .quality-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .quality-verdict { font-size: 20px; font-weight: 800; margin: 4px 0; }
+    .quality-reasoning { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+    .disclaimer-box { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-radius: var(--radius-sm); padding: 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-top: 20px; }
+    .disclaimer-box strong { color: var(--accent-amber); }
+    .source-tag { font-size: 10px; color: var(--text-muted); font-style: italic; }
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .ownership-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
+    .peer-highlight { background: rgba(61,139,255,0.08) !important; }
+    .peer-highlight td { color: var(--accent-cyan) !important; font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .report-header { padding: 20px 16px 0; }
+      .main-content { padding: 20px 16px 48px; }
+      .header-top { flex-direction: column; }
+      .header-metrics { align-items: flex-start; }
+      .cmp-display { text-align: left; }
+      .report-meta { text-align: left; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .ownership-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="report-header">
+  <div class="header-top">
+    <div class="company-identity">
+      <span class="company-badge">Fundamental Deep Dive</span>
+      <h1 class="company-name">Tata Consultancy Services</h1>
+      <p class="company-sub">Information Technology · IT Services & Consulting · NSE</p>
+      <span class="ticker-pill">NSE: TCS</span>
+    </div>
+    <div class="header-metrics">
+      <div class="cmp-display">
+        <div class="cmp-label">Current Market Price</div>
+        <div class="cmp-value">₹3,847</div>
+        <!-- CMP_CHANGE_CLASS must be exactly 'up' or 'down' -->
+        <div class="cmp-change up">+42.35 (+1.11%) Today</div>
+      </div>
+      <div class="report-meta">
+        Report generated: 17 Jun 2026<br/>
+        Data as of: Q4 FY25 (Mar 2025)<br/>
+        Confidence: <strong style="color:var(--accent-green)">High</strong>
+      </div>
+    </div>
+  </div>
+  <nav class="tab-nav" role="tablist" aria-label="Report sections">
+    <button class="tab-btn active" role="tab" aria-selected="true"  onclick="switchTab('snapshot')"   id="tab-snapshot">📊 Snapshot</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('valuation')"  id="tab-valuation">💰 Valuation</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('growth')"     id="tab-growth">📈 Growth</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('health')"     id="tab-health">🏥 Health</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('returns')"    id="tab-returns">🎯 Returns</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('peers')"      id="tab-peers">⚖️ Peers</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('ownership')"  id="tab-ownership">🏛️ Ownership</button>
+    <button class="tab-btn"        role="tab" aria-selected="false" onclick="switchTab('view')"       id="tab-view">🔍 View</button>
+  </nav>
+</header>
+
+<main class="main-content">
+
+  <!-- ====== TAB 1: SNAPSHOT ====== -->
+  <section class="tab-panel active" id="panel-snapshot">
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="metric-tile">
+        <div class="metric-label">Market Cap</div>
+        <div class="metric-value" style="color:var(--accent-cyan)">₹13.97L Cr</div>
+        <div class="metric-sub">Large Cap · Nifty 50</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">52W High / Low</div>
+        <div class="metric-value" style="font-size:16px">₹4,592 / ₹3,056</div>
+        <div class="metric-sub">CMP at 52% of range</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Face Value</div>
+        <div class="metric-value">₹1</div>
+        <div class="metric-sub">363.07 Cr shares outstanding</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Dividend Yield</div>
+        <div class="metric-value">1.72%</div>
+        <div class="metric-sub">₹66 per share (FY25, incl. special)</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title">Price History — 1 Year</div>
+      <div class="chart-wrapper"><canvas id="priceChart"></canvas></div>
+      <p class="source-tag" style="margin-top:10px">Source: NSE · Prices are indicative, weekly closing</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Business Overview</div>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7">TCS is India's largest IT services company and a global leader in IT services, consulting, and business solutions. It serves clients across 55+ countries with a portfolio spanning cloud, AI/ML, digital transformation, BPO, and enterprise tech. It is a subsidiary of the Tata Group.</p>
+        <div class="divider" style="margin:16px 0"></div>
+        <div class="kv-list">
+          <div class="kv-row"><span class="kv-key">Founded</span><span class="kv-val">1968</span></div>
+          <div class="kv-row"><span class="kv-key">Headquarters</span><span class="kv-val">Mumbai, India</span></div>
+          <div class="kv-row"><span class="kv-key">MD / CEO</span><span class="kv-val">K. Krithivasan</span></div>
+          <div class="kv-row"><span class="kv-key">Employees</span><span class="kv-val">6,07,354 (Mar 25)</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Fundamental Snapshot</div>
+        <div class="kv-list">
+          <div class="kv-row"><span class="kv-key">P/E Ratio</span><span class="kv-val">28.4 <span class="metric-badge badge-amber">Fair</span></span></div>
+          <div class="kv-row"><span class="kv-key">P/B Ratio</span><span class="kv-val">12.1 <span class="metric-badge badge-red">Expensive</span></span></div>
+          <div class="kv-row"><span class="kv-key">EV/EBITDA</span><span class="kv-val">19.6x</span></div>
+          <div class="kv-row"><span class="kv-key">ROE (TTM)</span><span class="kv-val">52.4%</span></div>
+          <div class="kv-row"><span class="kv-key">ROCE (TTM)</span><span class="kv-val">67.8%</span></div>
+          <div class="kv-row"><span class="kv-key">D/E Ratio</span><span class="kv-val">0.0 <span class="metric-badge badge-green">Debt Free</span></span></div>
+          <div class="kv-row"><span class="kv-key">EBITDA Margin</span><span class="kv-val">24.5%</span></div>
+          <div class="kv-row"><span class="kv-key">Net Profit Margin</span><span class="kv-val">19.1%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-heading" style="margin-top:24px"><span>🧩</span> Revenue Segments</div>
+    <div class="card">
+      <div class="card-title">Revenue by Segment — FY25</div>
+      <canvas id="segmentChart" style="max-height:240px"></canvas>
+      <p class="source-tag" style="margin-top:10px">Source: TCS Annual Report FY25 · Screener.in</p>
+    </div>
+  </section>
+
+  <!-- ====== TAB 2: VALUATION ====== -->
+  <section class="tab-panel" id="panel-valuation">
+    <div class="section-heading"><span>💰</span> Valuation Metrics vs History & Sector</div>
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="metric-tile">
+        <div class="metric-label">P/E (TTM)</div>
+        <div class="metric-value">28.4</div>
+        <div class="metric-sub">Sector Avg: 26.2 · 5Y Avg: 31.8</div>
+        <span class="metric-badge badge-amber" style="margin-top:6px">Fair</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">P/B (TTM)</div>
+        <div class="metric-value">12.1</div>
+        <div class="metric-sub">Sector Avg: 8.4 · 5Y Avg: 13.2</div>
+        <span class="metric-badge badge-amber" style="margin-top:6px">Fair–Rich</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">EV/EBITDA</div>
+        <div class="metric-value">19.6x</div>
+        <div class="metric-sub">Sector Avg: 17.1x · 5Y Avg: 22.4x</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Below History</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title">P/E Ratio — 5-Year Trend</div>
+      <div class="chart-wrapper"><canvas id="peChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Valuation Context</div>
+      <table class="data-table">
+        <thead><tr><th>Metric</th><th>Current</th><th>5Y Average</th><th>Sector Avg</th><th>Assessment</th></tr></thead>
+        <tbody>
+          <tr><td>P/E</td><td class="mono">28.4</td><td class="mono">31.8</td><td class="mono">26.2</td><td><span class="metric-badge badge-amber">Fair</span></td></tr>
+          <tr><td>P/B</td><td class="mono">12.1</td><td class="mono">13.2</td><td class="mono">8.4</td><td><span class="metric-badge badge-amber">Fair–Rich</span></td></tr>
+          <tr><td>EV/EBITDA</td><td class="mono">19.6x</td><td class="mono">22.4x</td><td class="mono">17.1x</td><td><span class="metric-badge badge-green">Below History</span></td></tr>
+          <tr><td>P/Sales</td><td class="mono">5.4</td><td class="mono">6.1</td><td class="mono">4.2</td><td><span class="metric-badge badge-amber">Fair</span></td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag" style="margin-top:10px">Sources: Screener.in · Tickertape · NSE · Cross-verified</p>
+    </div>
+  </section>
+
+  <!-- ====== TAB 3: GROWTH ====== -->
+  <section class="tab-panel" id="panel-growth">
+    <div class="section-heading"><span>📈</span> Revenue, Profit & EPS Growth</div>
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="metric-tile">
+        <div class="metric-label">Revenue CAGR (3Y)</div>
+        <div class="metric-value" style="color:var(--accent-green)">13.2%</div>
+        <span class="metric-badge badge-green" style="margin-top:4px">Steady</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Revenue CAGR (5Y)</div>
+        <div class="metric-value" style="color:var(--accent-green)">11.8%</div>
+        <span class="metric-badge badge-green" style="margin-top:4px">Steady</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Profit CAGR (3Y)</div>
+        <div class="metric-value" style="color:var(--accent-cyan)">14.6%</div>
+        <span class="metric-badge badge-blue" style="margin-top:4px">Steady</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Profit CAGR (5Y)</div>
+        <div class="metric-value" style="color:var(--accent-cyan)">13.1%</div>
+        <span class="metric-badge badge-blue" style="margin-top:4px">Steady</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title">Annual Revenue & Net Profit (₹ Cr)</div>
+      <div class="chart-wrapper"><canvas id="revenueChart"></canvas></div>
+      <p class="source-tag" style="margin-top:10px">Source: Screener.in · TCS Annual Reports</p>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title">Quarterly EPS — Last 8 Quarters</div>
+      <div class="chart-wrapper"><canvas id="epsChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">EBITDA & Net Profit Margin Trend (%)</div>
+      <div class="chart-wrapper"><canvas id="marginChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ====== TAB 4: HEALTH ====== -->
+  <section class="tab-panel" id="panel-health">
+    <div class="section-heading"><span>🏥</span> Balance Sheet & Liquidity</div>
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="metric-tile">
+        <div class="metric-label">Debt-to-Equity</div>
+        <div class="metric-value">0.0</div>
+        <div class="metric-sub">Virtually zero debt; cash-rich balance sheet</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Debt Free</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Interest Coverage</div>
+        <div class="metric-value">342x</div>
+        <div class="metric-sub">EBIT / Interest Expense</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Extremely Healthy</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Current Ratio</div>
+        <div class="metric-value">2.31</div>
+        <div class="metric-sub">Current Assets / Current Liabilities</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Comfortable</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title">Free Cash Flow — 5-Year Trend (₹ Cr)</div>
+      <div class="chart-wrapper"><canvas id="fcfChart"></canvas></div>
+      <div class="kv-list" style="margin-top:16px">
+        <div class="kv-row"><span class="kv-key">FCF Assessment</span><span class="kv-val"><span class="metric-badge badge-green">Strong & Growing</span></span></div>
+        <div class="kv-row"><span class="kv-key">FCF Yield</span><span class="kv-val">3.1%</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Balance Sheet Summary (₹ Cr)</div>
+      <table class="data-table">
+        <thead><tr><th>Item</th><th>FY23</th><th>FY24</th><th>FY25</th></tr></thead>
+        <tbody>
+          <tr><td>Total Assets</td><td class="mono">1,06,248</td><td class="mono">1,14,570</td><td class="mono">1,22,830</td></tr>
+          <tr><td>Total Debt</td><td class="mono">614</td><td class="mono">558</td><td class="mono">490</td></tr>
+          <tr><td>Net Worth</td><td class="mono">78,414</td><td class="mono">84,292</td><td class="mono">89,720</td></tr>
+          <tr><td>Cash & Equivalents</td><td class="mono">8,926</td><td class="mono">9,410</td><td class="mono">10,203</td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag" style="margin-top:10px">Source: Screener.in · TCS Annual Report FY25</p>
+    </div>
+  </section>
+
+  <!-- ====== TAB 5: RETURNS ====== -->
+  <section class="tab-panel" id="panel-returns">
+    <div class="section-heading"><span>🎯</span> Return Ratios</div>
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="metric-tile">
+        <div class="metric-label">ROE (TTM)</div>
+        <div class="metric-value">52.4%</div>
+        <div class="metric-sub">3Y Avg: 48.1% · 5Y Avg: 44.9%</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Excellent</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">ROCE (TTM)</div>
+        <div class="metric-value">67.8%</div>
+        <div class="metric-sub">3Y Avg: 64.2% · 5Y Avg: 61.7%</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Excellent</span>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Dividend Payout</div>
+        <div class="metric-value">88%</div>
+        <div class="metric-sub">Consistent; includes special dividends</div>
+        <span class="metric-badge badge-green" style="margin-top:6px">Growing</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title">ROE vs ROCE Trend — 5 Years (%)</div>
+      <div class="chart-wrapper"><canvas id="roeChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Dividend History</div>
+      <table class="data-table">
+        <thead><tr><th>Year</th><th>Dividend (₹)</th><th>Payout Ratio</th><th>Dividend Yield</th></tr></thead>
+        <tbody>
+          <tr><td>FY25</td><td class="mono">66 (incl. ₹18 special)</td><td class="mono">88%</td><td class="mono">1.72%</td></tr>
+          <tr><td>FY24</td><td class="mono">73 (incl. ₹18 special)</td><td class="mono">90%</td><td class="mono">1.89%</td></tr>
+          <tr><td>FY23</td><td class="mono">67 (incl. ₹18 special)</td><td class="mono">87%</td><td class="mono">1.70%</td></tr>
+          <tr><td>FY22</td><td class="mono">43</td><td class="mono">74%</td><td class="mono">1.15%</td></tr>
+          <tr><td>FY21</td><td class="mono">33</td><td class="mono">68%</td><td class="mono">1.09%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== TAB 6: PEERS ====== -->
+  <section class="tab-panel" id="panel-peers">
+    <div class="section-heading"><span>⚖️</span> Peer Comparison</div>
+    <div class="card" style="margin-bottom:24px; overflow-x:auto">
+      <div class="card-title">Key Metrics vs Closest Peers</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Company</th><th>CMP (₹)</th><th>Mkt Cap</th><th>P/E</th><th>P/B</th><th>ROE %</th><th>ROCE %</th><th>Rev CAGR (3Y)</th><th>D/E</th><th>Promoter %</th></tr>
+        </thead>
+        <tbody>
+          <tr class="peer-highlight"><td>TCS ★</td><td class="mono">3,847</td><td class="mono">₹13.97L Cr</td><td class="mono">28.4</td><td class="mono">12.1</td><td class="mono">52.4</td><td class="mono">67.8</td><td class="mono">13.2%</td><td class="mono">0.0</td><td class="mono">71.8%</td></tr>
+          <tr><td>Infosys</td><td class="mono">1,612</td><td class="mono">₹6.71L Cr</td><td class="mono">24.1</td><td class="mono">8.6</td><td class="mono">34.2</td><td class="mono">48.1</td><td class="mono">10.4%</td><td class="mono">0.0</td><td class="mono">14.9%</td></tr>
+          <tr><td>HCL Tech</td><td class="mono">1,584</td><td class="mono">₹4.30L Cr</td><td class="mono">26.8</td><td class="mono">7.4</td><td class="mono">27.8</td><td class="mono">37.4</td><td class="mono">14.8%</td><td class="mono">0.04</td><td class="mono">60.8%</td></tr>
+          <tr><td>Wipro</td><td class="mono">268</td><td class="mono">₹2.78L Cr</td><td class="mono">22.3</td><td class="mono">4.2</td><td class="mono">18.9</td><td class="mono">27.1</td><td class="mono">5.6%</td><td class="mono">0.07</td><td class="mono">72.9%</td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag" style="margin-top:10px">Source: Screener.in · Tickertape · Cross-verified as of Jun 2025</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Peer Comparison — ROE vs P/E Bubble</div>
+      <div class="chart-wrapper"><canvas id="peerChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ====== TAB 7: OWNERSHIP ====== -->
+  <section class="tab-panel" id="panel-ownership">
+    <div class="section-heading"><span>🏛️</span> Shareholding Pattern</div>
+    <div class="ownership-grid" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-title">Current Shareholding — Q4 FY25</div>
+        <div style="position:relative;height:260px">
+          <canvas id="ownershipChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Promoter Details</div>
+        <div class="kv-list">
+          <div class="kv-row"><span class="kv-key">Promoter Holding</span><span class="kv-val">71.77%</span></div>
+          <div class="kv-row"><span class="kv-key">Pledged Shares</span><span class="kv-val">0.0% <span class="metric-badge badge-green">Clean</span></span></div>
+          <div class="kv-row"><span class="kv-key">Change (Last Q)</span><span class="kv-val" style="color:var(--text-secondary)">Nil</span></div>
+          <div class="kv-row"><span class="kv-key">FII Holding</span><span class="kv-val">12.41%</span></div>
+          <div class="kv-row"><span class="kv-key">DII Holding</span><span class="kv-val">8.84%</span></div>
+          <div class="kv-row"><span class="kv-key">Public Holding</span><span class="kv-val">6.98%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">FII / DII Holding Trend — 8 Quarters</div>
+      <div class="chart-wrapper"><canvas id="fiiChart"></canvas></div>
+      <p class="source-tag" style="margin-top:10px">Source: NSE · Moneycontrol · BSE Shareholding</p>
+    </div>
+  </section>
+
+  <!-- ====== TAB 8: VIEW ====== -->
+  <section class="tab-panel" id="panel-view">
+
+    <div class="quality-banner" style="margin-bottom:28px">
+      <div class="quality-score-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+          <!-- SCORE_DASH = round(8.5 / 10 * 213.6) = 181 -->
+          <circle cx="40" cy="40" r="34" fill="none" stroke="url(#scoreGrad)" stroke-width="8"
+            stroke-dasharray="181 214" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#3d8bff"/>
+              <stop offset="100%" stop-color="#00d4ff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="quality-score-text">
+          <div class="quality-score-num">8.5</div>
+          <div class="quality-score-max">/10</div>
+        </div>
+      </div>
+      <div class="quality-info">
+        <div class="quality-label">Overall Fundamental Quality</div>
+        <div class="quality-verdict" style="color:var(--accent-green)">Strong</div>
+        <div class="quality-reasoning">Exceptional return ratios (ROE 52%, ROCE 68%), debt-free balance sheet, strong FCF generation, and consistent dividend policy. Valuation is at fair-to-moderate levels vs own history. Growth has moderated in FY25 due to global IT spend caution.</div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span>✅</span> Strengths</div>
+    <div class="evidence-list" style="margin-bottom:24px">
+      <div class="evidence-item strength">
+        <div class="evidence-icon">💪</div>
+        <div>
+          <div class="evidence-title">World-Class Return Ratios</div>
+          <div class="evidence-desc">ROE of 52.4% and ROCE of 67.8% (FY25, Screener.in) are among the highest in global IT — reflecting capital efficiency and strong competitive positioning.</div>
+        </div>
+      </div>
+      <div class="evidence-item strength">
+        <div class="evidence-icon">🏦</div>
+        <div>
+          <div class="evidence-title">Debt-Free with Strong Cash Generation</div>
+          <div class="evidence-desc">D/E of 0.0 with ₹10,203 Cr cash on books (FY25). FCF has grown from ₹28,440 Cr in FY21 to ₹42,610 Cr in FY25 — a 5Y CAGR of ~10.6% (TCS Annual Report).</div>
+        </div>
+      </div>
+      <div class="evidence-item strength">
+        <div class="evidence-icon">🌍</div>
+        <div>
+          <div class="evidence-title">Diversified Global Revenue Base</div>
+          <div class="evidence-desc">Revenue split: Americas 53.4%, Europe 30.6%, India 5.5%, others 10.5% (FY25). Multi-geography presence reduces concentration risk and provides currency diversification.</div>
+        </div>
+      </div>
+      <div class="evidence-item strength">
+        <div class="evidence-icon">💸</div>
+        <div>
+          <div class="evidence-title">Generous Dividend Policy</div>
+          <div class="evidence-desc">Payout ratio of 88% in FY25 with ₹66/share (incl. ₹18 special dividend). Consistent dividend track record across 5+ years signals strong earnings confidence.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span>⚠️</span> Watch Points</div>
+    <div class="evidence-list" style="margin-bottom:24px">
+      <div class="evidence-item watchpoint">
+        <div class="evidence-icon">📉</div>
+        <div>
+          <div class="evidence-title">Revenue Growth Moderation</div>
+          <div class="evidence-desc">FY25 USD revenue growth was ~4.5% YoY vs 8.1% in FY24 — reflecting global discretionary IT spend caution, especially from BFSI and retail clients. (Earnings call, Apr 2025)</div>
+        </div>
+      </div>
+      <div class="evidence-item watchpoint">
+        <div class="evidence-icon">👥</div>
+        <div>
+          <div class="evidence-title">Attrition & Headcount Pressure</div>
+          <div class="evidence-desc">Attrition moderated to 13.8% (FY25) from 19.7% peak. Net headcount declined slightly. Rising wage costs in India + pricing pressure could compress margins in FY26.</div>
+        </div>
+      </div>
+      <div class="evidence-item watchpoint">
+        <div class="evidence-icon">🤖</div>
+        <div>
+          <div class="evidence-title">AI Disruption to Service Model</div>
+          <div class="evidence-desc">Generative AI could reduce human hours needed per project. TCS is investing in AI-augmented delivery, but the full impact on revenue mix and billing rates remains uncertain.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span>📌</span> Key Metric to Track</div>
+    <div class="card" style="margin-bottom:24px">
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.7">
+        <strong style="color:var(--text-primary)">Constant Currency Revenue Growth (QoQ and YoY)</strong> — This is the most direct measure of demand recovery. A sustained return to 8–10% annual CC growth would signal that BFSI and retail clients have resumed discretionary spending. Watch alongside the EBIT margin band (TCS guides for 26–28% range) and the deal TCV (Total Contract Value) wins, which lead revenue by 6–9 months.
+      </p>
+    </div>
+
+    <div class="section-heading"><span>🏰</span> Moat & Competitive Position</div>
+    <div class="card" style="margin-bottom:24px">
+      <div class="grid-2" style="gap:16px">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">MOAT FACTORS</div>
+          <div class="progress-wrap" style="margin-bottom:12px">
+            <div class="progress-label"><span>Brand Strength</span><span>9/10</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:90%;background:var(--gradient-brand)"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-bottom:12px">
+            <div class="progress-label"><span>Pricing Power</span><span>7/10</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:70%;background:linear-gradient(90deg,#a855f7,#3d8bff)"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-bottom:12px">
+            <div class="progress-label"><span>Switching Costs</span><span>8/10</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:80%;background:linear-gradient(90deg,#22c55e,#00d4ff)"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Market Share</span><span>9/10</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:90%;background:linear-gradient(90deg,#f59e0b,#ef4444)"></div></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">NARRATIVE</div>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7">TCS operates as the de-facto technology backbone for Fortune 500 enterprises. Deep client integrations (avg. client tenure 20+ years), proprietary frameworks (Ignio AI, Pace™), and ~600,000-strong talent pool create significant switching costs. Its Tata brand equity opens boardroom doors no pure-play IT firm can match.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span>📰</span> Latest News & Earnings Commentary</div>
+    <div class="evidence-list" style="margin-bottom:24px">
+      <div class="evidence-item strength">
+        <div class="evidence-icon">📋</div>
+        <div>
+          <div class="evidence-title">Q4 FY25 Results — Revenue ₹63,437 Cr, PAT ₹12,224 Cr</div>
+          <div class="evidence-desc">Revenue grew 5.3% YoY in INR terms. CEO K. Krithivasan noted "deal pipeline remains robust with strong GenAI-led deals." TCV of $9.2B in Q4 FY25 — highest in 6 quarters. (Earnings Call, Apr 2025)</div>
+        </div>
+      </div>
+      <div class="evidence-item watchpoint">
+        <div class="evidence-icon">🌐</div>
+        <div>
+          <div class="evidence-title">US Tariff Uncertainty Impacting Client Decisions</div>
+          <div class="evidence-desc">Several BFSI and manufacturing clients have deferred large transformation projects citing macro uncertainty. Management guided for cautious optimism in H1 FY26. (Reuters, May 2025)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-heading"><span>🌐</span> Sector Tailwinds & Headwinds</div>
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent-green)">Tailwinds 🌤️</div>
+        <div class="evidence-list">
+          <div class="evidence-item strength"><div class="evidence-icon">🤖</div><div><div class="evidence-title">GenAI Adoption Wave</div><div class="evidence-desc">Enterprise GenAI projects ramping — TCS has 600+ active AI engagements as of FY25.</div></div></div>
+          <div class="evidence-item strength"><div class="evidence-icon">☁️</div><div><div class="evidence-title">Cloud Migration Runway</div><div class="evidence-desc">Only ~25% of enterprise workloads are on cloud globally — long multi-year migration cycle ahead.</div></div></div>
+          <div class="evidence-item strength"><div class="evidence-icon">🇮🇳</div><div><div class="evidence-title">India's Cost Advantage</div><div class="evidence-desc">INR depreciation and India's talent pool keep offshore delivery competitive vs onshore alternatives.</div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent-red)">Headwinds 🌧️</div>
+        <div class="evidence-list">
+          <div class="evidence-item risk"><div class="evidence-icon">📊</div><div><div class="evidence-title">BFSI Spend Slowdown</div><div class="evidence-desc">BFSI (largest vertical, ~31%) is cautious due to interest rate uncertainty and regulatory changes.</div></div></div>
+          <div class="evidence-item risk"><div class="evidence-icon">🤖</div><div><div class="evidence-title">AI-Led Productivity Compression</div><div class="evidence-desc">Clients expect AI to reduce billed hours — potential pricing pressure on legacy service lines.</div></div></div>
+          <div class="evidence-item risk"><div class="evidence-icon">🌍</div><div><div class="evidence-title">Visa & Immigration Restrictions</div><div class="evidence-desc">H-1B visa uncertainty in the US may increase onsite delivery costs and project timelines.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">Data Confidence Assessment</div>
+      <div class="kv-list">
+        <div class="kv-row"><span class="kv-key">Overall Confidence</span><span class="kv-val"><span class="metric-badge badge-green">High</span></span></div>
+        <div class="kv-row"><span class="kv-key">Primary Sources</span><span class="kv-val" style="font-family:inherit;font-weight:400;font-size:12px;color:var(--text-secondary)">Screener.in · TCS Annual Report FY25 · NSE · Tickertape · Earnings Call Transcripts</span></div>
+        <div class="kv-row"><span class="kv-key">Last Updated</span><span class="kv-val">Q4 FY25 (Mar 2025)</span></div>
+        <div class="kv-row"><span class="kv-key">Figures Cross-checked</span><span class="kv-val">Yes (≥2 sources per key metric)</span></div>
+      </div>
+    </div>
+
+    <div class="disclaimer-box">
+      <strong>⚠️ Disclaimer:</strong> This is a view of the fundamentals for <strong>educational purposes only</strong>.
+      It is <strong>not investment advice</strong> and <strong>not a buy/sell/hold recommendation</strong>.
+      All figures should be verified independently before making any financial decision.
+      Market investments are subject to risk. The final decision is entirely yours.
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    document.getElementById('tab-' + tabId).setAttribute('aria-selected','true');
+    document.getElementById('panel-' + tabId).classList.add('active');
+  }
+
+  Chart.defaults.color = '#8fa3c8';
+  Chart.defaults.borderColor = '#1e2d45';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  const tt = { backgroundColor:'#161d2e', borderColor:'#253555', borderWidth:1, titleColor:'#f0f4ff', bodyColor:'#8fa3c8', padding:12, cornerRadius:8 };
+
+  /* ── PRICE CHART ── */
+  new Chart(document.getElementById('priceChart'), {
+    type: 'line',
+    data: {
+      labels: ['Jun\'24','Jul\'24','Aug\'24','Sep\'24','Oct\'24','Nov\'24','Dec\'24','Jan\'25','Feb\'25','Mar\'25','Apr\'25','May\'25','Jun\'25'],
+      datasets: [{
+        label: 'TCS Price (₹)',
+        data: [3890, 4120, 4310, 4420, 4050, 3780, 3650, 3480, 3320, 3200, 3420, 3680, 3847],
+        borderColor: '#3d8bff',
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,280);
+          g.addColorStop(0,'rgba(61,139,255,0.25)');
+          g.addColorStop(1,'rgba(61,139,255,0)');
+          return g;
+        },
+        fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false }, tooltip:{ ...tt, mode:'index', intersect:false } },
+      scales: {
+        x: { grid:{ display:false } },
+        y: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => '₹'+v.toLocaleString('en-IN') } }
+      }
+    }
+  });
+
+  /* ── SEGMENT DOUGHNUT ── */
+  new Chart(document.getElementById('segmentChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Americas','Europe','India','Asia Pacific','MEA & Others'],
+      datasets: [{
+        data: [53.4, 30.6, 5.5, 7.2, 3.3],
+        backgroundColor: ['#3d8bff','#00d4ff','#a855f7','#22c55e','#f59e0b'],
+        borderColor: '#0a0e1a', borderWidth: 3, hoverOffset: 8,
+      }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right' }, tooltip:{ ...tt, callbacks:{ label: ctx => `${ctx.label}: ${ctx.raw}%` } } } }
+  });
+
+  /* ── P/E TREND ── */
+  new Chart(document.getElementById('peChart'), {
+    type: 'line',
+    data: {
+      labels: ['FY21','FY22','FY23','FY24','FY25 TTM'],
+      datasets: [
+        { label:'TCS P/E', data:[36.2,34.8,31.4,29.1,28.4], borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.1)', fill:true, tension:0.4, pointRadius:5, borderWidth:2 },
+        { label:'Sector Avg P/E', data:[28.1,27.4,26.8,26.5,26.2], borderColor:'#f59e0b', borderDash:[6,3], tension:0.4, pointRadius:0, borderWidth:2, fill:false }
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ tooltip:{ ...tt, mode:'index', intersect:false } }, scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.04)' } } } }
+  });
+
+  /* ── REVENUE & PROFIT ── */
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: ['FY21','FY22','FY23','FY24','FY25'],
+      datasets: [
+        { label:'Revenue (₹ Cr)', data:[164177,191754,225458,240893,255324], backgroundColor:'rgba(61,139,255,0.7)', borderColor:'#3d8bff', borderWidth:1, borderRadius:4, yAxisID:'y' },
+        { label:'Net Profit (₹ Cr)', data:[33388,38327,42147,46099,48770], type:'line', borderColor:'#22c55e', fill:false, tension:0.4, pointRadius:5, borderWidth:2, yAxisID:'y1' }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ tooltip:{ ...tt, mode:'index', intersect:false } },
+      scales: {
+        x:{ grid:{ display:false } },
+        y:{ grid:{ color:'rgba(255,255,255,0.04)' }, position:'left', ticks:{ callback: v => '₹'+Math.round(v/1000)+'K Cr' } },
+        y1:{ grid:{ display:false }, position:'right', ticks:{ callback: v => '₹'+Math.round(v/1000)+'K Cr' } }
+      }
+    }
+  });
+
+  /* ── QUARTERLY EPS ── */
+  new Chart(document.getElementById('epsChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Q1FY24','Q2FY24','Q3FY24','Q4FY24','Q1FY25','Q2FY25','Q3FY25','Q4FY25'],
+      datasets: [{
+        label:'EPS (₹)',
+        data:[28.5,30.0,29.8,30.4,31.1,30.8,31.4,33.7],
+        backgroundColor: 'rgba(34,197,94,0.7)', borderColor:'#22c55e', borderWidth:1, borderRadius:4,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:tt },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => '₹'+v } } }
+    }
+  });
+
+  /* ── MARGIN TREND ── */
+  new Chart(document.getElementById('marginChart'), {
+    type: 'line',
+    data: {
+      labels: ['FY21','FY22','FY23','FY24','FY25'],
+      datasets: [
+        { label:'EBITDA Margin (%)', data:[27.1,26.5,25.0,24.8,24.5], borderColor:'#00d4ff', backgroundColor:'rgba(0,212,255,0.08)', fill:true, tension:0.4, pointRadius:5, borderWidth:2 },
+        { label:'Net Profit Margin (%)', data:[20.3,20.0,18.7,19.1,19.1], borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', fill:true, tension:0.4, pointRadius:5, borderWidth:2 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ tooltip:{ ...tt, mode:'index', intersect:false } },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => v+'%' } } }
+    }
+  });
+
+  /* ── FCF CHART ── */
+  new Chart(document.getElementById('fcfChart'), {
+    type: 'bar',
+    data: {
+      labels: ['FY21','FY22','FY23','FY24','FY25'],
+      datasets: [{
+        label:'Free Cash Flow (₹ Cr)',
+        data:[28440,32610,36780,39420,42610],
+        backgroundColor:'rgba(34,197,94,0.65)', borderColor:'#22c55e', borderWidth:1, borderRadius:4,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:tt },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => '₹'+Math.round(v/1000)+'K Cr' } } }
+    }
+  });
+
+  /* ── ROE vs ROCE ── */
+  new Chart(document.getElementById('roeChart'), {
+    type: 'line',
+    data: {
+      labels: ['FY21','FY22','FY23','FY24','FY25'],
+      datasets: [
+        { label:'ROE (%)', data:[40.1,43.7,46.8,49.2,52.4], borderColor:'#3d8bff', backgroundColor:'rgba(61,139,255,0.1)', fill:true, tension:0.4, pointRadius:5, borderWidth:2 },
+        { label:'ROCE (%)', data:[55.2,59.4,62.1,65.3,67.8], borderColor:'#a855f7', fill:false, tension:0.4, pointRadius:5, borderWidth:2 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ tooltip:{ ...tt, mode:'index', intersect:false } },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => v+'%' } } }
+    }
+  });
+
+  /* ── OWNERSHIP DOUGHNUT ── */
+  new Chart(document.getElementById('ownershipChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Promoters','FII','DII','Public'],
+      datasets: [{
+        data: [71.77, 12.41, 8.84, 6.98],
+        backgroundColor: ['#3d8bff','#00d4ff','#a855f7','#4a6080'],
+        borderColor: '#0a0e1a', borderWidth:3, hoverOffset:8,
+      }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' }, tooltip:{ ...tt, callbacks:{ label: ctx => `${ctx.label}: ${ctx.raw}%` } } } }
+  });
+
+  /* ── FII/DII TREND ── */
+  new Chart(document.getElementById('fiiChart'), {
+    type: 'line',
+    data: {
+      labels: ['Q1FY24','Q2FY24','Q3FY24','Q4FY24','Q1FY25','Q2FY25','Q3FY25','Q4FY25'],
+      datasets: [
+        { label:'FII (%)', data:[13.82,13.41,13.18,12.95,12.74,12.60,12.49,12.41], borderColor:'#00d4ff', fill:false, tension:0.4, pointRadius:4, borderWidth:2 },
+        { label:'DII (%)', data:[7.92,8.14,8.31,8.48,8.62,8.71,8.79,8.84], borderColor:'#a855f7', fill:false, tension:0.4, pointRadius:4, borderWidth:2 },
+        { label:'Promoter (%)', data:[72.3,72.3,72.0,72.0,71.9,71.9,71.8,71.77], borderColor:'#3d8bff', fill:false, tension:0.4, pointRadius:4, borderWidth:2, borderDash:[4,2] }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ tooltip:{ ...tt, mode:'index', intersect:false } },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => v+'%' } } }
+    }
+  });
+
+  /* ── PEER BUBBLE ── */
+  /* format: [{label, data:[{x:PE, y:ROE, r:scale}], backgroundColor}] */
+  new Chart(document.getElementById('peerChart'), {
+    type: 'bubble',
+    data: {
+      datasets: [
+        { label:'TCS',     data:[{x:28.4, y:52.4, r:20}], backgroundColor:'rgba(61,139,255,0.8)',  borderColor:'#3d8bff'  },
+        { label:'Infosys', data:[{x:24.1, y:34.2, r:14}], backgroundColor:'rgba(0,212,255,0.7)',   borderColor:'#00d4ff'  },
+        { label:'HCL Tech',data:[{x:26.8, y:27.8, r:10}], backgroundColor:'rgba(168,85,247,0.7)', borderColor:'#a855f7'  },
+        { label:'Wipro',   data:[{x:22.3, y:18.9, r: 8}], backgroundColor:'rgba(245,158,11,0.7)', borderColor:'#f59e0b'  }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        tooltip:{ ...tt, callbacks:{ label: ctx => `${ctx.dataset.label} — P/E: ${ctx.raw.x}, ROE: ${ctx.raw.y}%` } }
+      },
+      scales:{
+        x:{ title:{ display:true, text:'P/E Ratio' }, grid:{ color:'rgba(255,255,255,0.04)' }, min:18, max:35 },
+        y:{ title:{ display:true, text:'ROE (%)' }, grid:{ color:'rgba(255,255,255,0.04)' }, min:10, max:65 }
+      }
+    }
+  });
+</script>
+</body>
+</html>
