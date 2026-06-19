@@ -1,0 +1,749 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg:          #f8f9fc;
+    --surface:     #ffffff;
+    --surface-2:   #f1f4f9;
+    --border:      #e2e8f0;
+    --border-dark: #cbd5e1;
+
+    --text-1: #0f172a;
+    --text-2: #475569;
+    --text-3: #94a3b8;
+
+    --blue:   #3b82f6;
+    --blue-bg:#eff6ff;
+    --red:    #ef4444;
+    --red-bg: #fef2f2;
+    --amber:  #f59e0b;
+    --amber-bg:#fffbeb;
+    --green:  #22c55e;
+    --green-bg:#f0fdf4;
+    --purple: #8b5cf6;
+    --purple-bg:#f5f3ff;
+    --slate:  #64748b;
+    --slate-bg:#f8fafc;
+
+    --radius:    10px;
+    --radius-sm: 6px;
+    --radius-lg: 14px;
+    --shadow:    0 1px 4px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.06);
+    --shadow-md: 0 2px 8px rgba(15,23,42,.08), 0 8px 28px rgba(15,23,42,.08);
+
+    --transition: all .2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    line-height: 1.6;
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* ── Top nav ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .topbar-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 15px; color: var(--text-1);
+  }
+  .topbar-brand-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .topbar-meta { font-size: 12px; color: var(--text-3); display: flex; gap: 16px; align-items: center; }
+  .topbar-mode {
+    background: var(--blue-bg); color: var(--blue);
+    border: 1px solid #bfdbfe; border-radius: 20px;
+    padding: 3px 10px; font-size: 11px; font-weight: 600; letter-spacing: .5px;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+  @media(max-width:768px){ .layout { grid-template-columns: 1fr; } }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    position: sticky; top: 56px; align-self: start;
+    max-height: calc(100vh - 56px); overflow-y: auto;
+  }
+  @media(max-width:768px){ .sidebar { display:none; } }
+  .sidebar-section { margin-bottom: 24px; }
+  .sidebar-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-3); padding: 0 8px; margin-bottom: 6px; }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: var(--radius-sm);
+    color: var(--text-2); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: var(--transition);
+    text-decoration: none;
+  }
+  .sidebar-link:hover { background: var(--surface-2); color: var(--text-1); }
+  .sidebar-link.active { background: var(--blue-bg); color: var(--blue); }
+  .sidebar-count {
+    margin-left: auto; background: var(--surface-2);
+    color: var(--text-3); border-radius: 20px;
+    padding: 1px 7px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ── Main content ── */
+  .main { padding: 28px 32px; max-width: 960px; }
+  @media(max-width:768px){ .main { padding: 16px; } }
+
+  /* ── Page header ── */
+  .page-header { margin-bottom: 28px; }
+  .page-title { font-size: 22px; font-weight: 800; color: var(--text-1); margin-bottom: 6px; }
+  .page-subtitle { font-size: 13px; color: var(--text-2); }
+  .page-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag {
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-2); border-radius: 20px;
+    padding: 3px 10px; font-size: 11px; font-weight: 500;
+  }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 36px; scroll-margin-top: 72px; }
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon { font-size: 18px; }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+  .section-count {
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-3); border-radius: 20px;
+    padding: 2px 8px; font-size: 11px; font-weight: 600; margin-left: auto;
+  }
+
+  /* ── Summary box ── */
+  .summary-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--blue);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    color: var(--text-2);
+    line-height: 1.75;
+  }
+
+  /* ── Cards grid ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    box-shadow: var(--shadow); transition: var(--transition);
+    position: relative;
+  }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); border-color: var(--border-dark); }
+  .card-icon { font-size: 20px; margin-bottom: 10px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text-1); margin-bottom: 6px; }
+  .card-body { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+  .card-accent-blue   { border-top: 3px solid var(--blue); }
+  .card-accent-green  { border-top: 3px solid var(--green); }
+  .card-accent-amber  { border-top: 3px solid var(--amber); }
+  .card-accent-purple { border-top: 3px solid var(--purple); }
+  .card-accent-red    { border-top: 3px solid var(--red); }
+
+  /* ── Table ── */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
+  td { padding: 11px 14px; font-size: 13px; color: var(--text-2); border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: var(--transition); }
+  tbody tr:hover { background: var(--surface-2); }
+  .task-text { font-weight: 600; color: var(--text-1); }
+  .owner-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .deadline-text { font-size: 12px; white-space: nowrap; }
+  .deadline-soon { color: var(--red); font-weight: 600; }
+  .not-specified { color: var(--text-3); font-style: italic; font-size: 12px; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .badge-high     { background: var(--red-bg);    color: var(--red);    border: 1px solid #fecaca; }
+  .badge-medium   { background: var(--amber-bg);  color: var(--amber);  border: 1px solid #fde68a; }
+  .badge-low      { background: var(--green-bg);  color: var(--green);  border: 1px solid #bbf7d0; }
+  .badge-conflict { background: var(--amber-bg);  color: #b45309;       border: 1px solid #fde68a; }
+  .badge-question { background: var(--purple-bg); color: var(--purple); border: 1px solid #ddd6fe; }
+  .badge-done     { background: var(--green-bg);  color: #15803d;       border: 1px solid #bbf7d0; }
+  .badge-pending  { background: var(--slate-bg);  color: var(--slate);  border: 1px solid #e2e8f0; }
+  .badge-info     { background: var(--blue-bg);   color: var(--blue);   border: 1px solid #bfdbfe; }
+
+  /* ── List items ── */
+  .item-list { display: flex; flex-direction: column; gap: 8px; }
+  .item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+    box-shadow: var(--shadow); transition: var(--transition);
+  }
+  .item:hover { border-color: var(--border-dark); box-shadow: var(--shadow-md); }
+  .item-badge-col { flex-shrink: 0; padding-top: 1px; }
+  .item-content { flex: 1; }
+  .item-title { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+  .item-desc  { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+  .item-meta  { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ── Speaker section (Transcript Mode) ── */
+  .speaker-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .speaker-row { display: grid; grid-template-columns: 160px 1fr 1fr; border-bottom: 1px solid var(--border); }
+  .speaker-row:last-child { border-bottom: none; }
+  .speaker-row.header { background: var(--surface-2); font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--text-3); }
+  .speaker-cell { padding: 11px 14px; font-size: 13px; }
+  .speaker-name { font-weight: 700; color: var(--text-1); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  @media(max-width:600px){ .speaker-row { grid-template-columns: 1fr; } }
+
+  /* ── Conflict box ── */
+  .conflict-box {
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-left: 4px solid var(--amber);
+    border-radius: var(--radius); padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+  .conflict-title { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .conflict-body  { font-size: 13px; color: #78350f; line-height: 1.65; }
+  .conflict-sources { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ── Collapsible ── */
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  details + details { margin-top: 8px; }
+  summary {
+    padding: 14px 16px; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--text-1);
+    display: flex; align-items: center; gap: 8px;
+    list-style: none; user-select: none;
+    transition: var(--transition);
+  }
+  summary:hover { background: var(--surface-2); }
+  summary::after { content: '›'; margin-left: auto; font-size: 18px; color: var(--text-3); transition: transform .2s; }
+  details[open] summary::after { transform: rotate(90deg); }
+  .details-body { padding: 0 16px 16px; border-top: 1px solid var(--border); padding-top: 14px; font-size: 13px; color: var(--text-2); line-height: 1.7; }
+
+  /* ── Info banner ── */
+  .info-banner {
+    background: var(--blue-bg); border: 1px solid #bfdbfe;
+    border-radius: var(--radius); padding: 12px 16px;
+    font-size: 13px; color: #1e40af;
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 16px 32px; font-size: 11px; color: var(--text-3);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  /* ── Responsive ── */
+  @media(max-width:600px){
+    .cards-grid { grid-template-columns: 1fr; }
+    .topbar-meta { display: none; }
+    th, td { padding: 8px 10px; }
+  }
+
+  /* ── Print ── */
+  @media print { .sidebar, .topbar { display: none; } .main { padding: 0; } }
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain Dump Action Planner — Demo Output</title>
+<meta name="description" content="Sample output from the Brain Dump Action Planner skill. Transforms raw notes into a structured project dashboard.">
+</head>
+<body>
+
+<!-- ══════════════════════ TOP BAR ══════════════════════ -->
+<nav class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-brand-icon">🧠</div>
+    Brain Dump Action Planner
+  </div>
+  <div class="topbar-meta">
+    <span class="topbar-mode">Full Breakdown Mode</span>
+    <span>Processed: 19 Jun 2026</span>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <a href="#summary"      class="sidebar-link active">📋 Summary</a>
+      <a href="#takeaways"    class="sidebar-link">💡 Key Takeaways <span class="sidebar-count">5</span></a>
+      <a href="#actions"      class="sidebar-link">⚡ Action Items <span class="sidebar-count">7</span></a>
+      <a href="#questions"    class="sidebar-link">❓ Open Questions <span class="sidebar-count">4</span></a>
+      <a href="#risks"        class="sidebar-link">⚠️ Risks / Blockers <span class="sidebar-count">3</span></a>
+      <a href="#conflicts"    class="sidebar-link">🔶 Conflicts <span class="sidebar-count">2</span></a>
+      <a href="#notes"        class="sidebar-link">📝 Additional Notes</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Skill Modes</div>
+      <a href="#" class="sidebar-link">📄 Full Breakdown</a>
+      <a href="#" class="sidebar-link">🎤 Transcript Mode</a>
+      <a href="#" class="sidebar-link">🔀 Merge Mode</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status Legend</div>
+      <div style="display:flex;flex-direction:column;gap:5px;padding:0 8px;">
+        <span class="badge badge-high">🔴 High Priority</span>
+        <span class="badge badge-medium">🟠 Medium Priority</span>
+        <span class="badge badge-low">🟢 Low Priority</span>
+        <span class="badge badge-conflict">⚠️ Conflict</span>
+        <span class="badge badge-question">❓ Open Question</span>
+        <span class="badge badge-done">✅ Completed</span>
+        <span class="badge badge-pending">⏳ Pending</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════ MAIN ══════════════════════ -->
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-title">Product Launch — Q3 Planning Session</div>
+      <div class="page-subtitle">Raw notes from strategy call on 18 Jun 2026 · 14 participants · 90 min session</div>
+      <div class="page-tags">
+        <span class="tag">🏷️ Product</span>
+        <span class="tag">🏷️ Q3 Launch</span>
+        <span class="tag">🏷️ Marketing</span>
+        <span class="tag">🏷️ Engineering</span>
+        <span class="tag">🏷️ Mobile App</span>
+      </div>
+    </div>
+
+    <div class="info-banner">
+      ℹ️ <span>This is a <strong>demo output</strong> from the <strong>brain-dump-action-planner</strong> skill. Paste any raw notes, meeting transcript, or brain dump to generate a dashboard like this. All data comes directly from source text — nothing is invented.</span>
+    </div>
+
+    <!-- ── 1. SUMMARY ── -->
+    <section class="section" id="summary">
+      <div class="section-header">
+        <span class="section-icon">📋</span>
+        <span class="section-title">Summary</span>
+      </div>
+      <div class="summary-box">
+        Strategy session to align product, engineering, and marketing teams on the Q3 mobile app launch. 
+        Core discussion covered the revised launch timeline (pushed from July 15 to August 3), 
+        budget reallocation for influencer partnerships, unresolved decisions on Android-first vs simultaneous 
+        iOS/Android rollout, and outstanding sign-off requirements from Legal and Finance. 
+        Several action items were assigned but two ownership conflicts remain unresolved.
+      </div>
+    </section>
+
+    <!-- ── 2. KEY TAKEAWAYS ── -->
+    <section class="section" id="takeaways">
+      <div class="section-header">
+        <span class="section-icon">💡</span>
+        <span class="section-title">Key Takeaways</span>
+        <span class="section-count">5</span>
+      </div>
+      <div class="cards-grid">
+        <div class="card card-accent-blue">
+          <div class="card-icon">📅</div>
+          <div class="card-title">Launch Date Pushed to August 3</div>
+          <div class="card-body">Original July 15 date deemed unrealistic. New target: August 3. Engineering needs 2 additional weeks for stability fixes.</div>
+        </div>
+        <div class="card card-accent-amber">
+          <div class="card-icon">💰</div>
+          <div class="card-title">₹18L Budget Reallocated</div>
+          <div class="card-body">₹18 lakhs moved from print advertising to influencer partnerships. Finance sign-off still pending as of session end.</div>
+        </div>
+        <div class="card card-accent-purple">
+          <div class="card-icon">📱</div>
+          <div class="card-title">Platform Rollout Undecided</div>
+          <div class="card-body">Android-first vs simultaneous iOS+Android rollout was not resolved. Decision deferred to next meeting.</div>
+        </div>
+        <div class="card card-accent-green">
+          <div class="card-icon">🧪</div>
+          <div class="card-title">Beta Closes June 28</div>
+          <div class="card-body">Beta testing window closes June 28. Priya to collate all feedback by June 30 and share report with team.</div>
+        </div>
+        <div class="card card-accent-red">
+          <div class="card-icon">⚖️</div>
+          <div class="card-title">Legal Review Not Started</div>
+          <div class="card-body">Terms of Service update has not been initiated. Legal review required before launch; no owner assigned during session.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. ACTION ITEMS ── -->
+    <section class="section" id="actions">
+      <div class="section-header">
+        <span class="section-icon">⚡</span>
+        <span class="section-title">Action Items</span>
+        <span class="section-count">7</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Owner</th>
+              <th>Deadline</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">01</td>
+              <td><div class="task-text">Finalize stability fixes for v2.3.1 build</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">Blocking launch. Regression tests must pass.</div></td>
+              <td><div class="owner-text">Arjun K.</div></td>
+              <td><div class="deadline-text deadline-soon">July 20, 2026</div></td>
+              <td><span class="badge badge-high">🔴 High Priority</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">02</td>
+              <td><div class="task-text">Collate beta feedback and share report</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">Beta closes June 28.</div></td>
+              <td><div class="owner-text">Priya S.</div></td>
+              <td><div class="deadline-text">June 30, 2026</div></td>
+              <td><span class="badge badge-high">🔴 High Priority</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">03</td>
+              <td><div class="task-text">Get Finance sign-off on ₹18L budget reallocation</div></td>
+              <td><div class="owner-text">Meera T.</div></td>
+              <td><div class="deadline-text deadline-soon">June 25, 2026</div></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">04</td>
+              <td><div class="task-text">Draft influencer partnership brief</div></td>
+              <td><div class="owner-text">Meera T.</div></td>
+              <td><div class="deadline-text">July 5, 2026</div></td>
+              <td><span class="badge badge-medium">🟠 Medium Priority</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">05</td>
+              <td><div class="task-text">Confirm App Store and Play Store listing assets</div></td>
+              <td><div class="owner-text not-specified">Not specified</div></td>
+              <td><div class="deadline-text">July 15, 2026</div></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">06</td>
+              <td><div class="task-text">Initiate Legal review of updated Terms of Service</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">No owner assigned during session.</div></td>
+              <td><div class="owner-text not-specified">Not specified</div></td>
+              <td><div class="deadline-text not-specified">Not specified</div></td>
+              <td><span class="badge badge-high">🔴 High Priority</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">07</td>
+              <td><div class="task-text">Schedule platform rollout decision meeting</div></td>
+              <td><div class="owner-text">Raj D. (PM)</div></td>
+              <td><div class="deadline-text deadline-soon">June 23, 2026</div></td>
+              <td><span class="badge badge-done">✅ Completed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── 4. OPEN QUESTIONS ── -->
+    <section class="section" id="questions">
+      <div class="section-header">
+        <span class="section-icon">❓</span>
+        <span class="section-title">Open Questions</span>
+        <span class="section-count">4</span>
+      </div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-question">❓ Open</span></div>
+          <div class="item-content">
+            <div class="item-title">Android-first or simultaneous iOS + Android rollout?</div>
+            <div class="item-desc">Engineering recommends Android-first to reduce risk. Marketing prefers simultaneous for campaign impact. Decision deferred; no resolution reached in session.</div>
+            <div class="item-meta"><span class="badge badge-high">🔴 High Priority</span><span class="badge badge-info">Platform Strategy</span></div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-question">❓ Open</span></div>
+          <div class="item-content">
+            <div class="item-title">Who owns the Legal review of Terms of Service?</div>
+            <div class="item-desc">No owner was assigned during the session. Responsibility not clarified between product, legal, and operations teams.</div>
+            <div class="item-meta"><span class="badge badge-high">🔴 High Priority</span><span class="badge badge-info">Legal</span></div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-question">❓ Open</span></div>
+          <div class="item-content">
+            <div class="item-title">Will the influencer campaign be ready before August 3?</div>
+            <div class="item-desc">Budget not yet approved. Brief not yet drafted. Timeline feasibility not confirmed.</div>
+            <div class="item-meta"><span class="badge badge-medium">🟠 Medium Priority</span><span class="badge badge-info">Marketing</span></div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-question">❓ Open</span></div>
+          <div class="item-content">
+            <div class="item-title">Is the August 3 date confirmed with leadership?</div>
+            <div class="item-desc">Raj mentioned needing to "loop in Vikram" before the date is official. Status of that conversation is unknown.</div>
+            <div class="item-meta"><span class="badge badge-medium">🟠 Medium Priority</span><span class="badge badge-info">Timeline</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 5. RISKS / BLOCKERS ── -->
+    <section class="section" id="risks">
+      <div class="section-header">
+        <span class="section-icon">⚠️</span>
+        <span class="section-title">Risks / Blockers</span>
+        <span class="section-count">3</span>
+      </div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-high">🔴 High</span></div>
+          <div class="item-content">
+            <div class="item-title">Legal review not initiated — blocks launch</div>
+            <div class="item-desc">Terms of Service must be reviewed and approved before app can go live. No owner assigned; no timeline set. This is a hard blocker for the August 3 launch.</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-high">🔴 High</span></div>
+          <div class="item-content">
+            <div class="item-title">Finance sign-off on ₹18L reallocation pending</div>
+            <div class="item-desc">Marketing budget reallocation cannot proceed until Finance approves. If delayed past June 25, influencer brief cannot be drafted in time for launch.</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-badge-col"><span class="badge badge-medium">🟠 Medium</span></div>
+          <div class="item-content">
+            <div class="item-title">v2.3.1 stability fixes may slip</div>
+            <div class="item-desc">Arjun noted two outstanding crash bugs that "could take longer than expected." If fixes extend past July 20, August 3 launch is at risk.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. CONFLICTS ── -->
+    <section class="section" id="conflicts">
+      <div class="section-header">
+        <span class="section-icon">🔶</span>
+        <span class="section-title">Conflicts</span>
+        <span class="section-count">2</span>
+      </div>
+      <div class="item-list">
+        <div class="conflict-box">
+          <div class="conflict-title">⚠️ Conflicting Launch Strategy — Engineering vs Marketing</div>
+          <div class="conflict-body">
+            <strong>Engineering (Arjun):</strong> Recommends Android-first rollout to reduce simultaneous deployment risk and allow phased QA.<br>
+            <strong>Marketing (Meera):</strong> Requires simultaneous iOS + Android launch for campaign coordination and influencer content alignment.<br><br>
+            These positions are directly opposed. Resolution not reached in session.
+          </div>
+          <div class="conflict-sources">
+            <span class="badge badge-conflict">⚠️ Conflict</span>
+            <span class="badge badge-info">Engineering</span>
+            <span class="badge badge-info">Marketing</span>
+          </div>
+        </div>
+        <div class="conflict-box" style="margin-top:8px">
+          <div class="conflict-title">⚠️ Ownership Conflict — App Store Listing Assets</div>
+          <div class="conflict-body">
+            <strong>Raj (PM)</strong> stated design team owns app store assets. <strong>Meera (Marketing)</strong> stated it falls under marketing. No resolution reached; task logged without owner.
+          </div>
+          <div class="conflict-sources">
+            <span class="badge badge-conflict">⚠️ Conflict</span>
+            <span class="badge badge-info">Raj D. (PM)</span>
+            <span class="badge badge-info">Meera T. (Marketing)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 7. ADDITIONAL NOTES ── -->
+    <section class="section" id="notes">
+      <div class="section-header">
+        <span class="section-icon">📝</span>
+        <span class="section-title">Additional Notes</span>
+      </div>
+      <details open>
+        <summary>🗓️ Next meeting scheduled</summary>
+        <div class="details-body">Follow-up meeting set for June 23, 2026 at 10:00 AM IST. Agenda: platform rollout decision + Legal owner assignment. Attendees not confirmed.</div>
+      </details>
+      <details>
+        <summary>📊 Beta metrics mentioned</summary>
+        <div class="details-body">Priya referenced "strong retention numbers" from beta but did not share specifics during the call. Full report expected June 30, 2026.</div>
+      </details>
+      <details>
+        <summary>👤 Vikram — context note</summary>
+        <div class="details-body">Raj mentioned needing to "loop in Vikram" before the August 3 date is officially confirmed. Vikram's role and seniority were not specified in the session.</div>
+      </details>
+    </section>
+
+    <!-- ══════════════════════ TRANSCRIPT MODE DEMO ══════════════════════ -->
+    <div style="border-top:2px dashed var(--border);padding-top:28px;margin-top:8px;margin-bottom:32px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);margin-bottom:20px;">── Transcript Mode Sections (Demo) ──</div>
+
+      <section class="section">
+        <div class="section-header">
+          <span class="section-icon">🎤</span>
+          <span class="section-title">Speaker Summary</span>
+        </div>
+        <div class="speaker-table-wrap">
+          <div class="speaker-row header">
+            <div class="speaker-cell">Speaker</div>
+            <div class="speaker-cell">Role / Contribution</div>
+            <div class="speaker-cell">Decisions Driven</div>
+          </div>
+          <div class="speaker-row">
+            <div class="speaker-cell"><span class="speaker-name">Raj D.</span><br><span style="font-size:11px;color:var(--text-3)">Product Manager</span></div>
+            <div class="speaker-cell" style="font-size:13px;color:var(--text-2)">Facilitated session. Proposed August 3 date. Assigned action items. Noted need to confirm with Vikram.</div>
+            <div class="speaker-cell"><span class="badge badge-info">August 3 target</span> <span class="badge badge-info">Follow-up mtg</span></div>
+          </div>
+          <div class="speaker-row">
+            <div class="speaker-cell"><span class="speaker-name">Arjun K.</span><br><span style="font-size:11px;color:var(--text-3)">Engineering Lead</span></div>
+            <div class="speaker-cell" style="font-size:13px;color:var(--text-2)">Flagged stability issues with v2.3.1. Advocated for Android-first rollout. Noted crash bugs may delay timeline.</div>
+            <div class="speaker-cell"><span class="badge badge-info">Android-first rec.</span></div>
+          </div>
+          <div class="speaker-row">
+            <div class="speaker-cell"><span class="speaker-name">Meera T.</span><br><span style="font-size:11px;color:var(--text-3)">Marketing Lead</span></div>
+            <div class="speaker-cell" style="font-size:13px;color:var(--text-2)">Proposed ₹18L budget reallocation to influencers. Requires simultaneous platform launch for campaign.</div>
+            <div class="speaker-cell"><span class="badge badge-info">Budget reallocation</span></div>
+          </div>
+          <div class="speaker-row">
+            <div class="speaker-cell"><span class="speaker-name">Priya S.</span><br><span style="font-size:11px;color:var(--text-3)">QA / Beta Lead</span></div>
+            <div class="speaker-cell" style="font-size:13px;color:var(--text-2)">Reported beta closing June 28. Committed to delivering feedback report by June 30.</div>
+            <div class="speaker-cell"><span class="badge badge-info">Beta report deadline</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ══════════════════════ MERGE MODE DEMO ══════════════════════ -->
+    <div style="border-top:2px dashed var(--border);padding-top:28px;margin-bottom:32px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);margin-bottom:20px;">── Merge Mode Sections (Demo) ──</div>
+
+      <section class="section">
+        <div class="section-header">
+          <span class="section-icon">🔀</span>
+          <span class="section-title">Source Information</span>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon">📄</div>
+            <div class="card-title">Source 1 — Meeting Notes</div>
+            <div class="card-body">Raj's typed notes from the June 18 session. Captured live during call.</div>
+            <div style="margin-top:8px;"><span class="badge badge-info">Source 1</span></div>
+          </div>
+          <div class="card">
+            <div class="card-icon">🎙️</div>
+            <div class="card-title">Source 2 — Slack Thread Recap</div>
+            <div class="card-body">Post-meeting Slack thread summary posted by Meera. Contains partial action item list.</div>
+            <div style="margin-top:8px;"><span class="badge badge-info">Source 2</span></div>
+          </div>
+          <div class="card">
+            <div class="card-icon">📧</div>
+            <div class="card-title">Source 3 — Follow-up Email</div>
+            <div class="card-body">Raj's follow-up email sent June 19. Contains revised deadlines that conflict with Source 1.</div>
+            <div style="margin-top:8px;"><span class="badge badge-info">Source 3</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="margin-top:28px;">
+        <div class="section-header">
+          <span class="section-icon">🧩</span>
+          <span class="section-title">Duplicate Items</span>
+        </div>
+        <div class="item-list">
+          <div class="item">
+            <div class="item-badge-col"><span class="badge badge-medium">🟠 Duplicate</span></div>
+            <div class="item-content">
+              <div class="item-title">Beta feedback report — appears in Source 1 and Source 2</div>
+              <div class="item-desc">Both sources reference Priya's beta report due June 30. Deadline consistent across sources. No conflict.</div>
+              <div class="item-meta"><span class="badge badge-info">Source 1</span><span class="badge badge-info">Source 2</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="margin-top:28px;">
+        <div class="section-header">
+          <span class="section-icon">🔍</span>
+          <span class="section-title">Conflict Resolution Review</span>
+        </div>
+        <div class="conflict-box">
+          <div class="conflict-title">⚠️ Deadline Conflict — Finance Sign-off</div>
+          <div class="conflict-body">
+            <strong>Source 1 (Meeting Notes):</strong> Finance sign-off deadline stated as June 25, 2026.<br>
+            <strong>Source 3 (Follow-up Email):</strong> Finance sign-off deadline stated as June 28, 2026.<br><br>
+            These conflict by 3 days. This has NOT been automatically resolved. Please verify with Meera T. or Finance team.
+          </div>
+          <div class="conflict-sources">
+            <span class="badge badge-conflict">⚠️ Requires Human Review</span>
+            <span class="badge badge-info">Source 1</span>
+            <span class="badge badge-info">Source 3</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+</div><!-- /layout -->
+
+<footer class="footer">
+  <span>🧠 brain-dump-action-planner · Day 18 · 60-Day Claude Challenge</span>
+  <span>All data sourced from provided notes. Nothing invented. Nothing assumed.</span>
+</footer>
+
+<script>
+  // Sidebar active link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar-link[href^="#"]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sidebar-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Smooth scroll for sidebar links
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
