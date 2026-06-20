@@ -1,0 +1,191 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.report{padding:1rem 0;display:flex;flex-direction:column;gap:1.5rem}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.pred-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;display:flex;flex-direction:column;gap:12px}
+.pred-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pred-left{display:flex;align-items:center;gap:12px}
+.flag-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.pred-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.pred-role{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.conf-badge{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.conf-high{background:#E6F1FB;color:#0C447C}
+.conf-med{background:#FAEEDA;color:#633806}
+.conf-low{background:#EAF3DE;color:#27500A}
+.conf-bar-wrap{width:100%;height:6px;background:var(--color-background-tertiary);border-radius:3px;overflow:hidden}
+.conf-bar{height:6px;border-radius:3px}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.pill.green{background:#EAF3DE;border-color:#97C459;color:#27500A}
+.pill.red{background:#FCEBEB;border-color:#F09595;color:#791F1F}
+.pill.amber{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.divider{height:0.5px;background:var(--color-border-tertiary)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.stat-val{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.stat-lbl{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.player-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.player-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.player-meta{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.player-stat{font-size:12px;color:var(--color-text-info);margin-top:4px}
+.conf-row{display:flex;align-items:center;gap:10px}
+.conf-label{font-size:12px;color:var(--color-text-secondary);min-width:70px}
+.bar-wrap{flex:1;height:6px;background:var(--color-background-tertiary);border-radius:3px;overflow:hidden}
+.bar{height:6px;border-radius:3px}
+.conf-pct{font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:36px;text-align:right}
+</style>
+<h2 class="sr-only">FIFA World Cup 2026 prediction report covering winner, runner-up, dark horse, and players to watch</h2>
+<div class="report">
+
+<div>
+  <div class="section-label">Predicted winner</div>
+  <div class="pred-card" style="border:2px solid var(--color-border-info)">
+    <div class="pred-header">
+      <div class="pred-left">
+        <div class="flag-circle" style="background:#E6F1FB">ARG</div>
+        <div>
+          <div class="pred-title">Argentina</div>
+          <div class="pred-role">Defending champions · FIFA rank #1</div>
+        </div>
+      </div>
+      <div class="conf-badge conf-high">72% confidence</div>
+    </div>
+    <div class="conf-bar-wrap"><div class="conf-bar" style="width:72%;background:#378ADD"></div></div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">68%</div><div class="stat-lbl">Historical win %</div></div>
+      <div class="stat"><div class="stat-val">92</div><div class="stat-lbl">Current form score</div></div>
+      <div class="stat"><div class="stat-val">3–0</div><div class="stat-lbl">vs Algeria (Jun 16)</div></div>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="section-label" style="margin-bottom:6px">Evidence</div>
+      <div class="pill-row">
+        <span class="pill green">Back-to-back WC winner since 2022</span>
+        <span class="pill green">Highest form score (92) in dataset</span>
+        <span class="pill green">70% historical win rate over 50 matches</span>
+        <span class="pill green">Only 6 goals conceded in recent 10 games</span>
+        <span class="pill green">Messi in group stage — 20 goals, rating 96</span>
+      </div>
+    </div>
+    <div>
+      <div class="section-label" style="margin-bottom:6px">Key risks</div>
+      <div class="pill-row">
+        <span class="pill red">Messi's age (38) — durability over 7 matches</span>
+        <span class="pill red">France lurking in Group I as revenge rival</span>
+        <span class="pill amber">Pressure of defending the title</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="section-label">Predicted runner-up</div>
+  <div class="pred-card">
+    <div class="pred-header">
+      <div class="pred-left">
+        <div class="flag-circle" style="background:#EAF3DE">FRA</div>
+        <div>
+          <div class="pred-title">France</div>
+          <div class="pred-role">2022 finalists · FIFA rank #3</div>
+        </div>
+      </div>
+      <div class="conf-badge conf-med">65% confidence</div>
+    </div>
+    <div class="conf-bar-wrap"><div class="conf-bar" style="width:65%;background:#EF9F27"></div></div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">62%</div><div class="stat-lbl">Historical win %</div></div>
+      <div class="stat"><div class="stat-val">90</div><div class="stat-lbl">Current form score</div></div>
+      <div class="stat"><div class="stat-val">2–0</div><div class="stat-lbl">vs Senegal (Jun 16)</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="pill-row">
+      <span class="pill green">Mbappé — 22 goals, highest in star players</span>
+      <span class="pill green">Won in 2018, finalist in 2022 — pedigree</span>
+      <span class="pill green">Strong opening win vs Senegal</span>
+      <span class="pill red">Lost to Argentina in 2022 final</span>
+      <span class="pill amber">Reliant on Mbappé staying fit</span>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="section-label">Dark horse nation</div>
+  <div class="pred-card">
+    <div class="pred-header">
+      <div class="pred-left">
+        <div class="flag-circle" style="background:#FAEEDA">MAR</div>
+        <div>
+          <div class="pred-title">Morocco</div>
+          <div class="pred-role">2022 semi-finalists · FIFA rank #12</div>
+        </div>
+      </div>
+      <div class="conf-badge conf-low">38% confidence</div>
+    </div>
+    <div class="conf-bar-wrap"><div class="conf-bar" style="width:38%;background:#639922"></div></div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">44%</div><div class="stat-lbl">Historical win %</div></div>
+      <div class="stat"><div class="stat-val">86</div><div class="stat-lbl">Current form score</div></div>
+      <div class="stat"><div class="stat-val">1–1</div><div class="stat-lbl">vs Brazil (Jun 13)</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="pill-row">
+      <span class="pill green">Held Brazil to a draw in opening game</span>
+      <span class="pill green">Lowest goals conceded in recent form (6)</span>
+      <span class="pill green">2022 WC semi-final — Africa's best ever</span>
+      <span class="pill red">Lower historical win rate (44%)</span>
+      <span class="pill amber">Rank #12 — tough knockout draw likely</span>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="section-label">Players to watch</div>
+  <div class="players-grid">
+    <div class="player-card">
+      <div class="player-name">Lionel Messi</div>
+      <div class="player-meta">Argentina · Forward</div>
+      <div class="player-stat">20 goals · 12 assists · Rating 96</div>
+    </div>
+    <div class="player-card">
+      <div class="player-name">Kylian Mbappé</div>
+      <div class="player-meta">France · Forward</div>
+      <div class="player-stat">22 goals · 8 assists · Rating 95</div>
+    </div>
+    <div class="player-card">
+      <div class="player-name">Jude Bellingham</div>
+      <div class="player-meta">England · Midfielder</div>
+      <div class="player-stat">10 goals · 9 assists · Rating 91</div>
+    </div>
+    <div class="player-card">
+      <div class="player-name">Erling Haaland</div>
+      <div class="player-meta">Norway · Forward</div>
+      <div class="player-stat">25 goals · 4 assists · Rating 94</div>
+    </div>
+    <div class="player-card">
+      <div class="player-name">C. Ronaldo</div>
+      <div class="player-meta">Portugal · Forward</div>
+      <div class="player-stat">18 goals · 5 assists · Rating 94</div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="section-label">Overall confidence comparison</div>
+  <div style="display:flex;flex-direction:column;gap:10px;background:var(--color-background-secondary);padding:1rem;border-radius:var(--border-radius-md)">
+    <div class="conf-row"><div class="conf-label">Argentina</div><div class="bar-wrap"><div class="bar" style="width:72%;background:#378ADD"></div></div><div class="conf-pct">72%</div></div>
+    <div class="conf-row"><div class="conf-label">France</div><div class="bar-wrap"><div class="bar" style="width:65%;background:#EF9F27"></div></div><div class="conf-pct">65%</div></div>
+    <div class="conf-row"><div class="conf-label">Spain</div><div class="bar-wrap"><div class="bar" style="width:55%;background:#5DCAA5"></div></div><div class="conf-pct">55%</div></div>
+    <div class="conf-row"><div class="conf-label">Brazil</div><div class="bar-wrap"><div class="bar" style="width:50%;background:#97C459"></div></div><div class="conf-pct">50%</div></div>
+    <div class="conf-row"><div class="conf-label">Morocco</div><div class="bar-wrap"><div class="bar" style="width:38%;background:#EF9F27"></div></div><div class="conf-pct">38%</div></div>
+  </div>
+</div>
+
+<div style="background:var(--color-background-info);border-radius:var(--border-radius-md);padding:12px 16px;display:flex;align-items:flex-start;gap:10px">
+  <i class="ti ti-info-circle" style="font-size:16px;color:var(--color-text-info);margin-top:1px" aria-hidden="true"></i>
+  <span style="font-size:13px;color:var(--color-text-info);line-height:1.5">Live data as of June 17, 2026. Only 21 of 48 group stage matches have been played. Predictions will sharpen as more results come in.</span>
+</div>
+
+</div>
