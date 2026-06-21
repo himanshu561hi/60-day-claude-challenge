@@ -35,6 +35,5 @@ For Day 20 of the challenge, I built a complete, self-contained **AI Face Puzzle
 
 *Add your application screenshots here!*
 
-* `![Game Launch & Camera Feed](./camera-preview.png)`
 * `![Active Gameplay Grid](./gameplay.png)`
 * `![Win Screen & Leaderboard](./victory-leaderboard.png)`
