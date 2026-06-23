@@ -1,0 +1,70 @@
+# Day 21: Digital Privacy Intelligence Dashboard
+
+## Challenge Overview
+
+**Objective:** Build an interactive, premium cybersecurity-themed dashboard to visualize a user's digital footprint and privacy exposure based on their reported application usage.
+**Time Allocation:** 45 minutes
+**Level:** Intermediate
+**Deliverable:** Interactive HTML Artifact / GitHub Commit
+
+---
+
+## 📊 Core Dataset & Guidelines
+
+### 1. Reported Digital Footprint (Facts)
+
+The following applications and services are treated as absolute **Facts** for calculating scores, exposure rankings, and risk levels:
+
+* **Meta:** Instagram, WhatsApp
+* **Google:** YouTube, Google Search, Google Pay, Google Photos
+* **ByteDance:** TikTok
+* **Snap Inc.:** Snapchat
+* **Discord Inc.:** Discord
+* **Apple:** iMessage
+* **Spotify:** Spotify
+* **Roblox Corp:** Roblox
+* **Krafton:** PUBG Mobile
+* **Amazon:** Amazon
+* **Meesho:** Meesho
+
+### 2. Behavioral Rules (Estimates)
+
+* Any behavioral, demographic, lifestyle, shopping, spending, entertainment, mobility, travel, communication, or technology-related conclusions must be clearly labeled as **Estimates**.
+* The dashboard must never claim certainty or access to private databases.
+* If data points cannot reasonably be inferred, display: `Not enough information provided.`
+
+---
+
+## 🛠️ Dashboard Architecture
+
+The dashboard is generated as a single self-contained premium HTML/CSS file matching a modern dark-mode SaaS UI (inspired by Stripe, Linear, and Apple Privacy Reports).
+
+### UI/UX Component Specifications
+
+1. **Digital Footprint Score (0-100)**
+    * 🟢 `0-30` = Minimal
+    * 🟡 `31-60` = Moderate
+    * 🟠 `61-80` = Significant
+    * 🔴 `81-100` = Extensive
+2. **Privacy Score (0-100)**
+    * 🔴 `0-30` = Weak
+    * 🟠 `31-60` = Fair
+    * 🟡 `61-80` = Good
+    * 🟢 `81-100` = Strong
+3. **Key Tracking Metrics**
+    * Total Services Used (Count: 15)
+    * Number of Parent Companies
+    * Ecosystem Concentration Score
+    * Estimated Tracking Surface
+4. **Data Visualizations**
+    * **Exposure Heatmap:** Cross-referencing data collection categories (Location, Financial, Behavioral, Contacts) across services.
+    * **Company Exposure Ranking:** Identifying which parent companies hold the highest risk.
+    * **Risk Radar & Data Collection Matrix:** Visualizing the likelihood of data harvesting.
+5. **Digital Twin Profile**
+    * Inferred traits, lifestyle tracking, and commercial profile categorized exclusively under **Estimates**.
+6. **Actionable Intelligence**
+    * **Most Valuable Data Assets:** Pinpointing what data is most lucrative to brokers.
+    * **Privacy Improvement Simulator:** A live tool to see how scores improve when specific privacy settings are toggled.
+    * **Final Verdict:** Summarized expert security risk posture.
+
+---
