@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPM Business Intelligence Dashboard | Day 24</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #050d1a;
+      --bg2: #081525;
+      --bg3: #0d1e35;
+      --card: #0b1a30;
+      --card2: #112038;
+      --border: rgba(100,180,255,0.10);
+      --border2: rgba(100,180,255,0.18);
+      --blue: #1a8fff;
+      --teal: #00d4aa;
+      --orange: #ff6b35;
+      --gold: #ffd700;
+      --purple: #bf5af2;
+      --red: #ff453a;
+      --green: #30d158;
+      --warn: #ff9f0a;
+      --validate: #ffd60a;
+      --text: #e8f0fe;
+      --text2: #8fa3c0;
+      --text3: #4d6a8a;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(160deg, #050d1a 0%, #091826 60%, #050f1c 100%);
+      border-bottom: 1px solid var(--border2);
+      padding: 40px 52px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content:'';position:absolute;top:-100px;right:-60px;
+      width:340px;height:340px;border-radius:50%;
+      background:radial-gradient(circle,rgba(26,143,255,.14) 0%,transparent 70%);
+    }
+    .header::after {
+      content:'';position:absolute;bottom:-80px;left:280px;
+      width:240px;height:240px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,212,170,.09) 0%,transparent 70%);
+    }
+    .day-chip {
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(26,143,255,.12);border:1px solid rgba(26,143,255,.28);
+      color:var(--blue);font-size:11px;font-weight:700;letter-spacing:2px;
+      text-transform:uppercase;padding:5px 14px;border-radius:30px;margin-bottom:16px;
+    }
+    .day-chip span { font-size:9px;opacity:.7; }
+    h1 {
+      font-family:'Outfit',sans-serif;font-size:2.8rem;font-weight:900;
+      background:linear-gradient(135deg,#fff 0%,#7ec8ff 55%,#00d4aa 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;line-height:1.1;margin-bottom:8px;
+    }
+    .header-sub { color:var(--text2);font-size:14px;max-width:620px;margin-bottom:20px; }
+    .header-tags { display:flex;gap:10px;flex-wrap:wrap; }
+    .htag {
+      font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+      color:var(--text2);
+    }
+
+    /* VERDICT BANNER */
+    .verdict {
+      background:linear-gradient(135deg,rgba(255,214,10,.09),rgba(255,159,10,.06));
+      border-top:1px solid rgba(255,214,10,.25);
+      border-bottom:1px solid rgba(255,214,10,.25);
+      padding:18px 52px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    }
+    .verdict-left { display:flex;align-items:center;gap:16px; }
+    .verdict-icon { font-size:34px; }
+    .verdict-title { font-size:20px;font-weight:900;color:var(--validate);letter-spacing:.5px; }
+    .verdict-sub { font-size:12px;color:var(--text2);margin-top:2px; }
+    .verdict-score-block { text-align:center; }
+    .vscore {
+      font-family:'Outfit',sans-serif;font-size:3.4rem;font-weight:900;
+      color:var(--validate);line-height:1;
+    }
+    .vscore span { font-size:1.3rem;color:var(--text3);font-weight:400; }
+    .delta-row { display:flex;gap:20px;align-items:center;flex-wrap:wrap; }
+    .delta-item { text-align:center; }
+    .delta-val { font-size:13px;font-weight:800;color:var(--green); }
+    .delta-label { font-size:10px;color:var(--text3);margin-top:1px; }
+
+    /* LAYOUT */
+    .dash { padding:28px 52px; display:flex;flex-direction:column;gap:20px; }
+    .row { display:grid;gap:20px; }
+    .r4 { grid-template-columns:repeat(4,1fr); }
+    .r3 { grid-template-columns:repeat(3,1fr); }
+    .r2 { grid-template-columns:repeat(2,1fr); }
+    .r21 { grid-template-columns:2fr 1fr; }
+    .r12 { grid-template-columns:1fr 2fr; }
+
+    /* CARDS */
+    .card {
+      background:var(--card);border:1px solid var(--border);border-radius:14px;
+      padding:22px;position:relative;overflow:hidden;
+      transition:border-color .25s,transform .2s;
+    }
+    .card:hover { border-color:var(--border2);transform:translateY(-2px); }
+    .ct {
+      font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+      color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:8px;
+    }
+    .ct-dot { width:6px;height:6px;border-radius:50%; }
+
+    /* STAT CARDS */
+    .stat { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px; }
+    .stat-lbl { font-size:10px;color:var(--text3);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px; }
+    .stat-val { font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:900;line-height:1; }
+    .stat-sub { font-size:11px;color:var(--text2);margin-top:5px; }
+
+    /* SCORE BARS */
+    .scores { display:flex;flex-direction:column;gap:11px; }
+    .si { display:flex;flex-direction:column;gap:4px; }
+    .sh { display:flex;justify-content:space-between;align-items:center; }
+    .sl { font-size:12px;color:var(--text2);font-weight:500; }
+    .sv { font-size:13px;font-weight:800; }
+    .sbar { height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;position:relative; }
+    .sfill { height:100%;border-radius:3px;transition:width 1.6s cubic-bezier(.4,0,.2,1); }
+
+    /* DELTA COMPARE */
+    .delta-table { width:100%;border-collapse:collapse;font-size:12px; }
+    .delta-table th { font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border); }
+    .delta-table td { padding:8px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2); }
+    .delta-table td:first-child { color:var(--text);font-weight:500; }
+    .delta-up { color:var(--green);font-weight:700; }
+    .delta-same { color:var(--text3); }
+
+    /* PRICING */
+    .ptable { width:100%;border-collapse:collapse;font-size:12px; }
+    .ptable th { font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border);text-align:left; }
+    .ptable td { padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle; }
+    .ptable tr:last-child td { border-bottom:none; }
+    .tier-name { font-weight:700;color:var(--text); }
+    .tier-price { font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--teal); }
+    .tier-who { color:var(--text2);font-size:11px; }
+    .pbadge {
+      font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;
+      display:inline-block;
+    }
+    .b-live { background:rgba(48,209,88,.15);color:var(--green);border:1px solid rgba(48,209,88,.3); }
+    .b-hypo { background:rgba(255,159,10,.15);color:var(--warn);border:1px solid rgba(255,159,10,.3); }
+    .b-future { background:rgba(191,90,242,.15);color:var(--purple);border:1px solid rgba(191,90,242,.3); }
+
+    /* GTM */
+    .gtm-phases { display:flex;flex-direction:column;gap:12px; }
+    .gp { display:grid;grid-template-columns:88px 1fr;gap:14px;align-items:start; }
+    .gp-tag {
+      font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+      padding:6px 8px;border-radius:7px;text-align:center;line-height:1.4;
+    }
+    .gp1 { background:rgba(26,143,255,.14);color:var(--blue);border:1px solid rgba(26,143,255,.25); }
+    .gp2 { background:rgba(0,212,170,.14);color:var(--teal);border:1px solid rgba(0,212,170,.25); }
+    .gp3 { background:rgba(191,90,242,.14);color:var(--purple);border:1px solid rgba(191,90,242,.25); }
+    .gp-body strong { display:block;font-size:13px;color:var(--text);margin-bottom:5px; }
+    .gp-body p { font-size:11.5px;color:var(--text2);line-height:1.6; }
+    .tags { display:flex;flex-wrap:wrap;gap:6px;margin-top:7px; }
+    .tag {
+      font-size:10px;padding:2px 10px;border-radius:20px;
+      background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text2);
+    }
+
+    /* RISK MATRIX */
+    .risks { display:flex;flex-direction:column;gap:8px; }
+    .risk-row {
+      display:grid;grid-template-columns:1fr 64px 64px;gap:8px;align-items:center;
+      padding:9px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid transparent;
+    }
+    .rhh { border-left-color:var(--red); }
+    .rhm { border-left-color:var(--warn); }
+    .rmh { border-left-color:var(--warn); }
+    .rmm { border-left-color:var(--blue); }
+    .rname { font-size:12px;color:var(--text);font-weight:500; }
+    .rpill { font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-align:center; }
+    .ph { background:rgba(255,69,58,.18);color:var(--red); }
+    .pm { background:rgba(255,159,10,.18);color:var(--warn); }
+    .pl { background:rgba(48,209,88,.18);color:var(--green); }
+
+    /* TIMELINE */
+    .tl { display:flex;flex-direction:column;gap:0; }
+    .tl-item { display:grid;grid-template-columns:72px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid var(--border); }
+    .tl-item:last-child { border-bottom:none; }
+    .tl-days {
+      font-size:10px;font-weight:700;color:var(--blue);
+      background:rgba(26,143,255,.1);padding:3px 7px;border-radius:6px;
+      text-align:center;align-self:start;white-space:nowrap;
+    }
+    .tl-txt { font-size:12px;color:var(--text2);line-height:1.5; }
+    .tl-txt strong { color:var(--text); }
+    .tl-metric { font-size:10.5px;color:var(--teal);font-weight:600;margin-top:3px; }
+
+    /* USER TARGETS */
+    .user-targets { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px; }
+    .ut {
+      background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+      padding:12px;text-align:center;
+    }
+    .ut-val { font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;line-height:1; }
+    .ut-lbl { font-size:10px;color:var(--text2);margin-top:4px; }
+
+    /* MOAT */
+    .moat-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+    .mi { background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px; }
+    .mi h4 { font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px; }
+    .mi p { font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:7px; }
+    .mbar-wrap { display:flex;align-items:center;gap:8px; }
+    .mbar { flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden; }
+    .mfill { height:100%;border-radius:3px;transition:width 1.8s ease; }
+    .mstr { font-size:10px;font-weight:700;white-space:nowrap; }
+
+    /* BMC */
+    .bmc-grid {
+      display:grid;
+      grid-template-areas:
+        "kp ka vp cr cs"
+        "kp kres vp ch cs"
+        "cost cost vp rev rev";
+      gap:6px;font-size:11px;
+    }
+    .bmc-cell {
+      background:var(--bg3);border:1px solid var(--border);
+      border-radius:8px;padding:12px;
+    }
+    .bmc-cell h4 { font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:7px; }
+    .bmc-cell li { color:var(--text2);line-height:1.7;margin-left:12px; }
+    .bkp { grid-area:kp; }
+    .bka { grid-area:ka; }
+    .bvp { grid-area:vp;border-color:rgba(26,143,255,.3); }
+    .bcr { grid-area:cr; }
+    .bcs { grid-area:cs; }
+    .bkres { grid-area:kres; }
+    .bch { grid-area:ch; }
+    .bcost { grid-area:cost; }
+    .brev { grid-area:rev; }
+    .bmc-sub { font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:8px 0 4px; }
+    .bmc-sub.blue { color:var(--blue); }
+    .bmc-sub.teal { color:var(--teal); }
+
+    /* PITCH */
+    .pitch-card {
+      background:linear-gradient(135deg,rgba(26,143,255,.07),rgba(0,212,170,.04));
+      border:1px solid rgba(26,143,255,.2);border-radius:12px;padding:20px;
+    }
+    .pitch-ol {
+      font-size:14px;font-weight:700;color:var(--text);
+      border-left:3px solid var(--blue);padding-left:14px;
+      line-height:1.7;margin-bottom:16px;
+    }
+    .pitch-30 {
+      font-size:13px;color:var(--text2);font-style:italic;line-height:1.8;
+    }
+    .pitch-30 strong { color:var(--text);font-style:normal; }
+
+    /* ACTIONS */
+    .actions { display:flex;flex-direction:column;gap:7px; }
+    .ai {
+      display:grid;grid-template-columns:28px 84px 1fr;gap:10px;align-items:start;
+      padding:9px 12px;background:var(--bg3);border:1px solid var(--border);
+      border-radius:8px;transition:border-color .2s;
+    }
+    .ai:hover { border-color:rgba(26,143,255,.28); }
+    .anum {
+      width:26px;height:26px;border-radius:50%;
+      background:rgba(26,143,255,.14);border:1px solid rgba(26,143,255,.25);
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:900;color:var(--blue);flex-shrink:0;
+    }
+    .awhen {
+      font-size:10px;font-weight:700;color:var(--warn);
+      background:rgba(255,159,10,.1);border:1px solid rgba(255,159,10,.2);
+      padding:2px 7px;border-radius:6px;text-align:center;align-self:center;white-space:nowrap;
+    }
+    .awhen.today { color:var(--red);background:rgba(255,69,58,.1);border-color:rgba(255,69,58,.2); }
+    .atxt { font-size:12px;color:var(--text2);line-height:1.45; }
+    .atxt strong { color:var(--text); }
+
+    /* REVENUE BARS */
+    .rev-bars { display:flex;flex-direction:column;gap:10px; }
+    .rb { display:flex;flex-direction:column;gap:4px; }
+    .rh { display:flex;justify-content:space-between;align-items:center; }
+    .rn { font-size:12px;font-weight:600;color:var(--text); }
+    .ra { font-size:12px;font-weight:700;color:var(--teal); }
+    .rbar { height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden; }
+    .rfill { height:100%;border-radius:4px;transition:width 1.6s ease; }
+
+    /* FINAL VERDICT */
+    .final {
+      background:linear-gradient(135deg,rgba(255,214,10,.07),rgba(255,159,10,.04));
+      border:1px solid rgba(255,214,10,.22);border-radius:14px;padding:26px;
+      display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start;
+    }
+    .fv-badge {
+      text-align:center;padding:18px 22px;
+      background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.22);
+      border-radius:12px;min-width:110px;
+    }
+    .fv-emoji { font-size:38px; }
+    .fv-label { font-size:14px;font-weight:900;color:var(--validate);letter-spacing:.8px;margin-top:6px; }
+    .fv-score { font-size:12px;color:var(--text2);margin-top:4px; }
+    .fv-text p { font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:10px; }
+    .fv-text p:last-child { margin-bottom:0; }
+    .fv-text strong { color:var(--text); }
+
+    /* COMPETITOR TABLE */
+    .ctable { width:100%;border-collapse:collapse;font-size:11.5px; }
+    .ctable th { font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border);text-align:left; }
+    .ctable td { padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2); }
+    .ctable tr:last-child td { border-bottom:none; }
+    .ctable td:first-child { color:var(--text);font-weight:600; }
+    .c-win { color:var(--green);font-weight:700; }
+    .c-threat { color:var(--red);font-weight:600; }
+
+    /* FOOTER */
+    footer {
+      border-top:1px solid var(--border);padding:18px 52px;
+      display:flex;justify-content:space-between;align-items:center;
+      color:var(--text3);font-size:11px;
+    }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
+    .card,.stat,.final { animation:fadeUp .5s ease both; }
+
+    @media(max-width:1100px){
+      .r4,.r3,.r2,.r21,.r12 { grid-template-columns:1fr; }
+      .dash { padding:20px 24px; }
+      .header,.verdict,footer { padding-left:24px;padding-right:24px; }
+      .bmc-grid { grid-template-areas:"kp""ka""vp""cr""cs""kres""ch""cost""rev"; grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="day-chip">Day 24 <span>|</span> Business Intelligence Dashboard</div>
+  <h1>Student Project Marketplace</h1>
+  <p class="header-sub">Automated Internship & Full-Stack Project Development Ecosystem — AI Co-Founder Analysis</p>
+  <div class="header-tags">
+    <span class="htag">EdTech / CareerTech</span>
+    <span class="htag">Idea — Pre-MVP</span>
+    <span class="htag">India Tier-2/3</span>
+    <span class="htag">Two-Sided Marketplace</span>
+    <span class="htag">June 2026</span>
+  </div>
+</div>
+
+<!-- VERDICT BANNER -->
+<div class="verdict">
+  <div class="verdict-left">
+    <div class="verdict-icon">🟡</div>
+    <div>
+      <div class="verdict-title">VALIDATE</div>
+      <div class="verdict-sub">Promising But Unvalidated — Execute 30-Day Discovery Sprint. No code until Day 30.</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:36px;align-items:center;flex-wrap:wrap">
+    <div class="verdict-score-block">
+      <div class="vscore">76<span>/100</span></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Day 24 Score</div>
+    </div>
+    <div class="delta-row">
+      <div class="delta-item">
+        <div class="delta-val">+2</div>
+        <div class="delta-label">vs Day 23</div>
+      </div>
+      <div style="width:1px;height:32px;background:var(--border)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 18px">
+        <div style="font-size:11.5px;color:var(--text2)">Problem: <strong style="color:var(--green)">90/100</strong></div>
+        <div style="font-size:11.5px;color:var(--text2)">Customer: <strong style="color:var(--blue)">78/100</strong></div>
+        <div style="font-size:11.5px;color:var(--text2)">Timing: <strong style="color:var(--teal)">85/100</strong></div>
+        <div style="font-size:11.5px;color:var(--text2)">Validation: <strong style="color:var(--red)">15/100</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dash">
+
+  <!-- KPI STATS -->
+  <div class="row r4">
+    <div class="stat">
+      <div class="stat-lbl">Market Size</div>
+      <div class="stat-val" style="color:var(--blue)">$12.1B</div>
+      <div class="stat-sub">India EdTech · 15%+ CAGR</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Annual Graduates</div>
+      <div class="stat-val" style="color:var(--teal)">1.5M+</div>
+      <div class="stat-sub">Engineering graduates/year</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Employer Skills Gap</div>
+      <div class="stat-val" style="color:var(--red)">60%</div>
+      <div class="stat-sub">Report unready graduates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Reachable SOM</div>
+      <div class="stat-val" style="color:var(--gold)">$29M</div>
+      <div class="stat-sub">Tier-2/3 project-first niche</div>
+    </div>
+  </div>
+
+  <!-- SCORECARD + DELTA -->
+  <div class="row r2">
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--blue)"></div>Investment Scorecard — Day 24</div>
+      <div class="scores">
+        <div class="si">
+          <div class="sh"><span class="sl">Problem Severity</span><span class="sv" style="color:var(--green)">90</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#30d158,#00d4aa)" data-w="90%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Market Timing</span><span class="sv" style="color:var(--teal)">85</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#00d4aa,#1a8fff)" data-w="85%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Customer Clarity</span><span class="sv" style="color:var(--blue)">78</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#1a8fff,#bf5af2)" data-w="78%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Business Viability</span><span class="sv" style="color:var(--blue)">74</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#1a8fff,#00d4aa)" data-w="74%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Competitive Strength</span><span class="sv" style="color:var(--purple)">72</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#bf5af2,#ff6b35)" data-w="72%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Revenue Potential</span><span class="sv" style="color:var(--teal)">70</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#00d4aa,#30d158)" data-w="70%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">GTM Strength</span><span class="sv" style="color:var(--gold)">65</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#ffd700,#ff9f0a)" data-w="65%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Investor Readiness</span><span class="sv" style="color:var(--warn)">60</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#ff9f0a,#ff6b35)" data-w="60%"></div></div>
+        </div>
+        <div class="si">
+          <div class="sh"><span class="sl">Validation Strength</span><span class="sv" style="color:var(--red)">15</span></div>
+          <div class="sbar"><div class="sfill" style="width:0%;background:linear-gradient(90deg,#ff453a,#ff9f0a)" data-w="15%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--teal)"></div>Day 23 → Day 24 Score Delta</div>
+      <table class="delta-table">
+        <thead><tr><th>Dimension</th><th>Day 23</th><th>Day 24</th><th>Δ</th></tr></thead>
+        <tbody>
+          <tr><td>Business Viability</td><td>72</td><td>74</td><td class="delta-up">+2 ↑</td></tr>
+          <tr><td>Revenue Potential</td><td>68</td><td>70</td><td class="delta-up">+2 ↑</td></tr>
+          <tr><td>GTM Strength</td><td>65</td><td>65</td><td class="delta-same">0 →</td></tr>
+          <tr><td>Competitive Strength</td><td>70</td><td>72</td><td class="delta-up">+2 ↑</td></tr>
+          <tr><td>Investor Readiness</td><td>58</td><td>60</td><td class="delta-up">+2 ↑</td></tr>
+          <tr><td><strong>Overall</strong></td><td><strong>74</strong></td><td><strong>76</strong></td><td class="delta-up"><strong>+2 ↑</strong></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;padding:11px 14px;background:rgba(0,212,170,.07);border:1px solid rgba(0,212,170,.18);border-radius:8px">
+        <div style="font-size:11px;color:var(--text2)">
+          <strong style="color:var(--teal)">Why +2?</strong> The workflow-automation framing (brief → apply → milestone → auto-portfolio) adds product defensibility and strengthens the competitive position vs pure-matching platforms. Core validation gap remains unchanged.
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="ct" style="margin-bottom:10px"><div class="ct-dot" style="background:var(--gold)"></div>Revenue Projections (Month 12)</div>
+        <div class="rev-bars">
+          <div class="rb">
+            <div class="rh"><span class="rn">Org Subscriptions (Primary)</span><span class="ra">₹60K–₹3.75L/mo</span></div>
+            <div class="rbar"><div class="rfill" style="width:0%;background:linear-gradient(90deg,#1a8fff,#00d4aa)" data-w="78%"></div></div>
+          </div>
+          <div class="rb">
+            <div class="rh"><span class="rn">Student Premium</span><span class="ra">₹20K–₹1.6L/mo</span></div>
+            <div class="rbar"><div class="rfill" style="width:0%;background:linear-gradient(90deg,#bf5af2,#ff6b35)" data-w="38%"></div></div>
+          </div>
+          <div class="rb">
+            <div class="rh"><span class="rn">College Enterprise</span><span class="ra">₹50K–₹2L/yr</span></div>
+            <div class="rbar"><div class="rfill" style="width:0%;background:linear-gradient(90deg,#ffd700,#ff9f0a)" data-w="18%"></div></div>
+          </div>
+        </div>
+        <div style="margin-top:11px;padding:10px 12px;background:rgba(26,143,255,.07);border-radius:8px;border:1px solid rgba(26,143,255,.14)">
+          <div style="font-size:11px;color:var(--text2)">
+            Path to <strong style="color:var(--teal)">₹1 Crore ARR</strong>: 70 Growth orgs (₹2,499/mo) + 800 premium students + 2 college contracts
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING + GTM -->
+  <div class="row r2">
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--teal)"></div>Revenue & Pricing Strategy</div>
+      <table class="ptable">
+        <thead><tr><th>Tier</th><th>Price</th><th>Segment</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="tier-name">Free</span></td>
+            <td><span class="tier-price">₹0</span></td>
+            <td><span class="tier-who">Students — Profile, apply, portfolio</span></td>
+            <td><span class="pbadge b-live">Always</span></td>
+          </tr>
+          <tr>
+            <td><span class="tier-name">Founding</span></td>
+            <td><span class="tier-price">₹0</span></td>
+            <td><span class="tier-who">Orgs — 90-day max, 10 seats</span></td>
+            <td><span class="pbadge b-live">Launch</span></td>
+          </tr>
+          <tr>
+            <td><span class="tier-name">Starter</span></td>
+            <td><span class="tier-price">₹999/mo</span></td>
+            <td><span class="tier-who">Orgs — 3 projects, full inbox</span></td>
+            <td><span class="pbadge b-hypo">Hypo</span></td>
+          </tr>
+          <tr>
+            <td><span class="tier-name">Growth</span></td>
+            <td><span class="tier-price">₹2,499/mo</span></td>
+            <td><span class="tier-who">Orgs — Unlimited + analytics</span></td>
+            <td><span class="pbadge b-hypo">Hypo</span></td>
+          </tr>
+          <tr>
+            <td><span class="tier-name">Premium</span></td>
+            <td><span class="tier-price">₹199/mo</span></td>
+            <td><span class="tier-who">Students — Badge + PDF portfolio</span></td>
+            <td><span class="pbadge b-hypo">Hypo</span></td>
+          </tr>
+          <tr>
+            <td><span class="tier-name">Enterprise</span></td>
+            <td><span class="tier-price">₹50K–2L/yr</span></td>
+            <td><span class="tier-who">Colleges — White-label dashboard</span></td>
+            <td><span class="pbadge b-future">Future</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;padding:11px;background:rgba(255,69,58,.06);border:1px solid rgba(255,69,58,.16);border-radius:8px">
+        <div style="font-size:11px;color:var(--text2)">
+          ⚠️ <strong style="color:var(--red)">Critical:</strong> Org willingness-to-pay is entirely unvalidated. Test with a real invoice ask in Week 1 — not a "would you pay?" poll.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--orange)"></div>Go-To-Market Strategy — 3 Phases</div>
+      <div class="gtm-phases">
+        <div class="gp">
+          <div class="gp-tag gp1">Month 0–1<br/>Pre-Code</div>
+          <div class="gp-body">
+            <strong>Manual Validation Sprint — Zero Code Written</strong>
+            <p>20 student interviews · 5 org calls · Landing page waitlist (50 sign-ups) · 3 project briefs secured verbally before any MVP build begins</p>
+            <div class="tags">
+              <span class="tag">WhatsApp Groups</span>
+              <span class="tag">Discord</span>
+              <span class="tag">LinkedIn DMs</span>
+              <span class="tag">Founder Network</span>
+            </div>
+          </div>
+        </div>
+        <div class="gp">
+          <div class="gp-tag gp2">Month 2<br/>Soft Launch</div>
+          <div class="gp-body">
+            <strong>Controlled MVP Launch — 3 Orgs + 20 Students</strong>
+            <p>3 projects live · Track completion funnel · NPS > 30 · Portfolio pages shared on LinkedIn · 1 ROI case study published</p>
+            <div class="tags">
+              <span class="tag">Pilot Cohort</span>
+              <span class="tag">NPS Survey</span>
+              <span class="tag">LinkedIn Stories</span>
+            </div>
+          </div>
+        </div>
+        <div class="gp">
+          <div class="gp-tag gp3">Month 3–6<br/>Flywheel</div>
+          <div class="gp-body">
+            <strong>Community-Led Growth — Ambassador Program + First Revenue</strong>
+            <p>5 campus ambassadors · Referral program for orgs · ₹5,000 MRR target · SEO blog live · Org ROI digest email monthly</p>
+            <div class="tags">
+              <span class="tag">Ambassador × 5</span>
+              <span class="tag">Referral Program</span>
+              <span class="tag">₹5K MRR</span>
+              <span class="tag">SEO Content</span>
+            </div>
+          </div>
+        </div>
+        <div style="padding:11px 14px;background:rgba(26,143,255,.06);border-radius:9px;border:1px solid rgba(26,143,255,.14)">
+          <div style="font-size:11.5px;color:var(--text2);line-height:1.9">
+            <strong style="color:var(--blue)">GTM Flow:</strong>
+            Founder Network → Anchor Orgs (5) → Manual Matching → Student Onboarding
+            → Completed Projects → Auto-Portfolio Live → Student Shares on LinkedIn
+            → Inbound Orgs Discover Platform → Premium Conversion → Scale
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISK MATRIX + FIRST 100 USERS -->
+  <div class="row r2">
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--red)"></div>Risk Matrix — Likelihood × Impact</div>
+      <div class="risks">
+        <div style="display:grid;grid-template-columns:1fr 64px 64px;gap:8px;padding:5px 12px;font-size:9px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase">
+          <span>Risk</span><span>Likelihood</span><span>Impact</span>
+        </div>
+        <div class="risk-row rhh"><span class="rname">Org willingness-to-pay unvalidated</span><span class="rpill ph">HIGH</span><span class="rpill ph">HIGH</span></div>
+        <div class="risk-row rhh"><span class="rname">Two-sided cold start — chicken-and-egg</span><span class="rpill ph">HIGH</span><span class="rpill ph">HIGH</span></div>
+        <div class="risk-row rhh"><span class="rname">Solo founder bandwidth constraint</span><span class="rpill ph">HIGH</span><span class="rpill ph">HIGH</span></div>
+        <div class="risk-row rmh"><span class="rname">Student drop-off mid-project</span><span class="rpill pm">MED</span><span class="rpill ph">HIGH</span></div>
+        <div class="risk-row rmh"><span class="rname">Network effects take too long</span><span class="rpill pm">MED</span><span class="rpill ph">HIGH</span></div>
+        <div class="risk-row rhm"><span class="rname">Internshala/LinkedIn fast-follow copy</span><span class="rpill ph">HIGH</span><span class="rpill pm">MED</span></div>
+        <div class="risk-row rhm"><span class="rname">Free founding tier dependency trap</span><span class="rpill ph">HIGH</span><span class="rpill pm">MED</span></div>
+        <div class="risk-row rmm"><span class="rname">Student premium price resistance</span><span class="rpill pm">MED</span><span class="rpill pm">MED</span></div>
+      </div>
+      <div style="margin-top:12px;padding:11px 12px;background:rgba(255,69,58,.07);border:1px solid rgba(255,69,58,.18);border-radius:8px">
+        <div style="font-size:11px;color:var(--text2)">
+          ⚠️ <strong style="color:var(--red)">#1 Existential Risk:</strong> Org willingness-to-pay. Test with a real invoice ask by Day 7 — not a survey. One "yes" or "no" is worth more than 100 "sounds good" responses.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--teal)"></div>First 100 Users — 30-Day Sprint</div>
+      <div class="user-targets">
+        <div class="ut">
+          <div class="ut-val" style="color:var(--blue)">80</div>
+          <div class="ut-lbl">Students</div>
+        </div>
+        <div class="ut">
+          <div class="ut-val" style="color:var(--teal)">15</div>
+          <div class="ut-lbl">Organizations</div>
+        </div>
+        <div class="ut">
+          <div class="ut-val" style="color:var(--purple)">5</div>
+          <div class="ut-lbl">Ambassadors</div>
+        </div>
+      </div>
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-days">Day 1–5</div>
+          <div class="tl-txt"><strong>20 student interviews + 5 org founder calls</strong><div class="tl-metric">✓ 20 responses · ✓ 5 calls · ✓ 3 pain phrases</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-days">Day 6–10</div>
+          <div class="tl-txt"><strong>Synthesize findings · Define 3 MVP features only</strong><div class="tl-metric">✓ Feature doc locked · ✓ Repo live</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-days">Day 11–15</div>
+          <div class="tl-txt"><strong>Landing page live · Post in 10 college groups</strong><div class="tl-metric">✓ 50 sign-ups · ✓ 100+ page views</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-days">Day 16–20</div>
+          <div class="tl-txt"><strong>Secure 3 org commitments · Build MVP core flow</strong><div class="tl-metric">✓ 3 project briefs · ✓ Working prototype</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-days">Day 21–25</div>
+          <div class="tl-txt"><strong>Soft-launch: 3 orgs + 20 students</strong><div class="tl-metric">✓ 3 projects posted live</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-days">Day 26–30</div>
+          <div class="tl-txt"><strong>Collect NPS · Identify top friction point</strong><div class="tl-metric">✓ NPS > 30 · ✓ Insights doc</div></div>
+        </div>
+      </div>
+      <div style="margin-top:11px;padding:11px 12px;background:rgba(255,214,10,.07);border-radius:8px;border:1px solid rgba(255,214,10,.18)">
+        <div style="font-size:11px;color:var(--text2)">
+          🏁 <strong style="color:var(--validate)">North Star Metric:</strong> 10 completed projects rated ≥ 4/5 — not sign-ups. Not downloads. Completions only.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPETITIVE MOAT + BMC -->
+  <div class="row r2">
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--purple)"></div>Competitive Position & Defensive Moat</div>
+      <table class="ctable" style="margin-bottom:16px">
+        <thead><tr><th>Platform</th><th>Core Focus</th><th>SPM Advantage</th></tr></thead>
+        <tbody>
+          <tr><td>Internshala</td><td>Internship-first, Tier-1</td><td class="c-win">Moving upstream — niche abandoned ✓</td></tr>
+          <tr><td>LinkedIn</td><td>General professional</td><td class="c-win">No project post, no rating, no workflow ✓</td></tr>
+          <tr><td>Fiverr</td><td>Paid freelance</td><td class="c-win">Quality risk; no portfolio incentive ✓</td></tr>
+          <tr><td>GitHub</td><td>Code portfolio (passive)</td><td class="c-win">No matching, no org tools, no workflow ✓</td></tr>
+          <tr><td>Unstop</td><td>Hackathons (events)</td><td class="c-win">Event-based only; no ongoing flow ✓</td></tr>
+          <tr><td>upGrad</td><td>Online courses</td><td class="c-win">Course-first; no project marketplace ✓</td></tr>
+        </tbody>
+      </table>
+      <div class="ct" style="margin-bottom:10px"><div class="ct-dot" style="background:var(--gold)"></div>Moat Strength Analysis</div>
+      <div class="moat-grid">
+        <div class="mi">
+          <h4>🌐 Network Effects</h4>
+          <p>Each completed project → portfolio → viral share → inbound orgs</p>
+          <div class="mbar-wrap">
+            <div class="mbar"><div class="mfill" style="width:0%;background:var(--blue)" data-w="78%"></div></div>
+            <span class="mstr" style="color:var(--blue)">High</span>
+          </div>
+        </div>
+        <div class="mi">
+          <h4>🏙️ Geo-Specific Trust</h4>
+          <p>Deep Tier-2/3 college community penetration — hard to replicate</p>
+          <div class="mbar-wrap">
+            <div class="mbar"><div class="mfill" style="width:0%;background:var(--teal)" data-w="83%"></div></div>
+            <span class="mstr" style="color:var(--teal)">High</span>
+          </div>
+        </div>
+        <div class="mi">
+          <h4>⚙️ Workflow Lock-in</h4>
+          <p>Automated brief → milestone → portfolio pipeline creates switching cost</p>
+          <div class="mbar-wrap">
+            <div class="mbar"><div class="mfill" style="width:0%;background:var(--purple)" data-w="68%"></div></div>
+            <span class="mstr" style="color:var(--purple)">Medium</span>
+          </div>
+        </div>
+        <div class="mi">
+          <h4>📊 Data Flywheel</h4>
+          <p>Completion rates + ratings → better matching over time</p>
+          <div class="mbar-wrap">
+            <div class="mbar"><div class="mfill" style="width:0%;background:var(--gold)" data-w="60%"></div></div>
+            <span class="mstr" style="color:var(--gold)">Medium</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:11px;background:rgba(255,69,58,.06);border:1px solid rgba(255,69,58,.16);border-radius:8px">
+        <div style="font-size:11px;color:var(--text2)">⚡ <strong style="color:var(--red)">Speed IS the Moat.</strong> Internshala can clone this in 3 months. Establish Tier-2/3 brand dominance before Month 12 or it's too late.</div>
+      </div>
+    </div>
+
+    <!-- BMC -->
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--gold)"></div>Business Model Canvas</div>
+      <div class="bmc-grid">
+        <div class="bmc-cell bkp">
+          <h4>Key Partners</h4>
+          <ul><li>College WhatsApp admins</li><li>Anchor org founders</li><li>Campus ambassadors</li><li>GitHub integration</li><li>Razorpay (deferred)</li></ul>
+        </div>
+        <div class="bmc-cell bka">
+          <h4>Key Activities</h4>
+          <ul><li>Manual project matching</li><li>Student onboarding</li><li>Org brief structuring</li><li>Milestone automation</li><li>Portfolio generation</li></ul>
+        </div>
+        <div class="bmc-cell bvp">
+          <h4>Value Propositions</h4>
+          <div class="bmc-sub blue">Students</div>
+          <ul><li>Real project → auto-portfolio</li><li>Geography-free access</li><li>Career ladder proof</li></ul>
+          <div class="bmc-sub teal">Orgs</div>
+          <ul><li>Contributors at &lt;₹999/mo</li><li>Structured inbox + tracking</li><li>5-star rating vs Fiverr</li></ul>
+        </div>
+        <div class="bmc-cell bcr">
+          <h4>Customer Relationships</h4>
+          <ul><li>Students: Community + referral</li><li>Orgs: Founder-led onboarding</li><li>Colleges: Account mgmt</li></ul>
+        </div>
+        <div class="bmc-cell bcs">
+          <h4>Segments</h4>
+          <ul><li>Tier-2/3 students 18–25</li><li>Startups/SMEs/NGOs (0–15)</li><li>Colleges (future)</li></ul>
+        </div>
+        <div class="bmc-cell bkres">
+          <h4>Key Resources</h4>
+          <ul><li>Founder's network</li><li>Platform tech</li><li>Community trust</li><li>Rating/completion data</li></ul>
+        </div>
+        <div class="bmc-cell bch">
+          <h4>Channels</h4>
+          <ul><li>WhatsApp & Discord</li><li>LinkedIn + Twitter/X</li><li>Campus ambassadors</li><li>SEO (Month 6+)</li></ul>
+        </div>
+        <div class="bmc-cell bcost">
+          <h4>Cost Structure</h4>
+          <ul style="display:grid;grid-template-columns:1fr 1fr;gap:0 8px"><li>Hosting (minimal)</li><li>Founder time</li><li>No paid ads at MVP</li><li>Future: Eng team</li></ul>
+        </div>
+        <div class="bmc-cell brev">
+          <h4>Revenue Streams</h4>
+          <ul style="display:grid;grid-template-columns:1fr 1fr;gap:0 8px"><li>Starter: ₹999/mo</li><li>Growth: ₹2,499/mo</li><li>Premium: ₹199/mo</li><li>Enterprise: ₹50K+/yr</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PITCH + ACTIONS -->
+  <div class="row r2">
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--orange)"></div>Investor One-Liner & 30-Second Pitch</div>
+      <div class="pitch-card">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:10px">Investor One-Liner</div>
+        <div class="pitch-ol">"SPM is India's automated project-internship platform for Tier-2/3 students — a two-sided marketplace where 1.5M+ underserved graduates get real-world project experience and auto-generated portfolios while early-stage startups access motivated contributors at <strong style="color:var(--teal)">₹999/month — 50x cheaper than a junior hire</strong>, with workflow automation, milestone tracking, and trust ratings built in."</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:10px">30-Second Founder Pitch</div>
+        <div class="pitch-30">"India produces <strong>1.5 million engineering graduates</strong> every year. 60% are stuck — no real projects, no portfolio, no path to a product company. Meanwhile, <strong>500,000+ early-stage startups</strong> need 3-week contributors but can't afford a hire.
+        <br><br>
+        We built Student Project Marketplace. Students post profiles, orgs post briefs, and our platform <strong>automates the entire workflow</strong> — application, matching, milestone check-ins, completion, and auto-portfolio generation.
+        <br><br>
+        Orgs pay ₹999/month. That's 2% of a junior dev's cost. <strong>Internshala went upmarket</strong> after the upGrad acquisition. The project-first, Tier-2 niche is wide open. We're running first pilots this month. Join us."</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ct-dot" style="background:var(--green)"></div>Founder Action Sheet — Top 10 Next Actions</div>
+      <div class="actions">
+        <div class="ai">
+          <div class="anum">1</div>
+          <div class="awhen today">TODAY</div>
+          <div class="atxt"><strong>Write 5 open-ended interview questions</strong> for students AND 5 separate for orgs</div>
+        </div>
+        <div class="ai">
+          <div class="anum">2</div>
+          <div class="awhen">Day 1–3</div>
+          <div class="atxt"><strong>Identify 20 students</strong> from personal network; book 30-min calls or send form</div>
+        </div>
+        <div class="ai">
+          <div class="anum">3</div>
+          <div class="awhen">Day 1–3</div>
+          <div class="atxt"><strong>Reach out to 10 startup founders</strong> via LinkedIn; get 5 replies for 15-min calls</div>
+        </div>
+        <div class="ai">
+          <div class="anum">4</div>
+          <div class="awhen">Day 3</div>
+          <div class="atxt"><strong>Create Notion/Google Form</strong> to log interview insights consistently</div>
+        </div>
+        <div class="ai">
+          <div class="anum">5</div>
+          <div class="awhen">Day 5</div>
+          <div class="atxt"><strong>Synthesize learnings</strong> — find 3 pain phrases repeated by ≥3 people</div>
+        </div>
+        <div class="ai">
+          <div class="anum">6</div>
+          <div class="awhen">Day 7</div>
+          <div class="atxt"><strong>Write one-paragraph value prop</strong> for students + orgs; stress-test with a peer</div>
+        </div>
+        <div class="ai">
+          <div class="anum">7</div>
+          <div class="awhen">Day 8</div>
+          <div class="atxt"><strong>Set up GitHub repo + Notion board</strong>; write exactly 3 user stories — no more</div>
+        </div>
+        <div class="ai">
+          <div class="anum">8</div>
+          <div class="awhen">Day 10</div>
+          <div class="atxt"><strong>Build no-code landing page</strong> (Carrd/Notion) with email waitlist — target 50 sign-ups</div>
+        </div>
+        <div class="ai">
+          <div class="anum">9</div>
+          <div class="awhen">Day 12</div>
+          <div class="atxt"><strong>Contact 5 orgs</strong>; offer founding tier; ask for 1 scoped project brief</div>
+        </div>
+        <div class="ai">
+          <div class="anum">10</div>
+          <div class="awhen">Day 15</div>
+          <div class="atxt"><strong>Write North Star Metric on paper:</strong> "10 completed projects rated ≥ 4/5" — stick it to your screen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL VERDICT -->
+  <div class="final">
+    <div class="fv-badge">
+      <div class="fv-emoji">🟡</div>
+      <div class="fv-label">VALIDATE</div>
+      <div class="fv-score">76 / 100</div>
+    </div>
+    <div class="fv-text">
+      <p><strong>Student Project Marketplace is a structurally sound business hypothesis with genuinely favorable market timing, a credible monetization model, and a founder distribution advantage that funded competitors cannot easily replicate.</strong> The project-first + Tier-2/3 geography + workflow automation combination is genuinely uncontested, and Internshala's upstream move has opened a measurable, time-limited window.</p>
+      <p>However, <strong style="color:var(--validate)">this startup does not yet qualify as a sustainable business.</strong> Not a single organization has paid. Not a single student has completed a platform-mediated project. Every revenue number, every GTM assumption, and every claim about org willingness-to-pay is a hypothesis dressed as a plan. The two-sided cold-start problem is unsolved and the validation sprint has not begun.</p>
+      <p><strong>The path to sustainability is precise:</strong> Execute the 30-day sprint (20+ interviews, 5+ org calls, 3 project briefs, 1 real invoice ask). If org willingness-to-pay at ₹999/month is confirmed by 3 independent founders → build the 3-feature MVP. If not → reprice before investing a single hour of engineering time. <strong style="color:var(--teal)">The idea is not the risk. Execution discipline is the only risk that matters now.</strong></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>AI Co-Founder · YC Advisory Framework · Day 24 Analysis</span>
+  <span>Student Project Marketplace | June 2026 | Confidential</span>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const animate = (els, delay = 300) => {
+      els.forEach(el => {
+        const w = el.getAttribute('data-w');
+        if (w) setTimeout(() => { el.style.width = w; }, delay);
+      });
+    };
+    animate(document.querySelectorAll('.sfill'), 400);
+    animate(document.querySelectorAll('.rfill'), 700);
+    animate(document.querySelectorAll('.mfill'), 900);
+  });
+</script>
+</body>
+</html>
