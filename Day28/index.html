@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Admission Readiness Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            750: '#2d3748',
+                            850: '#1a202c',
+                            950: '#0d1117',
+                        },
+                        cyan: {
+                            450: '#06b6d4',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+        }
+        .glass-input:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #22d3ee, #818cf8);
+        }
+
+        /* Animations */
+        .anim-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .anim-slide-up { animation: slideUp 0.5s ease-out forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Progress Circle */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .timeline-item:last-child .timeline-line::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-300 min-h-screen relative overflow-x-hidden">
+    <!-- Ambient Background -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-cyan-900/20 blur-[120px]"></div>
+        <div class="absolute top-[60%] -right-[10%] w-[40%] h-[60%] rounded-full bg-indigo-900/20 blur-[120px]"></div>
+    </div>
+
+    <!-- App Header -->
+    <header class="relative z-10 glass-panel border-b-0 border-x-0 border-t-0 border-b border-white/5 py-4 px-6 md:px-12 flex items-center justify-between sticky top-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-hospital-user text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Admission<span class="text-gradient">Sync</span></h1>
+                <p class="text-xs text-slate-400">Readiness Simulator</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+            <div class="hidden md:flex items-center gap-2 text-slate-400 bg-slate-900/50 px-3 py-1.5 rounded-full border border-white/5">
+                <i class="fa-solid fa-user-nurse text-cyan-400"></i>
+                <span>Role: Hospital Admission Coordinator</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- ==================== SETUP VIEW ==================== -->
+        <section id="setup-view" class="anim-slide-up max-w-3xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white mb-3">Initialize Patient Admission</h2>
+                <p class="text-slate-400">Configure the clinical and administrative parameters for the simulated admission.</p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 relative overflow-hidden">
+                <!-- Decorative top border -->
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-indigo-500 to-cyan-500"></div>
+                
+                <form id="setup-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Provider -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-slate-300">Insurance Provider / Payer</label>
+                            <input type="text" id="setup-provider" required placeholder="e.g., Medicare, BlueCross" class="w-full px-4 py-3 rounded-xl glass-input transition-all">
+                        </div>
+                        <!-- Attending Physician -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-slate-300">Attending Physician</label>
+                            <input type="text" id="setup-physician" required placeholder="e.g., Dr. Sarah Jenkins" class="w-full px-4 py-3 rounded-xl glass-input transition-all">
+                        </div>
+                        
+                        <!-- Diagnosis -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-slate-300">Primary Diagnosis</label>
+                            <div class="relative">
+                                <select id="setup-diagnosis" required class="w-full px-4 py-3 rounded-xl glass-input appearance-none transition-all cursor-pointer">
+                                    <option value="" disabled selected>Select Diagnosis</option>
+                                    <option value="Acute MI">Acute MI</option>
+                                    <option value="CHF">CHF (Congestive Heart Failure)</option>
+                                    <option value="Pneumonia">Pneumonia</option>
+                                    <option value="Elective Surgery">Elective Surgery</option>
+                                    <option value="Hip Fracture">Hip Fracture</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <!-- Admission Date -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-slate-300">Target Admission Date</label>
+                            <input type="date" id="setup-date" required class="w-full px-4 py-3 rounded-xl glass-input transition-all" style="color-scheme: dark;">
+                        </div>
+
+                        <!-- Admission Type -->
+                        <div class="space-y-2 md:col-span-2">
+                            <label class="text-sm font-medium text-slate-300">Admission Type</label>
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="admType" value="Inpatient" class="peer sr-only" required>
+                                    <div class="text-center px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800/50 peer-checked:bg-cyan-500/20 peer-checked:border-cyan-400 peer-checked:text-cyan-300 transition-all">Inpatient</div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="admType" value="Observation" class="peer sr-only">
+                                    <div class="text-center px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800/50 peer-checked:bg-indigo-500/20 peer-checked:border-indigo-400 peer-checked:text-indigo-300 transition-all">Observation</div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="admType" value="Emergency" class="peer sr-only">
+                                    <div class="text-center px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800/50 peer-checked:bg-rose-500/20 peer-checked:border-rose-400 peer-checked:text-rose-300 transition-all">Emergency</div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="admType" value="ICU" class="peer sr-only">
+                                    <div class="text-center px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800/50 peer-checked:bg-orange-500/20 peer-checked:border-orange-400 peer-checked:text-orange-300 transition-all">ICU</div>
+                                </label>
+                                <label class="cursor-pointer col-span-2 md:col-span-1">
+                                    <input type="radio" name="admType" value="Same-Day Surgery" class="peer sr-only">
+                                    <div class="text-center px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800/50 peer-checked:bg-emerald-500/20 peer-checked:border-emerald-400 peer-checked:text-emerald-300 transition-all">Same-Day</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Observation Alert Container -->
+                        <div id="observation-alert" class="hidden md:col-span-2 rounded-xl bg-indigo-900/30 border border-indigo-500/30 p-4 flex gap-3 anim-fade-in">
+                            <i class="fa-solid fa-circle-info text-indigo-400 text-lg mt-0.5"></i>
+                            <div class="text-sm text-indigo-200">
+                                <strong>CMS 2-Midnight Rule applies</strong> — different cost-sharing, SNF eligibility, and billing than inpatient. Medicare patients require written MOON notification.
+                            </div>
+                        </div>
+
+                        <!-- PA Status -->
+                        <div class="space-y-2 md:col-span-2">
+                            <label class="text-sm font-medium text-slate-300">Prior Authorization (PA) Status</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="paStatus" value="Approved" class="peer sr-only" required>
+                                    <div class="text-center px-3 py-3 text-sm rounded-xl border border-slate-700 bg-slate-800/50 peer-checked:bg-emerald-500/20 peer-checked:border-emerald-400 peer-checked:text-emerald-300 transition-all flex flex-col items-center gap-1">
+                                        <i class="fa-solid fa-check-circle text-lg"></i>
+                                        <span>Approved</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="paStatus" value="Pending" class="peer sr-only">
+                                    <div class="text-center px-3 py-3 text-sm rounded-xl border border-slate-700 bg-slate-800/50 peer-checked:bg-amber-500/20 peer-checked:border-amber-400 peer-checked:text-amber-300 transition-all flex flex-col items-center gap-1">
+                                        <i class="fa-solid fa-clock text-lg"></i>
+                                        <span>Pending</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="paStatus" value="Denied" class="peer sr-only">
+                                    <div class="text-center px-3 py-3 text-sm rounded-xl border border-slate-700 bg-slate-800/50 peer-checked:bg-rose-500/20 peer-checked:border-rose-400 peer-checked:text-rose-300 transition-all flex flex-col items-center gap-1">
+                                        <i class="fa-solid fa-circle-xmark text-lg"></i>
+                                        <span>Denied</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-700/50 flex flex-col items-center gap-4">
+                        <p class="text-xs text-slate-500 italic"><i class="fa-solid fa-database mr-1"></i> Note: All provider/payer names are illustrative training data.</p>
+                        <button type="submit" class="w-full md:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-semibold shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-truck-medical"></i> Analyze Admission Readiness
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==================== SIMULATION VIEW ==================== -->
+        <section id="sim-view" class="hidden space-y-6">
+            
+            <!-- Top Dashboard Strip -->
+            <div class="glass-panel rounded-2xl p-5 flex flex-col md:flex-row justify-between items-center gap-6 anim-slide-up">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                        <i class="fa-solid fa-user-injured text-2xl text-slate-400"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white"><span id="sim-diagnosis" class="text-gradient"></span> Admission</h2>
+                        <div class="flex flex-wrap items-center gap-2 text-sm mt-1">
+                            <span class="text-slate-400"><i class="fa-solid fa-user-doctor mr-1"></i> <span id="sim-physician"></span></span>
+                            <span class="text-slate-600">•</span>
+                            <span class="text-slate-400"><i class="fa-solid fa-building-shield mr-1"></i> <span id="sim-provider"></span></span>
+                            <span class="text-slate-600">•</span>
+                            <span class="px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700" id="sim-adm-type"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <!-- Governance Snapshot (Hidden initially) -->
+                    <div id="governance-snapshot" class="hidden text-right max-w-xs text-xs">
+                        <div class="text-emerald-400 font-semibold mb-1"><i class="fa-solid fa-scale-balanced"></i> Governance Snapshot</div>
+                        <div class="text-slate-400 leading-tight">Industry benchmarks (estimates only): PA turnaround 3–5 days · Inpatient denial rate ~8–10% (CMS) · PA rework cost ~$11/transaction (CAQH)</div>
+                    </div>
+
+                    <!-- Circular Progress -->
+                    <div class="relative w-20 h-20 flex-shrink-0">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-slate-800 stroke-current" stroke-width="8" cx="50" cy="50" r="40" fill="transparent"></circle>
+                            <circle id="score-ring" class="text-cyan-500 stroke-current progress-ring__circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span id="score-text" class="text-xl font-bold text-white">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Criteria Note Alert -->
+            <div id="criteria-note" class="hidden rounded-xl bg-orange-900/30 border border-orange-500/30 p-4 flex gap-3 anim-fade-in">
+                <i class="fa-solid fa-triangle-exclamation text-orange-400 text-lg mt-0.5"></i>
+                <div class="text-sm text-orange-200">
+                    <strong>InterQual/Milliman thresholds apply</strong> — ensure documentation meets medical necessity standards before UR review.
+                </div>
+            </div>
+
+            <!-- Three Column Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 anim-slide-up" style="animation-delay: 0.1s;">
+                
+                <!-- Left Column: Actions & Components -->
+                <div class="lg:col-span-4 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Coordination Tasks</h3>
+                    
+                    <div class="glass-panel rounded-xl p-1 overflow-hidden">
+                        <!-- PA Status Widget -->
+                        <div class="p-4 border-b border-white/5 bg-black/20">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-sm font-medium text-slate-300">Prior Authorization (25%)</span>
+                                <span id="pa-badge" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">Unknown</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 mb-3">
+                                <div id="pa-bar" class="bg-cyan-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            
+                            <!-- PA Dynamic Actions -->
+                            <div id="pa-actions-container" class="space-y-2 hidden">
+                                <!-- Populated dynamically based on PA Status -->
+                            </div>
+                        </div>
+
+                        <!-- Other Statuses -->
+                        <div class="p-2 space-y-1" id="standard-tasks-container">
+                            <!-- Tasks populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- General Workflow Actions -->
+                    <div class="glass-panel rounded-xl p-4">
+                        <h4 class="text-xs font-semibold text-slate-500 uppercase mb-3">Post-Admin Workflow</h4>
+                        <div class="space-y-2">
+                            <button id="btn-notify-nursing" class="w-full p-2.5 rounded-lg border border-slate-700 bg-slate-800/50 text-sm text-left hover:bg-slate-700 hover:border-slate-600 transition-all flex items-center justify-between group">
+                                <span class="text-slate-300 group-hover:text-white"><i class="fa-solid fa-user-nurse w-5 text-slate-400 group-hover:text-cyan-400"></i> Notify Nursing Unit</span>
+                                <i class="fa-solid fa-check text-emerald-500 hidden status-check"></i>
+                            </button>
+                            <button id="btn-prepare-arrival" class="w-full p-2.5 rounded-lg border border-slate-700 bg-slate-800/50 text-sm text-left hover:bg-slate-700 hover:border-slate-600 transition-all flex items-center justify-between group opacity-50 cursor-not-allowed pointer-events-none">
+                                <span class="text-slate-300 group-hover:text-white"><i class="fa-solid fa-bed-pulse w-5 text-slate-400 group-hover:text-indigo-400"></i> Prepare Patient Arrival</span>
+                                <i class="fa-solid fa-check text-emerald-500 hidden status-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column: Timeline & Care Cards -->
+                <div class="lg:col-span-5 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Patient Pathway</h3>
+                    
+                    <div class="glass-panel rounded-xl p-5 mb-4">
+                        <div class="relative pl-4 space-y-0" id="timeline-container">
+                            <!-- Timeline items generated by JS -->
+                        </div>
+                    </div>
+
+                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6">Care Coordination</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="care-cards-container">
+                        <!-- Cards generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Risk & Decision -->
+                <div class="lg:col-span-3 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Risk Assessment</h3>
+                    
+                    <div class="glass-panel rounded-xl p-4 space-y-4">
+                        <!-- Risks -->
+                        <div class="space-y-3" id="risks-container">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Final Decision Block -->
+                    <div class="glass-panel rounded-xl p-5 border-l-4 border-l-cyan-500 relative overflow-hidden mt-6" id="decision-container">
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-900/10 to-indigo-900/10 pointer-events-none"></div>
+                        <h4 class="text-sm font-bold text-white mb-2 relative z-10">Final Readiness Assessment</h4>
+                        <p class="text-xs text-slate-400 mb-4 relative z-10">Evaluate all factors before approving admission.</p>
+                        <button id="btn-evaluate" class="w-full py-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-sm font-medium transition-all relative z-10">
+                            Evaluate Now
+                        </button>
+                        
+                        <div id="decision-result" class="hidden mt-4 pt-4 border-t border-white/10 relative z-10 anim-fade-in">
+                            <!-- Result injected here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- State Management ---
+        const WEIGHTS = {
+            pa: 25,
+            docs: 20,
+            orders: 20,
+            insurance: 15,
+            consent: 10,
+            bed: 10
+        };
+
+        const state = {
+            provider: '',
+            physician: '',
+            diagnosis: '',
+            admType: '',
+            date: '',
+            
+            // Core state
+            paStatus: '', // Approved, Pending, Denied
+            
+            // Current points
+            points: {
+                pa: 0,
+                docs: 0,
+                orders: 0,
+                insurance: 0,
+                consent: 0,
+                bed: 0
+            },
+            
+            // Task completion
+            tasks: {
+                bed: false,
+                insurance: false,
+                docs: false,
+                orders: false,
+                consent: false,
+                
+                nursing: false,
+                arrival: false
+            },
+
+            // PA Workflow specific
+            paActions: {
+                followedUp: false,
+                appealed: false
+            },
+            
+            score: 0,
+            decisionRevealed: false
+        };
+
+        const timelineMilestones = [
+            { id: 'pa', label: 'PA Review' },
+            { id: 'insurance', label: 'Insurance Verification' },
+            { id: 'bed', label: 'Bed Assignment' },
+            { id: 'docs', label: 'Documentation' },
+            { id: 'consent', label: 'Consent' },
+            { id: 'nursing', label: 'Patient Arrival' },
+            { id: 'registration', label: 'Registration' },
+            { id: 'assessment', label: 'Clinical Assessment' },
+            { id: 'complete', label: 'Admission Complete' }
+        ];
+
+        const careRoles = [
+            { id: 'attending', name: 'Attending', icon: 'fa-user-doctor' },
+            { id: 'cm', name: 'Case Manager', icon: 'fa-clipboard-user' },
+            { id: 'nursing', name: 'Nursing', icon: 'fa-user-nurse' },
+            { id: 'ur', name: 'Utilization Review', icon: 'fa-magnifying-glass-chart', highlight: true },
+            { id: 'dp', name: 'Discharge Planner', icon: 'fa-truck-arrow-right' }
+        ];
+
+        // --- DOM Elements ---
+        const setupForm = document.getElementById('setup-form');
+        const setupView = document.getElementById('setup-view');
+        const simView = document.getElementById('sim-view');
+        
+        const admTypeRadios = document.querySelectorAll('input[name="admType"]');
+        const obsAlert = document.getElementById('observation-alert');
+        
+        const scoreRing = document.getElementById('score-ring');
+        const scoreText = document.getElementById('score-text');
+        
+        // --- Initialization ---
+        
+        // Observation Alert toggler
+        admTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'Observation') {
+                    obsAlert.classList.remove('hidden');
+                } else {
+                    obsAlert.classList.add('hidden');
+                }
+            });
+        });
+
+        setupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            state.provider = document.getElementById('setup-provider').value;
+            state.physician = document.getElementById('setup-physician').value;
+            state.diagnosis = document.getElementById('setup-diagnosis').value;
+            state.admType = document.querySelector('input[name="admType"]:checked').value;
+            state.paStatus = document.querySelector('input[name="paStatus"]:checked').value;
+            state.date = document.getElementById('setup-date').value;
+
+            startSimulation();
+        });
+
+        // --- Simulation Logic ---
+
+        function startSimulation() {
+            // Hide setup, show sim
+            setupView.classList.add('hidden');
+            simView.classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            // Populate static UI
+            document.getElementById('sim-diagnosis').textContent = state.diagnosis;
+            document.getElementById('sim-physician').textContent = state.physician;
+            document.getElementById('sim-provider').textContent = state.provider;
+            document.getElementById('sim-adm-type').textContent = state.admType;
+
+            // Criteria note for Acute MI / CHF
+            if (state.diagnosis === 'Acute MI' || state.diagnosis === 'CHF') {
+                document.getElementById('criteria-note').classList.remove('hidden');
+            }
+
+            // Calculate Initial Score (Targeting 30-60%)
+            // PA Weight
+            if (state.paStatus === 'Approved') state.points.pa = WEIGHTS.pa;
+            else if (state.paStatus === 'Pending') state.points.pa = 10;
+            else state.points.pa = 0; // Denied
+
+            // Randomize partial completion for others to ensure total is between 30 and 60
+            // If PA is 25, we need 5-35 more. If PA is 0, we need 30-60 more.
+            let neededMin = 30 - state.points.pa; if(neededMin < 0) neededMin = 0;
+            let neededMax = 60 - state.points.pa; 
+            
+            // Distribute random points
+            state.points.docs = getRandomInt(Math.max(0, neededMin/3), Math.min(WEIGHTS.docs - 5, neededMax/3));
+            state.points.orders = getRandomInt(Math.max(0, neededMin/3), Math.min(WEIGHTS.orders - 5, neededMax/3));
+            state.points.insurance = getRandomInt(0, Math.min(WEIGHTS.insurance - 2, neededMax/3));
+            state.points.consent = 0;
+            state.points.bed = 0;
+
+            // Edge Case: Denied PA + ICU cap check is handled in calculateTotalScore
+
+            renderTasks();
+            renderTimeline();
+            renderCareCards();
+            updateDashboard();
+            
+            // Workflow Buttons
+            document.getElementById('btn-notify-nursing').addEventListener('click', () => completeWorkflow('nursing'));
+            document.getElementById('btn-prepare-arrival').addEventListener('click', () => completeWorkflow('arrival'));
+            document.getElementById('btn-evaluate').addEventListener('click', evaluateDecision);
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min); max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function updateDashboard() {
+            let total = calculateTotalScore();
+            state.score = total;
+            
+            // Update Circle
+            const circumference = 251.2;
+            const offset = circumference - (total / 100) * circumference;
+            scoreRing.style.strokeDashoffset = offset;
+            
+            // Color logic
+            if(total < 50) scoreRing.classList.replace('text-cyan-500', 'text-rose-500') || scoreRing.classList.replace('text-emerald-500', 'text-rose-500');
+            else if (total < 75) scoreRing.classList.replace('text-rose-500', 'text-cyan-500') || scoreRing.classList.replace('text-emerald-500', 'text-cyan-500');
+            else scoreRing.classList.replace('text-cyan-500', 'text-emerald-500') || scoreRing.classList.replace('text-rose-500', 'text-emerald-500');
+
+            // Count Up animation
+            animateValue(scoreText, parseInt(scoreText.innerText), total, 800);
+
+            // Governance Snapshot check
+            if (total >= 75) {
+                const gov = document.getElementById('governance-snapshot');
+                gov.classList.remove('hidden');
+                gov.classList.add('anim-fade-in');
+            }
+
+            // Update PA UI
+            updatePAUI();
+            
+            // Update Risks
+            updateRisks();
+            
+            // Check workflow locks
+            if (state.tasks.nursing) {
+                const arrBtn = document.getElementById('btn-prepare-arrival');
+                arrBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+            }
+
+            updateTimelineUI();
+        }
+
+        function calculateTotalScore() {
+            let sum = state.points.pa + state.points.docs + state.points.orders + state.points.insurance + state.points.consent + state.points.bed;
+            
+            // Denied PA + ICU cap logic
+            if (state.paStatus === 'Denied' && state.admType === 'ICU') {
+                if (sum > 69) sum = 69;
+            }
+            return Math.min(100, Math.max(0, sum));
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start) + '%';
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('standard-tasks-container');
+            container.innerHTML = '';
+
+            const configs = [
+                { id: 'insurance', label: 'Verify Insurance', weight: WEIGHTS.insurance, icon: 'fa-shield-halved' },
+                { id: 'docs', label: 'Upload Documentation', weight: WEIGHTS.docs, icon: 'fa-file-medical' },
+                { id: 'orders', label: 'Physician Orders', weight: WEIGHTS.orders, icon: 'fa-stethoscope' },
+                { id: 'bed', label: 'Assign Bed', weight: WEIGHTS.bed, icon: 'fa-bed' },
+                { id: 'consent', label: 'Complete Consent', weight: WEIGHTS.consent, icon: 'fa-signature' }
+            ];
+
+            configs.forEach(cfg => {
+                const pts = state.points[cfg.id];
+                const pct = (pts / cfg.weight) * 100;
+                const isDone = state.tasks[cfg.id] || pct === 100;
+                
+                if (pct === 100) state.tasks[cfg.id] = true;
+
+                const el = document.createElement('div');
+                el.className = `p-3 rounded-lg border transition-all flex items-center justify-between group ${isDone ? 'bg-slate-800/80 border-slate-700/50' : 'bg-slate-800/30 border-slate-700 hover:border-cyan-500/50 cursor-pointer'}`;
+                
+                el.innerHTML = `
+                    <div class="flex items-center gap-3 w-full">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center ${isDone ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400 group-hover:text-cyan-400 transition-colors'}">
+                            <i class="fa-solid ${isDone ? 'fa-check' : cfg.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium ${isDone ? 'text-slate-400 line-through' : 'text-slate-200'}">${cfg.label}</span>
+                                <span class="text-xs text-slate-500">${pts}/${cfg.weight} pt</span>
+                            </div>
+                            <div class="w-full bg-slate-900 rounded-full h-1">
+                                <div class="bg-${isDone ? 'emerald' : 'cyan'}-500 h-1 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (!isDone) {
+                    el.addEventListener('click', () => completeTask(cfg.id, cfg.weight));
+                }
+                
+                container.appendChild(el);
+            });
+        }
+
+        function completeTask(taskId, weight) {
+            state.tasks[taskId] = true;
+            state.points[taskId] = weight;
+            
+            // Cross-trigger logic for PA Pending "Upload Docs" sharing
+            if (taskId === 'docs' && state.paStatus === 'Pending') {
+                // visually handled in PA ui
+            }
+
+            renderTasks();
+            updateDashboard();
+        }
+
+        function completeWorkflow(step) {
+            state.tasks[step] = true;
+            const btn = step === 'nursing' ? document.getElementById('btn-notify-nursing') : document.getElementById('btn-prepare-arrival');
+            btn.classList.add('bg-slate-800', 'border-slate-700', 'cursor-default');
+            btn.classList.remove('hover:bg-slate-700', 'hover:border-slate-600');
+            btn.querySelector('.status-check').classList.remove('hidden');
+            
+            updateDashboard();
+        }
+
+        function updatePAUI() {
+            const badge = document.getElementById('pa-badge');
+            const bar = document.getElementById('pa-bar');
+            const container = document.getElementById('pa-actions-container');
+            
+            bar.style.width = (state.points.pa / WEIGHTS.pa) * 100 + '%';
+
+            if (state.paStatus === 'Approved') {
+                badge.textContent = 'Approved';
+                badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                bar.className = 'bg-emerald-500 h-1.5 rounded-full transition-all duration-500';
+                container.classList.add('hidden');
+            } else if (state.paStatus === 'Pending') {
+                badge.textContent = 'Pending';
+                badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                bar.className = 'bg-amber-500 h-1.5 rounded-full transition-all duration-500';
+                
+                container.classList.remove('hidden');
+                container.innerHTML = `
+                    <div class="text-xs text-slate-400 mb-2 mt-3">Required Actions:</div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="handlePAAction('followUp')" class="px-3 py-1.5 rounded text-xs border ${state.paActions.followedUp ? 'bg-slate-800 text-slate-500 border-slate-700' : 'bg-slate-800/50 text-slate-300 border-slate-600 hover:bg-slate-700'} text-left flex justify-between">
+                            Follow Up <i class="fa-solid fa-check ${state.paActions.followedUp ? 'text-emerald-500' : 'hidden'}"></i>
+                        </button>
+                        <button onclick="completeTask('docs', ${WEIGHTS.docs})" class="px-3 py-1.5 rounded text-xs border ${state.tasks.docs ? 'bg-slate-800 text-slate-500 border-slate-700' : 'bg-slate-800/50 text-slate-300 border-slate-600 hover:bg-slate-700'} text-left flex justify-between">
+                            Upload Docs <i class="fa-solid fa-check ${state.tasks.docs ? 'text-emerald-500' : 'hidden'}"></i>
+                        </button>
+                        <button onclick="completeTask('orders', ${WEIGHTS.orders})" class="px-3 py-1.5 rounded text-xs border ${state.tasks.orders ? 'bg-slate-800 text-slate-500 border-slate-700' : 'bg-slate-800/50 text-slate-300 border-slate-600 hover:bg-slate-700'} text-left flex justify-between">
+                            Contact Physician <i class="fa-solid fa-check ${state.tasks.orders ? 'text-emerald-500' : 'hidden'}"></i>
+                        </button>
+                    </div>
+                `;
+
+                // If all done, convert to approved
+                if (state.paActions.followedUp && state.tasks.docs && state.tasks.orders) {
+                    setTimeout(() => {
+                        state.paStatus = 'Approved';
+                        state.points.pa = WEIGHTS.pa;
+                        updateDashboard();
+                    }, 500);
+                }
+
+            } else if (state.paStatus === 'Denied') {
+                badge.textContent = 'Denied';
+                badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                bar.className = 'bg-rose-500 h-1.5 rounded-full transition-all duration-500';
+                
+                container.classList.remove('hidden');
+                container.innerHTML = `
+                    <div class="text-xs text-rose-400/80 mb-2 mt-3">PA Denied - Appeal Required</div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="handlePAAction('appeal')" class="px-3 py-2 rounded text-xs border border-rose-500/50 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 text-center font-medium transition-colors">
+                            <i class="fa-solid fa-file-signature mr-1"></i> Submit Appeal & Review Reason
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Global function for onclick
+        window.handlePAAction = function(action) {
+            if (action === 'followUp') {
+                state.paActions.followedUp = true;
+            } else if (action === 'appeal') {
+                // Successful appeal converts to Approved
+                state.paActions.appealed = true;
+                state.paStatus = 'Approved';
+                state.points.pa = WEIGHTS.pa;
+            }
+            updateDashboard();
+        }
+        window.completeTask = completeTask; // expose to global for inline onclick
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+
+            timelineMilestones.forEach((m, idx) => {
+                const el = document.createElement('div');
+                el.className = `timeline-item relative py-2 pl-6 ${idx === 0 ? 'mt-0' : ''}`;
+                el.id = `timeline-${m.id}`;
+                
+                el.innerHTML = `
+                    <div class="timeline-line"></div>
+                    <div class="absolute left-0 top-3.5 w-2.5 h-2.5 rounded-full bg-slate-700 border-2 border-slate-900 z-10 node-dot transition-colors duration-300"></div>
+                    <div class="text-sm text-slate-500 node-text transition-colors duration-300">${m.label}</div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function updateTimelineUI() {
+            // Map logic state to timeline indices
+            // PA Review -> insurance -> bed -> docs -> consent -> arrival -> reg -> assessment -> complete
+            
+            const activeIds = [];
+            if (state.paStatus === 'Approved') activeIds.push('pa');
+            if (state.tasks.insurance) activeIds.push('insurance');
+            if (state.tasks.bed) activeIds.push('bed');
+            if (state.tasks.docs) activeIds.push('docs');
+            if (state.tasks.consent) activeIds.push('consent');
+            if (state.tasks.arrival) {
+                activeIds.push('nursing', 'registration', 'assessment'); // Simulate rapid completion post arrival
+                if (state.score >= 90) activeIds.push('complete');
+            }
+
+            timelineMilestones.forEach(m => {
+                const el = document.getElementById(`timeline-${m.id}`);
+                const dot = el.querySelector('.node-dot');
+                const text = el.querySelector('.node-text');
+                
+                if (activeIds.includes(m.id)) {
+                    dot.classList.remove('bg-slate-700');
+                    dot.classList.add('bg-cyan-500', 'shadow-[0_0_8px_rgba(6,182,212,0.6)]');
+                    text.classList.remove('text-slate-500');
+                    text.classList.add('text-slate-200', 'font-medium');
+                }
+            });
+        }
+
+        function renderCareCards() {
+            const container = document.getElementById('care-cards-container');
+            container.innerHTML = '';
+
+            careRoles.forEach(role => {
+                const isUR = role.id === 'ur';
+                const el = document.createElement('div');
+                el.className = `p-3 rounded-lg border ${role.highlight ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-slate-800/30 border-white/5'} flex items-start gap-3`;
+                
+                let extraContent = '';
+                if (isUR) {
+                    extraContent = `<div class="mt-2 text-[10px] text-indigo-300/80 leading-tight">Focus: Concurrent review, denial risk identification, InterQual/Milliman compliance.</div>`;
+                }
+
+                el.innerHTML = `
+                    <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${role.highlight ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-400'}">
+                        <i class="fa-solid ${role.icon}"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium ${role.highlight ? 'text-indigo-200' : 'text-slate-300'}">${role.name}</div>
+                        ${extraContent}
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function updateRisks() {
+            const container = document.getElementById('risks-container');
+            container.innerHTML = '';
+
+            // Calculate risks dynamically based on missing tasks/points
+            let docRisk = ((WEIGHTS.docs - state.points.docs) / WEIGHTS.docs) * 100;
+            let insRisk = state.paStatus === 'Denied' ? 100 : (state.paStatus === 'Pending' ? 50 : 0);
+            if (!state.tasks.insurance) insRisk += 20;
+            
+            let bedRisk = state.tasks.bed ? 0 : 70;
+            
+            let clinRisk = ((WEIGHTS.orders - state.points.orders) / WEIGHTS.orders) * 100;
+            if (state.diagnosis === 'Acute MI' || state.diagnosis === 'CHF' || state.admType === 'ICU') {
+                clinRisk = Math.min(100, clinRisk * 1.5); // Weighted higher
+            }
+
+            const risks = [
+                { label: 'Documentation Risk', val: docRisk },
+                { label: 'Insurance Risk', val: Math.min(100, insRisk) },
+                { label: 'Bed/Capacity Risk', val: bedRisk },
+                { label: 'Clinical Readiness', val: clinRisk }
+            ];
+
+            // Sort by highest risk
+            risks.sort((a,b) => b.val - a.val);
+
+            risks.forEach(r => {
+                let colorClass = 'bg-emerald-500';
+                if (r.val > 60) colorClass = 'bg-rose-500';
+                else if (r.val > 30) colorClass = 'bg-amber-500';
+
+                const el = document.createElement('div');
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-medium text-slate-300">${r.label}</span>
+                        <span class="text-[10px] text-slate-500">${r.val > 60 ? 'HIGH' : r.val > 30 ? 'MED' : 'LOW'}</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-1.5">
+                        <div class="${colorClass} h-1.5 rounded-full transition-all" style="width: ${r.val}%"></div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function evaluateDecision() {
+            const container = document.getElementById('decision-result');
+            container.classList.remove('hidden');
+            
+            const btn = document.getElementById('btn-evaluate');
+            btn.classList.add('hidden');
+
+            if (state.score >= 90) {
+                container.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex flex-shrink-0 items-center justify-center border border-emerald-500/30">
+                            <i class="fa-solid fa-check text-emerald-400 text-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-emerald-400 font-bold text-lg mb-1">✅ Admit — Cleared</h5>
+                            <p class="text-sm text-slate-300 mb-2">All critical administrative and clinical criteria met. Patient is cleared for formal admission.</p>
+                            <div class="bg-slate-900/50 rounded p-2 text-xs text-slate-400 border border-white/5">
+                                Summary: PA Approved, Insurance Verified, Orders Present, Documentation complete.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                
+                let missing = [];
+                if (state.paStatus !== 'Approved') missing.push('Prior Auth Resolution');
+                if (!state.tasks.docs) missing.push('Clinical Documentation');
+                if (!state.tasks.orders) missing.push('Physician Orders');
+                if (!state.tasks.insurance) missing.push('Insurance Verification');
+                if (!state.tasks.bed) missing.push('Bed Assignment');
+                if (!state.tasks.consent) missing.push('Consent Form');
+
+                container.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full bg-rose-500/20 flex flex-shrink-0 items-center justify-center border border-rose-500/30">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-rose-400 font-bold text-lg mb-1">⚠ Not Ready</h5>
+                            <p class="text-sm text-slate-300 mb-3">Admission readiness score (${state.score}%) is below the 90% threshold. Missing critical items.</p>
+                            
+                            <div class="text-xs font-semibold text-slate-400 mb-1">Required Actions:</div>
+                            <ul class="list-disc pl-4 text-xs text-slate-300 space-y-1">
+                                ${missing.map(m => `<li>${m}</li>`).join('')}
+                            </ul>
+                            
+                            <button onclick="resetEvaluation()" class="mt-4 text-xs text-cyan-400 hover:text-cyan-300 underline underline-offset-2">
+                                Resume Workflow
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        window.resetEvaluation = function() {
+            document.getElementById('decision-result').classList.add('hidden');
+            document.getElementById('btn-evaluate').classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>
