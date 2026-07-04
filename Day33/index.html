@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Media Integrity Analyzer - Learn media literacy through interactive discovery.">
+    <title>Media Integrity Analyzer</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --accent: #38bdf8;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .hidden { display: none !important; }
+        
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Metrics */
+        .live-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            animation: fadeInDown 0.6s ease-out;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .metric { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .metric .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .metric .value { font-size: 1.5rem; font-weight: bold; color: var(--accent); transition: color 0.3s; }
+        
+        /* Progress Indicator */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+        .card h1 { color: var(--text-main); margin-bottom: 15px; font-size: 2.2rem; }
+        .card h2 { color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; }
+        .card p { margin-bottom: 20px; color: var(--text-muted); font-size: 1.1rem; }
+        .card strong { color: var(--text-main); }
+
+        /* Buttons */
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2);
+        }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 8px -1px rgba(14, 165, 233, 0.4); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: var(--border);
+            border-color: var(--primary);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Challenge elements */
+        .challenge-box {
+            background: #0f172a;
+            border-left: 4px solid var(--accent);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 12px 12px 0;
+            position: relative;
+        }
+        .challenge-box::before {
+            content: 'SCENARIO';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .challenge-box h3 { margin-bottom: 15px; color: var(--text-main); font-size: 1.4rem; line-height: 1.4; }
+        .challenge-box p.excerpt { color: var(--text-muted); margin-bottom: 0; font-size: 1.05rem; font-style: italic; border-top: 1px solid var(--border); padding-top: 15px; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .highlight-danger {
+            color: #fff;
+            background: var(--danger);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0 2px;
+            animation: pulseBg 2s infinite;
+        }
+        .highlight-warning {
+            color: #fff;
+            background: var(--warning);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .dash-card {
+            background: #0f172a;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s;
+        }
+        .dash-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+        .dash-card h4 { color: var(--accent); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
+
+        .takeaway-box {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+            margin: 25px 0;
+        }
+        
+        .rewrite-box {
+            background: rgba(14, 165, 233, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            margin: 25px 0;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseBg {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        @media (max-width: 600px) {
+            .options-grid, .dashboard-grid { grid-template-columns: 1fr; }
+            .card { padding: 25px; }
+            .challenge-box { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="live-metrics hidden" id="liveMetrics">
+            <div class="metric"><span class="label">Headline Accuracy</span><span class="value" id="met-acc">--%</span></div>
+            <div class="metric"><span class="label">Source Reliability</span><span class="value" id="met-src">--%</span></div>
+            <div class="metric"><span class="label">Emotional Manipulation</span><span class="value" id="met-emo">--%</span></div>
+            <div class="metric"><span class="label">Audience Targeting</span><span class="value" id="met-aud">--%</span></div>
+        </header>
+
+        <main id="mainContent">
+            <!-- Dynamic Content Injected Here -->
+        </main>
+    </div>
+    
+    <script>
+        const dom = {
+            main: document.getElementById('mainContent'),
+            metrics: document.getElementById('liveMetrics')
+        };
+
+        function updateMetrics(acc, src, emo, aud) {
+            if(acc !== null) {
+                const el = document.getElementById('met-acc');
+                el.textContent = acc + '%';
+                el.style.color = acc < 50 ? 'var(--danger)' : 'var(--success)';
+            }
+            if(src !== null) {
+                const el = document.getElementById('met-src');
+                el.textContent = src + '%';
+                el.style.color = src < 50 ? 'var(--warning)' : 'var(--success)';
+            }
+            if(emo !== null) {
+                const el = document.getElementById('met-emo');
+                el.textContent = emo + '%';
+                el.style.color = emo > 70 ? 'var(--danger)' : 'var(--success)';
+            }
+            if(aud !== null) {
+                const el = document.getElementById('met-aud');
+                el.textContent = aud + '%';
+                el.style.color = aud > 70 ? 'var(--warning)' : 'var(--primary)';
+            }
+        }
+
+        function render(html, progress = 0) {
+            let progressHtml = '';
+            if(progress > 0 && progress < 100) {
+                progressHtml = `<div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>`;
+            }
+            dom.main.innerHTML = `<div class="fade-in">${progressHtml}${html}</div>`;
+        }
+
+        function startApp() {
+            dom.metrics.classList.add('hidden');
+            render(`
+                <div class="card">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 15px;">
+                            <path d="M2 12h3l3 -9l5 18l3 -9h5"/>
+                        </svg>
+                        <h1>Media Integrity Analyzer</h1>
+                        <p style="color: var(--accent); font-size: 1.2rem; margin-top: -5px;">Learn to read between the lines.</p>
+                    </div>
+                    <p style="text-align: center;">Welcome to the media literacy training simulation. You will analyze real-world scenarios, identify manipulation tactics, and verify accuracy.</p>
+                    <div style="margin-top: 40px;">
+                        <button class="btn" onclick="intro1()">Start Analysis</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function intro1() {
+            dom.metrics.classList.remove('hidden');
+            updateMetrics('--', '--', '--', '--');
+            render(`
+                <div class="card">
+                    <h2>Concept 1: Sensationalism vs Reality</h2>
+                    <p><strong>What it is:</strong> When media uses exaggerated language or distorted facts to grab your attention.</p>
+                    <p><strong>Why it matters:</strong> In the battle for your clicks, truth often becomes the casualty. Relying on sensational headlines leads to a skewed worldview and heightened anxiety.</p>
+                    <p><strong>Everyday application:</strong> Before sharing or reacting to a news story, always compare the headline's dramatic claim with the actual facts presented in the article body.</p>
+                    <button class="btn" style="margin-top: 20px;" onclick="challenge1()">Proceed to Challenge 1</button>
+                </div>
+            `, 10);
+        }
+
+        function challenge1() {
+            render(`
+                <div class="card">
+                    <h2>Challenge 1: Headline Detective</h2>
+                    <p>Read the news headline and the accompanying article excerpt below.</p>
+                    
+                    <div class="challenge-box">
+                        <h3 style="color: var(--text-main);">"Scientists Discover SHOCKING Secret That Could End Aging FOREVER!"</h3>
+                        <p class="excerpt">"Researchers at University X found that mice eating a diet rich in a specific synthesized antioxidant lived 5% longer on average than the control group during the two-year study..."</p>
+                    </div>
+
+                    <p style="color: var(--text-main); margin-bottom: 15px; font-weight: bold;">Would you click this article based on the headline?</p>
+                    <div class="options-grid">
+                        <button class="btn btn-outline" onclick="challenge1Part2()">Yes, I need to know!</button>
+                        <button class="btn btn-outline" onclick="challenge1Part2()">Maybe, seems interesting.</button>
+                        <button class="btn btn-outline" onclick="challenge1Part2()">No, seems like clickbait.</button>
+                    </div>
+                </div>
+            `, 25);
+        }
+
+        function challenge1Part2() {
+            render(`
+                <div class="card">
+                    <h2>Analyze the Discrepancy</h2>
+                    <p>The headline claims it's a "SHOCKING secret" that ends aging "FOREVER". But the article text states that mice lived just 5% longer.</p>
+                    <p style="color: var(--text-main); margin-bottom: 15px; font-weight: bold;">Which parts of the headline are the most exaggerated and misleading? (Choose the best answer)</p>
+                    
+                    <button class="btn btn-outline" onclick="reveal1()">"Scientists Discover"</button>
+                    <button class="btn btn-outline" onclick="reveal1()">"SHOCKING" and "End Aging FOREVER"</button>
+                    <button class="btn btn-outline" onclick="reveal1()">"Secret"</button>
+                </div>
+            `, 40);
+        }
+
+        function reveal1() {
+            updateMetrics(15, 45, 60, null);
+            render(`
+                <div class="card">
+                    <h2>Analysis Results</h2>
+                    
+                    <div class="challenge-box">
+                        <h3>"Scientists Discover <span class="highlight-danger">SHOCKING</span> Secret That Could <span class="highlight-danger">End Aging FOREVER</span>!"</h3>
+                    </div>
+                    
+                    <p><strong>Explanation:</strong> The capitalization and extreme absolute terms ("FOREVER", "SHOCKING") completely misrepresent a minor 5% lifespan increase in rodents. This is textbook sensationalism designed to farm clicks.</p>
+                    
+                    <div class="rewrite-box">
+                        <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Fair Rewritten Headline:</strong> 
+                        "Study shows new antioxidant diet slightly increases lifespan in mice"
+                    </div>
+                    
+                    <div class="takeaway-box">
+                        <strong style="color: var(--success); display: block; margin-bottom: 8px;">Key Takeaway:</strong> 
+                        Watch out for absolute terms and emotional triggers in headlines. If a scientific claim sounds like magic, it's usually just marketing.
+                    </div>
+
+                    <button class="btn" style="margin-top: 15px;" onclick="intro2()">Next Module</button>
+                </div>
+            `, 50);
+        }
+
+        function intro2() {
+            render(`
+                <div class="card">
+                    <h2>Concept 2: Emotional Manipulation</h2>
+                    <p><strong>What it is:</strong> Using specific loaded words and scenarios to bypass your logic and directly trigger your emotions.</p>
+                    <p><strong>Why it matters:</strong> When you are highly emotional (angry, fearful, or overly excited), your critical thinking shuts down. You are much more likely to share misinformation and less likely to fact-check.</p>
+                    <p><strong>Everyday application:</strong> Pause when a post makes your heart race. Ask yourself: "Is this trying to inform me, or provoke me?"</p>
+                    <button class="btn" style="margin-top: 20px;" onclick="challenge2()">Proceed to Challenge 2</button>
+                </div>
+            `, 65);
+        }
+
+        function challenge2() {
+            render(`
+                <div class="card">
+                    <h2>Challenge 2: Emotion Detector</h2>
+                    <p>Analyze this trending social media post:</p>
+                    
+                    <div class="challenge-box" style="border-left-color: var(--warning);">
+                        <h3 style="font-style: normal; color: var(--text-main); font-weight: normal; font-size: 1.25rem; line-height: 1.6;">
+                            "Can you BELIEVE they are trying to sneak this past us? We CANNOT let them destroy our way of life! Share if you agree! 😡🚩 #WakeUp"
+                        </h3>
+                    </div>
+
+                    <p style="color: var(--text-main); margin-bottom: 15px; font-weight: bold;">How does this post make you feel, and which technique is it using?</p>
+                    <div class="options-grid">
+                        <button class="btn btn-outline" onclick="reveal2()">Hopeful (Call to action)</button>
+                        <button class="btn btn-outline" onclick="reveal2()">Outraged (Fear-mongering & Us vs Them)</button>
+                        <button class="btn btn-outline" onclick="reveal2()">Curious (Information gap)</button>
+                        <button class="btn btn-outline" onclick="reveal2()">Indifferent (Satire)</button>
+                    </div>
+                </div>
+            `, 80);
+        }
+
+        function reveal2() {
+            updateMetrics(15, 30, 95, 85);
+            render(`
+                <div class="card">
+                    <h2>Analysis Results</h2>
+                    
+                    <div class="challenge-box" style="border-left-color: var(--warning);">
+                        <h3 style="font-style: normal; color: var(--text-main); font-weight: normal; font-size: 1.25rem; line-height: 1.6;">
+                            "Can you <span class="highlight-warning">BELIEVE</span> <span class="highlight-danger">they</span> are trying to <span class="highlight-warning">sneak this</span> past us? We <span class="highlight-danger">CANNOT let them destroy</span> our way of life! <span class="highlight-warning">Share if you agree!</span>"
+                        </h3>
+                    </div>
+                    
+                    <div class="dashboard-grid" style="margin-bottom: 15px;">
+                        <div>
+                            <p><strong>Target Audience:</strong><br> Highly engaged, politically polarized groups.</p>
+                            <p><strong>Intended Response:</strong><br> Outrage, urgency, and immediate sharing.</p>
+                        </div>
+                        <div>
+                            <p><strong>Manipulation Technique:</strong><br> "Us vs. Them" framing, vague catastrophic threats, and a forced call-to-action.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="rewrite-box">
+                        <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Neutral Rewrite:</strong> 
+                        "There is a new policy proposal being discussed. I strongly disagree with it because [insert factual reason]."
+                    </div>
+                    
+                    <div class="takeaway-box">
+                        <strong style="color: var(--success); display: block; margin-bottom: 8px;">Key Takeaway:</strong> 
+                        When a post tries to make you furious without providing specific verifiable facts, take a step back and ask who benefits from your anger.
+                    </div>
+
+                    <button class="btn" style="margin-top: 15px;" onclick="finalDash()">View Final Report</button>
+                </div>
+            `, 95);
+        }
+
+        function finalDash() {
+            dom.metrics.classList.add('hidden');
+            render(`
+                <div class="card" style="border-top: 6px solid var(--accent);">
+                    <h1 style="color: var(--text-main); text-align: center; font-size: 1.8rem;">Media Integrity Dashboard</h1>
+                    
+                    <div style="text-align: center; margin: 30px 0 40px;">
+                        <div style="font-size: 4rem; font-weight: bold; color: var(--accent); line-height: 1;">85<span style="font-size: 2rem; color: var(--text-muted);">/100</span></div>
+                        <p style="color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; margin-top: 10px;">Overall Media Integrity Score</p>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dash-card">
+                            <h4>What You Learned</h4>
+                            <p style="color: var(--text-main); font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">Emotional Detachment</p>
+                            <p style="font-size: 0.95rem; color: var(--text-muted);">Recognizing when media intentionally bypasses logic to trigger outrage for engagement metrics.</p>
+                        </div>
+                        <div class="dash-card">
+                            <h4>Biggest Red Flag</h4>
+                            <p style="color: var(--text-main); font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">Absolute Terminology</p>
+                            <p style="font-size: 0.95rem; color: var(--text-muted);">Unwarranted capitalized words like "SHOCKING", "DESTROY", and "FOREVER" in headlines or social posts.</p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(14, 165, 233, 0.05); padding: 25px; border-radius: 12px; margin-bottom: 30px;">
+                        <h3 style="margin: 0 0 15px; color: var(--primary); font-size: 1.2rem;">Three Practical Habits</h3>
+                        <ul style="color: var(--text-main); padding-left: 20px; list-style-type: none;">
+                            <li style="margin-bottom: 12px; position: relative;">
+                                <span style="position: absolute; left: -20px; color: var(--accent);">1.</span>
+                                <strong>Read past the headline:</strong> Always verify claims in the body text before forming an opinion.
+                            </li>
+                            <li style="margin-bottom: 12px; position: relative;">
+                                <span style="position: absolute; left: -20px; color: var(--accent);">2.</span>
+                                <strong>Check your pulse:</strong> If a post makes you intensely angry or anxious, delay sharing it by 10 minutes.
+                            </li>
+                            <li style="position: relative;">
+                                <span style="position: absolute; left: -20px; color: var(--accent);">3.</span>
+                                <strong>Identify the 'They':</strong> Be highly skeptical of vague "Us vs. Them" narratives without specific named actors.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-outline" style="border-color: var(--primary); color: var(--primary);" onclick="startApp()">Replay with New Scenarios</button>
+                </div>
+            `, 100);
+        }
+
+        window.onload = startApp;
+    </script>
+</body>
+</html>
