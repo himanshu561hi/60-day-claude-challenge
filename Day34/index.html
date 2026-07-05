@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Marketing Detective | Solve the Case</title>
+<meta name="description" content="A detective game where you analyze marketing campaigns, find mistakes, and crack the case." />
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --navy-deep:#040d21;--navy-dark:#071630;--navy-mid:#0d2347;--navy-light:#1a3a6b;
+  --navy-accent:#234580;--cyan-bright:#00d4ff;--cyan-mid:#00aacc;--cyan-dim:#005577;
+  --steel-light:#8faabb;--steel-mid:#5a7a99;--steel-dark:#2a4a66;
+  --gold:#f0c040;--gold-dim:#c09820;--amber:#ff9a00;
+  --success:#00e5a0;--danger:#ff4466;--paper:#d4c9a8;--paper-dark:#b8aa88;
+  --text-primary:#e8f4ff;--text-secondary:#8faabb;--text-muted:#4a6a88;
+  --shadow-cyan:0 0 20px rgba(0,212,255,0.3);--shadow-deep:0 8px 32px rgba(0,0,0,0.6);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--navy-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,212,255,0.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(26,58,107,0.15) 0%,transparent 50%),repeating-linear-gradient(0deg,transparent,transparent 49px,rgba(0,212,255,0.02) 50px),repeating-linear-gradient(90deg,transparent,transparent 49px,rgba(0,212,255,0.02) 50px);pointer-events:none;z-index:0}
+#root{position:relative;z-index:1}
+.screen{display:none;animation:fadeSlideIn 0.5s ease}
+.screen.active{display:block}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 10px rgba(0,212,255,0.3)}50%{box-shadow:0 0 30px rgba(0,212,255,0.8)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes stampIn{from{transform:scale(2) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(-5deg);opacity:1}}
+@keyframes barGrow{from{width:0}to{width:var(--bar-w)}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.app-header{background:linear-gradient(90deg,var(--navy-dark),var(--navy-mid));border-bottom:1px solid var(--cyan-dim);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.header-badge{width:44px;height:44px;background:linear-gradient(135deg,var(--navy-accent),var(--navy-light));border:2px solid var(--cyan-bright);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow-cyan);animation:pulseGlow 3s ease-in-out infinite}
+.header-title{font-family:'Special Elite',cursive;font-size:22px;color:var(--cyan-bright);letter-spacing:2px;text-shadow:0 0 15px rgba(0,212,255,0.5)}
+.header-subtitle{font-size:11px;color:var(--steel-mid);letter-spacing:3px;text-transform:uppercase}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.case-counter{background:var(--navy-dark);border:1px solid var(--cyan-dim);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--steel-light);font-family:'Courier Prime',monospace}
+.progress-dots{display:flex;gap:6px}
+.progress-dot{width:8px;height:8px;border-radius:50%;background:var(--steel-dark);border:1px solid var(--steel-mid);transition:all 0.3s}
+.progress-dot.active{background:var(--cyan-bright);box-shadow:0 0 8px var(--cyan-bright)}
+.progress-dot.done{background:var(--success)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s ease;letter-spacing:0.5px;text-transform:uppercase}
+.btn-primary{background:linear-gradient(135deg,var(--cyan-mid),var(--cyan-bright));color:var(--navy-deep);box-shadow:0 4px 15px rgba(0,212,255,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,212,255,0.5)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:transparent;color:var(--cyan-bright);border:1px solid var(--cyan-dim)}
+.btn-secondary:hover{background:rgba(0,212,255,0.08);border-color:var(--cyan-bright)}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--navy-deep);box-shadow:0 4px 15px rgba(240,192,64,0.3)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(240,192,64,0.5)}
+.btn-sm{padding:8px 16px;font-size:12px}
+.classified-stamp{display:inline-block;font-family:'Special Elite',cursive;font-size:13px;color:var(--cyan-bright);border:2px solid var(--cyan-bright);padding:4px 16px;letter-spacing:4px;margin-bottom:24px;text-transform:uppercase;opacity:0.8;animation:pulseGlow 3s ease infinite}
+.assignment-title{font-family:'Special Elite',cursive;font-size:clamp(32px,6vw,56px);color:var(--text-primary);line-height:1.1;margin-bottom:8px;text-shadow:0 0 30px rgba(0,212,255,0.2)}
+.assignment-title span{color:var(--cyan-bright)}
+.assignment-tagline{font-size:14px;color:var(--steel-mid);letter-spacing:2px;text-transform:uppercase;margin-bottom:48px}
+.case-file-preview{background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid));border:1px solid var(--steel-dark);border-radius:16px;padding:36px;margin-bottom:36px;text-align:left;position:relative;overflow:hidden;box-shadow:var(--shadow-deep)}
+.case-file-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cyan-bright),transparent)}
+.case-file-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--steel-dark)}
+.case-number-badge{background:var(--cyan-bright);color:var(--navy-deep);font-family:'Courier Prime',monospace;font-weight:700;font-size:11px;padding:4px 10px;border-radius:4px;letter-spacing:1px}
+.case-industry-tag{background:rgba(0,212,255,0.1);border:1px solid var(--cyan-dim);color:var(--cyan-bright);font-size:11px;padding:4px 10px;border-radius:4px;letter-spacing:1px;text-transform:uppercase}
+.case-title-large{font-family:'Special Elite',cursive;font-size:28px;color:var(--text-primary);margin-bottom:8px}
+.case-objective{font-size:14px;color:var(--steel-light);font-style:italic;margin-bottom:24px}
+.case-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.case-meta-item{background:rgba(0,0,0,0.2);border:1px solid var(--steel-dark);border-radius:8px;padding:12px 16px}
+.case-meta-label{font-size:10px;color:var(--steel-mid);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.case-meta-value{font-size:14px;color:var(--text-primary);font-weight:500}
+.difficulty-bar{display:flex;gap:4px;margin-top:4px}
+.diff-segment{height:4px;flex:1;border-radius:2px;background:var(--steel-dark)}
+.diff-segment.filled{background:var(--cyan-bright)}
+.assignment-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.file-icon{width:56px;height:56px;background:linear-gradient(135deg,var(--navy-accent),var(--navy-light));border:2px solid var(--cyan-dim);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:var(--shadow-cyan);animation:float 4s ease-in-out infinite}
+.board-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.board-title{font-family:'Special Elite',cursive;font-size:24px;color:var(--cyan-bright)}
+.board-subtitle{font-size:13px;color:var(--steel-mid)}
+.corkboard{background:linear-gradient(135deg,#2d1f0e 0%,#3d2910 25%,#2a1c08 50%,#382510 75%,#2d1f0e 100%);border:3px solid #4a3020;border-radius:16px;padding:28px;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,0.5),var(--shadow-deep);overflow:hidden}
+.board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;position:relative;z-index:1}
+.evidence-card{background:var(--paper);border-radius:2px;padding:18px 16px 16px;position:relative;box-shadow:3px 3px 8px rgba(0,0,0,0.4),inset 0 0 0 1px rgba(0,0,0,0.1);cursor:grab;transition:transform 0.2s,box-shadow 0.2s;transform:rotate(calc(var(--rot,0)*1deg));color:#2a1c08;user-select:none}
+.evidence-card:hover{transform:rotate(0deg) scale(1.03) translateY(-4px);box-shadow:6px 6px 20px rgba(0,0,0,0.6);z-index:10}
+.evidence-card.dragging{cursor:grabbing;transform:scale(1.05) rotate(2deg);box-shadow:10px 10px 30px rgba(0,0,0,0.8);z-index:100;opacity:0.9}
+.pushpin{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:5;box-shadow:0 2px 4px rgba(0,0,0,0.5)}
+.pushpin-cyan{background:radial-gradient(circle at 35% 35%,#80f0ff,var(--cyan-mid))}
+.pushpin-gold{background:radial-gradient(circle at 35% 35%,#ffe080,var(--gold-dim))}
+.pushpin-red{background:radial-gradient(circle at 35% 35%,#ff8090,#cc2244)}
+.pushpin-green{background:radial-gradient(circle at 35% 35%,#80ffcc,#00aa66)}
+.evidence-type-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--steel-dark);margin-bottom:6px;font-family:'Courier Prime',monospace}
+.evidence-title{font-family:'Special Elite',cursive;font-size:15px;color:#1a0c02;margin-bottom:8px;line-height:1.3}
+.evidence-value{font-family:'Courier Prime',monospace;font-size:13px;color:#3a2010;line-height:1.5}
+.metrics-panel{background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid));border:1px solid var(--steel-dark);border-radius:12px;padding:24px;margin-bottom:24px}
+.metrics-panel-title{font-family:'Special Elite',cursive;font-size:16px;color:var(--cyan-bright);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.metric-card{background:rgba(0,0,0,0.3);border:1px solid var(--steel-dark);border-radius:8px;padding:16px;text-align:center;position:relative;overflow:hidden}
+.metric-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan-bright),transparent)}
+.metric-value{font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;color:var(--cyan-bright);margin-bottom:4px}
+.metric-label{font-size:11px;color:var(--steel-mid);letter-spacing:1px;text-transform:uppercase}
+.metric-bar-wrap{margin-top:8px;background:var(--steel-dark);border-radius:2px;height:4px;overflow:hidden}
+.metric-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan-bright));width:var(--bar-w,0);animation:barGrow 1s ease forwards;animation-delay:var(--bar-delay,0s)}
+.circular-charts{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.chart-ring{display:flex;flex-direction:column;align-items:center;gap:8px}
+.chart-ring svg{transform:rotate(-90deg)}
+.ring-label{font-size:11px;color:var(--steel-mid);text-align:center}
+.clue-section{margin-bottom:28px}
+.section-title{font-family:'Special Elite',cursive;font-size:18px;color:var(--cyan-bright);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--cyan-dim),transparent)}
+.clue-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.clue-card{background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid));border:1px solid var(--steel-dark);border-radius:10px;padding:20px;cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden}
+.clue-card:hover{border-color:var(--cyan-mid);box-shadow:var(--shadow-cyan)}
+.clue-card.unlocked{border-color:var(--success);background:linear-gradient(135deg,rgba(0,229,160,0.05),var(--navy-mid))}
+.clue-lock{width:40px;height:40px;border-radius:50%;background:var(--navy-accent);border:2px solid var(--steel-dark);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;transition:all 0.3s}
+.clue-card.unlocked .clue-lock{background:rgba(0,229,160,0.15);border-color:var(--success)}
+.clue-number{font-family:'Courier Prime',monospace;font-size:11px;color:var(--steel-mid);letter-spacing:2px;margin-bottom:8px}
+.clue-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px}
+.clue-desc{font-size:13px;color:var(--steel-light);line-height:1.6;display:none}
+.clue-card.unlocked .clue-desc{display:block}
+.clue-hint{font-size:12px;color:var(--steel-mid);font-style:italic}
+.clue-card.unlocked .clue-hint{display:none}
+.suspect-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.suspect-card{background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid));border:2px solid var(--steel-dark);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.3s ease;position:relative}
+.suspect-card:hover{border-color:var(--cyan-mid);transform:translateY(-3px)}
+.suspect-card.selected{border-color:var(--gold);box-shadow:0 0 20px rgba(240,192,64,0.3)}
+.suspect-card.correct{border-color:var(--success);box-shadow:0 0 20px rgba(0,229,160,0.3)}
+.suspect-card.wrong{border-color:var(--danger);animation:shake 0.5s ease}
+.suspect-icon{font-size:32px;margin-bottom:12px}
+.suspect-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.suspect-desc{font-size:12px;color:var(--steel-mid);line-height:1.5}
+.suspect-check{position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:var(--steel-dark);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.3s}
+.suspect-card.selected .suspect-check{background:var(--gold)}
+.suspect-card.correct .suspect-check{background:var(--success)}
+.closed-stamp{font-family:'Special Elite',cursive;font-size:clamp(48px,10vw,96px);color:var(--success);letter-spacing:6px;border:6px solid var(--success);padding:12px 32px;display:inline-block;animation:stampIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both;text-shadow:0 0 30px rgba(0,229,160,0.5);box-shadow:0 0 40px rgba(0,229,160,0.3),inset 0 0 30px rgba(0,229,160,0.05);transform:rotate(-5deg);margin-bottom:32px}
+.closed-title{font-family:'Special Elite',cursive;font-size:clamp(24px,4vw,40px);color:var(--text-primary);margin-bottom:12px}
+.score-display{font-family:'Courier Prime',monospace;font-size:64px;font-weight:700;color:var(--gold);text-shadow:0 0 30px rgba(240,192,64,0.5);margin:16px 0}
+.score-label{font-size:14px;color:var(--steel-mid);letter-spacing:2px;text-transform:uppercase}
+.confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards;pointer-events:none;z-index:200}
+.report-container{max-width:860px;margin:0 auto}
+.report-card{background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid));border:1px solid var(--steel-dark);border-radius:12px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden}
+.report-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--cyan-bright)}
+.report-section-title{font-family:'Special Elite',cursive;font-size:18px;color:var(--cyan-bright);margin-bottom:16px;padding-left:12px}
+.mistake-reveal{background:rgba(255,68,102,0.08);border:1px solid rgba(255,68,102,0.3);border-radius:8px;padding:20px;margin-bottom:16px}
+.mistake-label{font-size:10px;color:var(--danger);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.mistake-text{font-size:15px;color:var(--text-primary);line-height:1.6}
+.improvement-list{list-style:none}
+.improvement-list li{padding:12px 0;border-bottom:1px solid var(--steel-dark);font-size:14px;color:var(--steel-light);line-height:1.6;display:flex;gap:12px;align-items:flex-start}
+.improvement-list li:last-child{border-bottom:none}
+.improvement-list li::before{content:'->>';color:var(--cyan-bright);font-weight:700;flex-shrink:0;margin-top:1px}
+.report-explanation{font-size:14px;color:var(--steel-light);line-height:1.8;padding-left:12px}
+.customer-comments{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.comment-bubble{background:rgba(0,212,255,0.05);border:1px solid var(--cyan-dim);border-radius:12px;padding:14px;font-size:13px;color:var(--steel-light);font-style:italic;position:relative;line-height:1.5}
+.comment-bubble::before{content:'"';font-size:32px;color:var(--cyan-dim);position:absolute;top:-4px;left:10px;font-family:'Special Elite',cursive;line-height:1}
+.comment-bubble .comment-text{padding-top:12px}
+.social-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.social-card{background:rgba(0,0,0,0.3);border:1px solid var(--steel-dark);border-radius:8px;padding:14px;text-align:center}
+.social-platform{font-size:20px;margin-bottom:6px}
+.social-value{font-family:'Courier Prime',monospace;font-size:16px;color:var(--cyan-bright);font-weight:700}
+.social-label{font-size:11px;color:var(--steel-mid);margin-top:2px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--navy-mid),var(--navy-accent));border:1px solid var(--cyan-dim);border-radius:10px;padding:14px 24px;font-size:14px;color:var(--text-primary);box-shadow:var(--shadow-cyan),var(--shadow-deep);z-index:999;animation:fadeSlideIn 0.3s ease;max-width:400px;text-align:center}
+.budget-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.budget-label{font-size:12px;color:var(--steel-light);width:130px;flex-shrink:0}
+.budget-track{flex:1;background:var(--steel-dark);border-radius:3px;height:8px;overflow:hidden}
+.budget-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan-bright));width:var(--pct,0%);animation:barGrow 1.2s ease forwards;animation-delay:var(--delay,0s)}
+.budget-pct{font-size:12px;color:var(--cyan-bright);font-family:'Courier Prime',monospace;width:36px;text-align:right}
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--steel-dark)}
+.tab-btn{padding:10px 20px;border:none;background:transparent;color:var(--steel-mid);font-size:13px;cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;letter-spacing:0.5px}
+.tab-btn:hover{color:var(--text-primary)}
+.tab-btn.active{color:var(--cyan-bright);border-bottom-color:var(--cyan-bright)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--steel-dark),transparent);margin:20px 0}
+.glow-text{color:var(--cyan-bright);text-shadow:0 0 12px rgba(0,212,255,0.5)}
+.clue-progress{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.2);border:1px solid var(--steel-dark);border-radius:8px;padding:12px 16px;margin-bottom:20px}
+.clue-progress-text{font-size:13px;color:var(--steel-light)}
+.clue-progress-count{font-family:'Courier Prime',monospace;font-size:15px;color:var(--gold);font-weight:700}
+.page-content{max-width:1100px;margin:0 auto}
+.screen-footer{padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--steel-dark);margin-top:32px}
+.footer-info{font-size:12px;color:var(--steel-mid)}
+.solve-btn-wrap{text-align:center;margin-top:24px}
+@media(max-width:600px){.case-meta-grid{grid-template-columns:1fr}.board-grid{grid-template-columns:1fr}.clue-grid,.suspect-grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header class="app-header" id="app-header" style="display:none">
+  <div class="header-badge">🔍</div>
+  <div>
+    <div class="header-title">MARKETING DETECTIVE</div>
+    <div class="header-subtitle">Case Files Division</div>
+  </div>
+  <div class="header-right">
+    <div class="case-counter" id="header-case-num">CASE #001</div>
+    <div class="progress-dots" id="progress-dots">
+      <div class="progress-dot" data-step="0"></div>
+      <div class="progress-dot" data-step="1"></div>
+      <div class="progress-dot" data-step="2"></div>
+      <div class="progress-dot" data-step="3"></div>
+      <div class="progress-dot" data-step="4"></div>
+      <div class="progress-dot" data-step="5"></div>
+    </div>
+  </div>
+</header>
+
+<!-- SCREEN 1: ASSIGNMENT -->
+<div class="screen active" id="screen-assignment">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px">
+    <div style="max-width:780px;width:100%;text-align:center">
+      <div class="classified-stamp">&#9001; CONFIDENTIAL &#9002;</div>
+      <h1 class="assignment-title">Marketing<br><span>Detective</span></h1>
+      <p class="assignment-tagline">Crack the Campaign &bull; Find the Mistake &bull; Solve the Case</p>
+      <div class="case-file-preview" id="preview-card">
+        <div class="case-file-header">
+          <div class="file-icon">&#128193;</div>
+          <div>
+            <div id="prev-number" class="case-number-badge">CASE #001</div>
+            <div style="margin-top:6px"><span id="prev-industry" class="case-industry-tag">Loading...</span></div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div class="case-meta-label">Difficulty</div>
+            <div class="difficulty-bar" id="prev-difficulty"></div>
+          </div>
+        </div>
+        <h2 class="case-title-large" id="prev-company">Loading case...</h2>
+        <p class="case-objective" id="prev-objective">Fetching classified file...</p>
+        <div class="case-meta-grid">
+          <div class="case-meta-item"><div class="case-meta-label">Budget</div><div class="case-meta-value" id="prev-budget">--</div></div>
+          <div class="case-meta-item"><div class="case-meta-label">Target Audience</div><div class="case-meta-value" id="prev-audience">--</div></div>
+          <div class="case-meta-item"><div class="case-meta-label">Channels</div><div class="case-meta-value" id="prev-channels">--</div></div>
+          <div class="case-meta-item"><div class="case-meta-label">Status</div><div class="case-meta-value" style="color:var(--danger)">&#9888; Underperforming</div></div>
+        </div>
+      </div>
+      <div class="assignment-actions">
+        <button class="btn btn-primary" id="btn-accept">&#128269; Accept Assignment</button>
+        <button class="btn btn-secondary" id="btn-new-case">&#8634; New Case</button>
+      </div>
+      <p style="margin-top:20px;font-size:12px;color:var(--steel-mid)">15 classified cases in database &nbsp;|&nbsp; Random case loaded each session</p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: BOARD -->
+<div class="screen" id="screen-board">
+  <div class="page-content" style="padding:28px 20px">
+    <div class="board-header">
+      <div>
+        <div class="board-title" id="board-case-title">Case: ...</div>
+        <div class="board-subtitle" id="board-case-sub">Review all evidence</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" id="btn-to-investigate">&#128373; Begin Investigation &rarr;</button>
+    </div>
+    <div class="metrics-panel">
+      <div class="metrics-panel-title">&#128202; Campaign Metrics</div>
+      <div class="metrics-grid" id="metrics-grid"></div>
+      <div class="divider"></div>
+      <div class="circular-charts" id="circular-charts"></div>
+    </div>
+    <div class="metrics-panel">
+      <div class="metrics-panel-title">&#128176; Budget Allocation</div>
+      <div id="budget-bars"></div>
+    </div>
+    <div style="margin-bottom:24px">
+      <div class="section-title">&#129693; Evidence Board</div>
+      <div class="corkboard"><div class="board-grid" id="evidence-board"></div></div>
+    </div>
+    <div class="metrics-panel">
+      <div class="metrics-panel-title">&#128241; Social Media Performance</div>
+      <div class="social-grid" id="social-grid"></div>
+    </div>
+    <div class="screen-footer">
+      <div class="footer-info">Study all evidence carefully.</div>
+      <button class="btn btn-primary" id="btn-to-investigate2">&#128373; Begin Investigation &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: INVESTIGATE -->
+<div class="screen" id="screen-investigate">
+  <div class="page-content" style="padding:28px 20px">
+    <div class="board-header">
+      <div>
+        <div class="board-title">&#128294; Interactive Investigation</div>
+        <div class="board-subtitle">Unlock all 3 clues, then solve the case</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" id="btn-back-board">&larr; Back to Board</button>
+    </div>
+    <div class="clue-progress">
+      <span>&#128272;</span>
+      <span class="clue-progress-text">Clues Revealed:</span>
+      <span class="clue-progress-count" id="clue-count-display">0 / 3</span>
+      <div style="flex:1;background:var(--steel-dark);border-radius:2px;height:4px;overflow:hidden;margin-left:8px">
+        <div id="clue-progress-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan-bright));width:0%;transition:width 0.4s ease"></div>
+      </div>
+    </div>
+    <div class="clue-section">
+      <div class="section-title">&#128193; Case Clues</div>
+      <div class="clue-grid" id="clue-grid"></div>
+    </div>
+    <div style="margin-bottom:24px">
+      <div class="section-title">&#128204; Drag Evidence to Workspace</div>
+      <div class="corkboard" style="min-height:260px;position:relative" id="drag-board">
+        <div id="drag-cards-container" style="display:flex;flex-wrap:wrap;gap:16px;position:relative;z-index:1"></div>
+        <div style="position:absolute;bottom:12px;right:16px;font-size:11px;color:rgba(154,122,74,0.6);font-family:'Courier Prime',monospace">DRAG TO REARRANGE</div>
+      </div>
+    </div>
+    <div class="metrics-panel">
+      <div class="metrics-panel-title">&#128172; Customer Comments</div>
+      <div class="customer-comments" id="customer-comments"></div>
+    </div>
+    <div class="solve-btn-wrap">
+      <button class="btn btn-gold" id="btn-to-solve" style="font-size:16px;padding:16px 40px">&#9878; Solve the Case</button>
+      <div style="margin-top:10px;font-size:12px;color:var(--steel-mid)" id="solve-hint">Reveal all 3 clues to unlock the solve button</div>
+    </div>
+    <div class="screen-footer">
+      <div class="footer-info">Complete your investigation above.</div>
+      <button class="btn btn-secondary btn-sm" id="btn-to-solve2">&#9878; Attempt Solution &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: SOLVE -->
+<div class="screen" id="screen-solve">
+  <div class="page-content" style="padding:28px 20px">
+    <div class="board-header">
+      <div>
+        <div class="board-title">&#9878; Solve The Case</div>
+        <div class="board-subtitle">Select the primary marketing mistake</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" id="btn-back-investigate">&larr; Back</button>
+    </div>
+    <div class="metrics-panel" style="margin-bottom:24px">
+      <div class="metrics-panel-title">&#128203; Case Summary</div>
+      <div id="solve-summary"></div>
+    </div>
+    <div class="section-title">&#127919; What Was the Primary Marketing Mistake?</div>
+    <p style="font-size:13px;color:var(--steel-mid);margin-bottom:20px">Based on your investigation, choose the option that best identifies the core mistake:</p>
+    <div class="suspect-grid" id="suspect-grid"></div>
+    <div id="solve-feedback" style="display:none;margin-top:24px;padding:20px;border-radius:10px;border:2px solid var(--success)">
+      <div style="font-size:16px;font-weight:600;margin-bottom:8px" id="feedback-title"></div>
+      <div style="font-size:14px;color:var(--steel-light);line-height:1.6" id="feedback-text"></div>
+    </div>
+    <div class="solve-btn-wrap" id="solve-continue-wrap" style="display:none">
+      <button class="btn btn-primary" id="btn-to-closed" style="font-size:16px;padding:16px 40px">&#127881; Case Closed &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: CASE CLOSED -->
+<div class="screen" id="screen-closed">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center">
+    <div id="confetti-container"></div>
+    <div class="closed-stamp" id="closed-stamp">CASE CLOSED</div>
+    <h2 class="closed-title">Excellent Detective Work!</h2>
+    <div class="score-label">DETECTIVE SCORE</div>
+    <div class="score-display" id="score-display">--</div>
+    <div style="font-size:14px;color:var(--steel-mid);margin-bottom:32px" id="score-detail"></div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-primary" id="btn-view-report">&#128203; View Learning Report</button>
+      <button class="btn btn-secondary" id="btn-new-from-closed">&#8634; New Case</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 6: REPORT -->
+<div class="screen" id="screen-report">
+  <div class="report-container" style="padding:30px 20px">
+    <div class="board-header">
+      <div>
+        <div class="board-title">&#128203; Learning Report</div>
+        <div class="board-subtitle">Full case breakdown and marketing lessons</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" id="btn-new-from-report">&#8634; New Case</button>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="mistake">The Mistake</button>
+      <button class="tab-btn" data-tab="explanation">Full Explanation</button>
+      <button class="tab-btn" data-tab="improvements">Improvements</button>
+      <button class="tab-btn" data-tab="data">Data Review</button>
+    </div>
+    <div class="tab-panel active" id="tab-mistake"><div class="report-card" id="report-mistake-card"></div></div>
+    <div class="tab-panel" id="tab-explanation"><div class="report-card" id="report-explanation-card"></div></div>
+    <div class="tab-panel" id="tab-improvements"><div class="report-card" id="report-improvements-card"></div></div>
+    <div class="tab-panel" id="tab-data"><div class="report-card" id="report-data-card"></div></div>
+    <div style="text-align:center;padding:32px 0">
+      <button class="btn btn-primary" id="btn-new-case-final" style="font-size:16px;padding:16px 40px">&#128269; Next Case &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+const CASES=[{id:1,company:"BrewBliss Coffee Co.",industry:"Food & Beverage",objective:"Launch a new premium cold brew line targeting urban professionals aged 25-40",audience:"Urban professionals, 25-40, health-conscious, premium buyers",channels:["Instagram","Google Ads","Influencer Marketing","Out-of-Home (OOH)"],budget:"$120,000",budgetAllocation:[{label:"Instagram Ads",pct:40},{label:"Google Search",pct:20},{label:"Influencer Deals",pct:30},{label:"OOH / Billboards",pct:10}],metrics:{reach:"2.4M",ctr:"0.3%",engagement:"1.1%",conversions:"812",sales:"$38,200"},chartData:[{label:"Reach Goal",value:45},{label:"CTR Goal",value:20},{label:"Conv. Goal",value:22},{label:"ROI Goal",value:30}],customerComments:["The ad was beautiful but I couldn't find the product anywhere near me.","I clicked the ad but the website took forever to load on mobile.","The influencer post felt really fake - they clearly don't drink this.","Love the aesthetic, hate the price. No explanation of what makes it worth $12.","Saw it everywhere but never felt compelled to try it."],social:[{platform:"Instagram",icon:"📸",value:"1.2M",label:"Impressions"},{platform:"Twitter/X",icon:"🐦",value:"48K",label:"Impressions"},{platform:"Facebook",icon:"👥",value:"220K",label:"Reach"},{platform:"TikTok",icon:"🎵",value:"11K",label:"Views"},{platform:"YouTube",icon:"▶",value:"4.2K",label:"Views"}],mistake:"Influencer-Audience Mismatch",clues:[{title:"Influencer Follower Demographics",desc:"The three influencers chosen had a combined audience of 82% aged 16-22 — students, not urban professionals. Only 11% of their followers matched the brand's stated target demographic.",hint:"Look at who's actually watching the influencer content"},{title:"Engagement vs. Conversion Gap",desc:"Despite 1.2M Instagram impressions, only 812 total conversions occurred — a conversion rate of 0.07%, far below the 2-4% industry benchmark for premium CPG products.",hint:"Compare the audience size to what they actually bought"},{title:"Content Tone Analysis",desc:"Brand content used aspirational language like 'your 6AM hustle starts here' but influencer posts were predominantly lifestyle-casual gaming content — completely misaligned messaging.",hint:"What's the gap between the brand message and influencer style?"}],suspects:[{title:"Influencer-Audience Mismatch",desc:"The influencers chosen didn't reach the target demographic, wasting 30% of the budget.",icon:"🎯"},{title:"Low Mobile Website Speed",desc:"The product landing page scored 22/100 on Google PageSpeed, causing drop-offs.",icon:"📱"},{title:"Insufficient OOH Coverage",desc:"Billboards were placed in suburban areas, not the urban zones where the target market lives.",icon:"🏙"},{title:"Overpriced Product Positioning",desc:"At $12 per bottle, the product was priced 40% above market average without clear value communication.",icon:"💰"}],correctSuspect:0,explanation:"BrewBliss allocated 30% of its $120K budget ($36,000) to three influencers whose combined audiences skewed toward Gen Z students aged 16-22. The target demographic — urban professionals 25-40 — simply wasn't watching this content. This created a massive reach-to-conversion chasm. The campaign generated impressive vanity metrics but failed to convert because the message never meaningfully reached qualified buyers.",improvements:["Use creator analytics tools (Creator IQ, Modash) to verify demographic match before signing influencer deals","Set a minimum threshold: at least 60% of influencer audience must match core buyer persona","Reallocate influencer budget toward micro-influencers (10K-100K) in coffee, wellness, and career niches","Add a conversion tracking pixel to all influencer posts to measure true attribution","Split-test two influencer content styles: aspirational professional vs. authentic daily use"],difficulty:3},{id:2,company:"VeloRush Cycling Gear",industry:"Sports & Fitness",objective:"Drive online sales of premium cycling helmets during spring season",audience:"Cycling enthusiasts, 28-55, performance-focused, safety-conscious",channels:["Facebook Ads","SEO Blog Content","Email Marketing","YouTube Pre-roll"],budget:"$85,000",budgetAllocation:[{label:"Facebook Ads",pct:55},{label:"SEO / Blog",pct:10},{label:"Email Marketing",pct:8},{label:"YouTube Pre-roll",pct:27}],metrics:{reach:"890K",ctr:"2.1%",engagement:"4.3%",conversions:"234",sales:"$52,000"},chartData:[{label:"Reach Goal",value:72},{label:"CTR Goal",value:68},{label:"Conv. Goal",value:18},{label:"ROI Goal",value:55}],customerComments:["I saw the ad five times a day, it got really annoying.","Great product shots, but I needed to see safety ratings before buying.","The Facebook ad took me to a generic homepage, not the helmet page.","Email said 20% off but the code didn't work at checkout.","I wanted to compare models but the website made it impossible."],social:[{platform:"Facebook",icon:"👥",value:"540K",label:"Reach"},{platform:"Instagram",icon:"📸",value:"88K",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"180K",label:"Views"},{platform:"Twitter/X",icon:"🐦",value:"12K",label:"Impressions"},{platform:"Pinterest",icon:"📌",value:"28K",label:"Saves"}],mistake:"Ad Frequency Fatigue + Broken Landing Page Experience",clues:[{title:"Ad Frequency Data",desc:"Facebook campaign logs reveal an average ad frequency of 7.3 — meaning the same user saw the ad over 7 times. Industry best practice caps frequency at 3-4 before significant negative sentiment builds.",hint:"How many times did the same person see the ad?"},{title:"Landing Page Mismatch",desc:"Click-through from Facebook ads routed 94% of traffic to the generic homepage rather than the specific helmet product page, adding 3-5 extra clicks to the purchase journey and increasing drop-off by an estimated 60%.",hint:"Where exactly does the ad send the user after clicking?"},{title:"Email Coupon Failure",desc:"The promotional email (sent to 45,000 subscribers) featured a 20% discount code that was deactivated 6 hours after the email went live due to an internal system error — never fixed for the 3-week campaign.",hint:"Did the promotional offer actually work when customers tried it?"}],suspects:[{title:"Ad Frequency Fatigue",desc:"Users saw the ad 7+ times, causing banner blindness and negative brand perception.",icon:"🔁"},{title:"Broken Landing Page Experience",desc:"Ads linked to the homepage, not the product page — adding unnecessary friction to purchase.",icon:"🔗"},{title:"Broken Discount Code",desc:"45,000 subscribers received an invalid coupon for 3 weeks, destroying email channel trust.",icon:"🎟"},{title:"Wrong Platform Focus",desc:"Facebook audience skews older and less active in cycling vs. Strava or cycling forums.",icon:"📊"}],correctSuspect:1,explanation:"The single largest conversion killer was ad traffic being routed to the generic homepage instead of a targeted product landing page. When a user clicks a helmet ad, they expect to land directly on the helmet page with clear pricing, specs, safety ratings, and a buy button. Routing them to the homepage forced users to navigate manually — a process most abandoned. Combined with high ad frequency (7.3 average) that eroded goodwill, the campaign burned budget without creating the frictionless path to purchase that high-ticket items require.",improvements:["Create dedicated landing pages for each product line — match ad creative to landing page content 1:1","Implement frequency caps in Facebook Ads Manager (maximum 3-4 per week per user)","Set up automated QA testing for all promotional codes before campaign launch","Add social proof elements (safety certification badges, rider testimonials) above the fold","Use retargeting sequences: awareness ad -> product page ad -> review ad -> offer"],difficulty:2},{id:3,company:"TerraBloom Plant Studio",industry:"Home & Garden",objective:"Build brand awareness and grow subscriber base for monthly plant subscription box",audience:"Home decor enthusiasts, millennials, 22-38, apartment dwellers, first-time plant owners",channels:["Pinterest Ads","TikTok Organic","Instagram Stories","Referral Program"],budget:"$45,000",budgetAllocation:[{label:"Pinterest Ads",pct:45},{label:"TikTok (organic+boost)",pct:25},{label:"Instagram Stories",pct:20},{label:"Referral Program",pct:10}],metrics:{reach:"1.8M",ctr:"0.8%",engagement:"6.2%",conversions:"320",sales:"$19,200"},chartData:[{label:"Reach Goal",value:88},{label:"CTR Goal",value:40},{label:"Conv. Goal",value:28},{label:"ROI Goal",value:35}],customerComments:["I subscribed but never got my welcome email. Had no idea what was happening.","The TikTok videos were gorgeous! But I couldn't find the link to subscribe.","Why can't I choose which plants I get? I'm allergic to certain ones.","Referral code didn't give my friend any discount. She was annoyed.","Amazing plants but the box was damaged in shipping — never reordered."],social:[{platform:"Pinterest",icon:"📌",value:"920K",label:"Monthly Views"},{platform:"TikTok",icon:"🎵",value:"2.1M",label:"Views"},{platform:"Instagram",icon:"📸",value:"380K",label:"Impressions"},{platform:"Facebook",icon:"👥",value:"44K",label:"Reach"},{platform:"YouTube",icon:"▶",value:"8K",label:"Views"}],mistake:"No Clear Call-to-Action in Top-Performing Channel",clues:[{title:"TikTok Traffic Analysis",desc:"TikTok videos received 2.1M views organically, but the account bio link was changed 4 times during the campaign — at one point linking to a 404 error page for 11 days. Zero TikTok-attributed conversions were tracked.",hint:"TikTok drove the most eyeballs — did those viewers know where to go?"},{title:"Post-Click Journey Mapping",desc:"Pinterest ads had a strong CTR (0.8%) but the landing page had no subscription CTA above the fold — just a product gallery. Users had to scroll 3+ screens to find the 'Subscribe' button.",hint:"After someone clicks, how hard is it to actually subscribe?"},{title:"Referral Program Tracking",desc:"The referral program was promoted heavily but used static coupon codes instead of unique tracking links. 78% of referral codes were shared but never redeemed because they weren't automatically applied at checkout.",hint:"Did the referral program actually work technically?"}],suspects:[{title:"Broken TikTok Link in Bio",desc:"2.1M viewers had no working destination link for 11 of 30 campaign days.",icon:"🔗"},{title:"CTA Buried Below Fold",desc:"Pinterest visitors couldn't find the subscribe button without extensive scrolling.",icon:"📜"},{title:"Broken Referral Mechanics",desc:"Referral codes weren't auto-applied, causing high abandonment of the referral flow.",icon:"🔄"},{title:"No Email Onboarding Flow",desc:"New subscribers received no welcome email, causing confusion and early churn.",icon:"📧"}],correctSuspect:0,explanation:"TerraBloom's organic TikTok content went semi-viral with 2.1M views — this was the campaign's biggest asset and completely wasted. The bio link — the only clickable path from TikTok — was broken or misdirected for 11 of 30 campaign days. Viral reach without conversion infrastructure is one of the most expensive mistakes in social media marketing. A properly configured link-in-bio with UTM tracking would have likely captured hundreds of additional subscribers.",improvements:["Implement daily automated link testing across all social bio links","Use a dedicated link-in-bio page (Linktree or custom) with multiple tracked destination links","Add TikTok Shopping or direct product links using TikTok's native shopping features","Create a 'Subscribe Now' pinned TikTok video with on-screen text directing to bio link","Set up a post-purchase email sequence: welcome -> care guide -> community invite -> referral ask"],difficulty:2},{id:4,company:"QuantumLeap EdTech",industry:"Education Technology",objective:"Drive course enrollments for a new AI/ML certification program targeting professionals",audience:"Working professionals, 28-45, tech-adjacent roles, career-switchers seeking upskilling",channels:["LinkedIn Ads","Google Search Ads","Webinar Series","Content Marketing"],budget:"$200,000",budgetAllocation:[{label:"LinkedIn Ads",pct:50},{label:"Google Search",pct:25},{label:"Webinar Series",pct:15},{label:"Content / Blog",pct:10}],metrics:{reach:"3.1M",ctr:"1.8%",engagement:"3.4%",conversions:"148",sales:"$592,000"},chartData:[{label:"Reach Goal",value:82},{label:"CTR Goal",value:60},{label:"Conv. Goal",value:12},{label:"ROI Goal",value:90}],customerComments:["The webinar was incredible, but I needed 2 months to decide — no follow-up from the team.","I signed up for the free trial but hit a paywall after lesson 1. Very misleading.","LinkedIn ad promised 'job-ready in 8 weeks' — curriculum was 6 months long.","Hard to judge quality without seeing real alumni outcomes.","The Google ad mentioned live mentorship, but I found out it's just prerecorded."],social:[{platform:"LinkedIn",icon:"💼",value:"1.8M",label:"Impressions"},{platform:"Twitter/X",icon:"🐦",value:"290K",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"88K",label:"Views"},{platform:"Facebook",icon:"👥",value:"120K",label:"Reach"},{platform:"Instagram",icon:"📸",value:"44K",label:"Impressions"}],mistake:"Misleading Ad Claims Creating Trust Deficit",clues:[{title:"Ad Copy vs. Reality Audit",desc:"LinkedIn ads promised 'job-ready in 8 weeks' and 'live mentorship included.' The actual curriculum was 6 months with no live mentorship — only pre-recorded Q&A. Post-enrollment complaint rate reached 34%.",hint:"Do the ads accurately represent what the customer actually receives?"},{title:"Webinar-to-Enrollment Gap",desc:"Webinars generated a 68% attendance rate (exceptional) but only 4.2% conversion — vs. 12-18% EdTech benchmark. Exit survey: 61% cited 'need more trust signals before committing $3,999'.",hint:"Why did people who showed up to the webinar still not buy?"},{title:"Refund & Churn Data",desc:"Of 148 enrollments, 38 (26%) requested refunds within 14 days citing course content 'not matching advertised description.' Average LTV of retained students: $5,200 vs. acquisition cost: $1,350/student.",hint:"What's happening to students after they buy?"}],suspects:[{title:"Misleading Ad Claims",desc:"'Job-ready in 8 weeks' and 'live mentorship' were false promises that destroyed post-purchase trust.",icon:"⚠"},{title:"Underinvested Webinar Follow-up",desc:"No email nurture sequence after webinar attendance led to cold leads going nowhere.",icon:"📨"},{title:"Free Trial Paywall Deception",desc:"Hiding the paywall after lesson 1 created immediate distrust and negative reviews.",icon:"🚧"},{title:"Missing Social Proof",desc:"No alumni success stories or job placement data made $3,999 a hard sell.",icon:"⭐"}],correctSuspect:0,explanation:"QuantumLeap's core failure was misleading advertising. Promising '8 weeks to job-ready' for a 6-month course and advertising 'live mentorship' for a pre-recorded experience created a fundamental trust breach. The high webinar attendance showed strong demand existed. But the 26% refund rate and 34% complaint rate signal that acquired customers felt deceived — destroying word-of-mouth potential and LTV. In premium EdTech, trust is the primary purchase driver.",improvements:["Audit all ad copy against the actual product experience — any exaggerated claim must be removed","Develop a 6-email post-webinar nurture sequence with objection handling for each day","Create an alumni spotlight series with verified employment outcomes and salary increases","Structure free trial to demonstrate full course quality — not create a bait-and-switch experience","Add a 'live office hours' element to truthfully advertise as 'live mentorship'"],difficulty:4},{id:5,company:"FrostMint Ice Cream Co.",industry:"Food & Beverage",objective:"Launch a vegan ice cream line and capture 5% market share in 6 months",audience:"Vegan/flexitarian consumers, 20-45, health-conscious, willing to pay premium",channels:["TikTok Ads","Grocery Store Sampling","Vegan Influencers","Coupon Apps"],budget:"$60,000",budgetAllocation:[{label:"TikTok Ads",pct:35},{label:"In-Store Sampling",pct:30},{label:"Vegan Influencers",pct:25},{label:"Coupon Apps",pct:10}],metrics:{reach:"4.8M",ctr:"1.4%",engagement:"7.8%",conversions:"1,840",sales:"$28,000"},chartData:[{label:"Reach Goal",value:92},{label:"CTR Goal",value:55},{label:"Conv. Goal",value:70},{label:"ROI Goal",value:40}],customerComments:["Tasted it at the store and LOVED it, but haven't seen it since. Where is it sold?","The product is great but labeling says 'may contain dairy traces' — that's not vegan!","Bought it once, couldn't find it at my usual grocery store anymore.","The TikTok ad was so good I immediately searched Amazon — not available there.","Had a coupon but the cashier didn't know how to apply it digitally."],social:[{platform:"TikTok",icon:"🎵",value:"3.2M",label:"Views"},{platform:"Instagram",icon:"📸",value:"880K",label:"Impressions"},{platform:"Facebook",icon:"👥",value:"280K",label:"Reach"},{platform:"Pinterest",icon:"📌",value:"44K",label:"Saves"},{platform:"YouTube",icon:"▶",value:"18K",label:"Views"}],mistake:"Distribution Gap — High Demand, No Supply Access",clues:[{title:"Distribution vs. Campaign Coverage",desc:"The campaign ran in 50 U.S. DMAs, but the product was physically available in only 8 DMAs — exclusively in 3 regional grocery chains. 84% of interested buyers had no purchase path.",hint:"Where could people actually buy the product after seeing the ad?"},{title:"Packaging Claims Compliance",desc:"The 'vegan ice cream' label included a 'may contain traces of milk and eggs' warning. In vegan communities, this immediately discredits a vegan claim — confirmed by 73 negative TikTok comments flagging this issue.",hint:"What happens when the target audience reads the product label closely?"},{title:"Sampling-to-Reorder Data",desc:"In-store sampling converted at an extraordinary 42% (people who tasted it bought it immediately). However, 81% of those samplers couldn't find the product again at their primary grocery store 2 weeks later.",hint:"What happened to customers who loved the product after their first purchase?"}],suspects:[{title:"Distribution Gap",desc:"Campaign reached 50 markets but product was only sold in 8 — 84% of demand had nowhere to purchase.",icon:"🗺"},{title:"Packaging Credibility Issue",desc:"'May contain dairy traces' disclaimer directly contradicted the vegan positioning for core buyers.",icon:"🏷"},{title:"No Online Sales Channel",desc:"High TikTok demand couldn't convert because there was no e-commerce option or Amazon listing.",icon:"🛒"},{title:"Coupon Redemption Failure",desc:"Cashiers were untrained on digital coupon processing, leading to failed promotions.",icon:"🎟"}],correctSuspect:0,explanation:"FrostMint created genuine product-market fit — the 42% in-store sampling conversion rate proves demand was real. But the campaign was run at national scale while distribution remained hyperlocal. 84% of people who wanted to buy simply couldn't find the product. This is a classic demand-creation-without-supply-access failure. Marketing spend should always scale in lockstep with distribution expansion.",improvements:["Geo-fence all paid advertising to zip codes within 10 miles of actual retail stockists","Launch a direct-to-consumer e-commerce channel (Shopify) before or simultaneous with campaign","Negotiate minimum shelf placement in 20+ chains before investing in digital reach campaigns","Source a certified vegan manufacturing facility to eliminate cross-contamination claims","Build an 'in-store locator' tool prominently featured in all ad creative"],difficulty:3},{id:6,company:"Apex Armor Security Systems",industry:"Home Security",objective:"Generate qualified B2C leads for smart home security installation packages",audience:"Homeowners, 35-65, suburban, above-average income, safety-motivated",channels:["Google Search","Direct Mail","Radio Ads","Facebook Lead Forms"],budget:"$150,000",budgetAllocation:[{label:"Google Search",pct:40},{label:"Direct Mail",pct:25},{label:"Radio Ads",pct:20},{label:"Facebook Leads",pct:15}],metrics:{reach:"680K",ctr:"3.8%",engagement:"2.2%",conversions:"2,140",sales:"$0"},chartData:[{label:"Lead Goal",value:95},{label:"CTR Goal",value:88},{label:"Sales Close",value:2},{label:"ROI Goal",value:0}],customerComments:["Filled out the form — got a call 2 weeks later. Already chose a competitor.","I left my number on the website 3 times. No one ever called back.","The salesperson who finally called clearly didn't have my submitted details.","Quote took 11 days to arrive by mail. The digital age, right?","Great product demo, but the follow-up process felt completely disorganized."],social:[{platform:"Facebook",icon:"👥",value:"310K",label:"Reach"},{platform:"Google",icon:"🔍",value:"180K",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"22K",label:"Views"},{platform:"Twitter/X",icon:"🐦",value:"9K",label:"Impressions"},{platform:"Instagram",icon:"📸",value:"28K",label:"Impressions"}],mistake:"Lead Follow-up Failure — Zero Sales from 2,140 Qualified Leads",clues:[{title:"Lead Response Time Analysis",desc:"CRM data shows average first contact after lead submission was 11.4 days. Research shows B2C leads contacted within 5 minutes are 100x more likely to convert than leads contacted after 30 minutes. After 24 hours, conversion probability drops 80%.",hint:"How quickly did the sales team contact the people who expressed interest?"},{title:"CRM Integration Failure",desc:"Facebook Lead Form submissions were not connected to the company CRM — forms were downloaded as a weekly Excel export. 34% of leads were never contacted because the export process was manual and inconsistent.",hint:"Did the leads actually reach the sales team in a usable format?"},{title:"Sales Script Disconnect",desc:"Post-mortem interviews with 40 leads revealed that sales calls frequently started with 'Can you remind me what package you were interested in?' — indicating salespeople weren't briefed on lead form data.",hint:"What did customers experience when the sales team finally called?"}],suspects:[{title:"Broken Lead Routing",desc:"Facebook leads weren't auto-synced to CRM — 34% of leads were never contacted at all.",icon:"🔗"},{title:"11-Day Response Time",desc:"Leads were contacted 11+ days after submission — by then they'd chosen a competitor.",icon:"⏱"},{title:"Unprepared Sales Team",desc:"Sales reps called leads without access to their form data, eliminating all personalization.",icon:"📞"},{title:"Radio Ad Inefficiency",desc:"Radio had no trackable call-to-action or unique phone number — ROI was unmeasurable.",icon:"📻"}],correctSuspect:1,explanation:"Apex Armor generated 2,140 qualified leads — and made $0 in sales. This is an extreme case of perfect top-of-funnel execution destroyed by broken bottom-of-funnel infrastructure. The 11.4-day average lead response time was catastrophic in a considered-purchase category where buyers are actively comparing options. Every day a lead goes uncontacted, they progress further down a competitor's sales funnel.",improvements:["Implement real-time CRM integration with Facebook Lead Ads using Zapier or native Meta integration","Establish a 5-minute lead response SLA — use automated SMS acknowledgment while human follow-up is arranged","Brief sales team on every lead's submitted data before each call using automated pre-call briefing docs","Create tiered response sequences: instant SMS -> 30-min call attempt -> same-day email -> 24-hr callback","Implement lead scoring to prioritize high-intent leads (multiple touchpoints, specific package interest)"],difficulty:4},{id:7,company:"NomadNest Co-Living Spaces",industry:"Real Estate / Hospitality",objective:"Fill 120 co-living units in 3 cities within 90 days of grand opening",audience:"Remote workers, digital nomads, 24-38, location-independent, community-seekers",channels:["Instagram","Reddit Community Ads","Podcast Sponsorships","PR/Media Outreach"],budget:"$90,000",budgetAllocation:[{label:"Instagram Ads",pct:50},{label:"Reddit Ads",pct:15},{label:"Podcast Sponsorships",pct:25},{label:"PR / Media",pct:10}],metrics:{reach:"5.2M",ctr:"0.6%",engagement:"3.9%",conversions:"28",sales:"$168,000"},chartData:[{label:"Reach Goal",value:95},{label:"CTR Goal",value:28},{label:"Fill Rate",value:23},{label:"ROI Goal",value:55}],customerComments:["Couldn't find pricing on the website anywhere. Gave up after 5 minutes.","The Instagram aesthetic was stunning but I had no idea what was included.","I DM'd on Instagram 3 times, no reply for 10 days.","Why can't I do a virtual tour? I live on the other side of the country.","I'd love to try it but the minimum lease isn't visible anywhere."],social:[{platform:"Instagram",icon:"📸",value:"3.1M",label:"Impressions"},{platform:"Reddit",icon:"🟠",value:"420K",label:"Impressions"},{platform:"Podcast",icon:"🎙",value:"680K",label:"Listeners"},{platform:"Twitter/X",icon:"🐦",value:"88K",label:"Impressions"},{platform:"Facebook",icon:"👥",value:"120K",label:"Reach"}],mistake:"No Pricing Transparency or Friction-Reduced Conversion Path",clues:[{title:"Website Heatmap Data",desc:"Session recordings show 78% of website visitors scroll to a pricing section that doesn't exist. Average time-on-site: 2.4 minutes. 91% exit without submitting an inquiry. The 'Apply Now' button required creating an account before showing any unit details.",hint:"What happens when an interested visitor tries to find out how much it costs?"},{title:"Instagram DM Response Rate",desc:"Over 340 Instagram DMs from prospective tenants were received during the campaign. Response time averaged 8.7 days. 47% of those users who DM'd were found to have booked competitor spaces based on retargeting data.",hint:"How responsive was the brand when warm leads initiated contact?"},{title:"Podcast Listener Survey",desc:"Post-campaign survey of podcast listeners revealed 82% had a positive impression of NomadNest, 61% had visited the website, but only 3% submitted an inquiry. Top reason given: 'I wanted to see pricing and a virtual tour before making any commitment.'",hint:"What was stopping highly interested podcast listeners from converting?"}],suspects:[{title:"No Pricing on Website",desc:"78% of visitors searched for pricing that didn't exist, causing near-total exit rate.",icon:"💲"},{title:"8-Day DM Response Time",desc:"340 warm leads who DM'd on Instagram were ignored for nearly 9 days average.",icon:"💬"},{title:"No Virtual Tour Option",desc:"Remote workers couldn't evaluate units without traveling — a major conversion barrier.",icon:"🏠"},{title:"Account Required to Browse",desc:"Creating an account before viewing any unit details added critical friction at top of funnel.",icon:"🔐"}],correctSuspect:0,explanation:"NomadNest spent $90,000 reaching 5.2M people and filled only 23% of their units. The core failure: the marketing created desire but the website failed to convert it. Pricing information is the #1 piece of information a prospective tenant needs, and hiding it kills intent. This is especially critical for NomadNest's digital-nomad audience who make decisions quickly and compare options online before ever speaking to a human.",improvements:["Add a transparent pricing page with all-inclusive cost breakdown, lease terms, and what's included","Create a 360-degree virtual tour for each location — this is table stakes for remote-first audiences","Implement a 1-hour DM/chat response SLA using a community manager or chatbot for initial response","Remove account creation requirement — allow full browsing before any commitment","Add a simple 'Check Availability' form above the fold with just name + email + city of interest"],difficulty:3},{id:8,company:"LumaPeak Skincare",industry:"Beauty & Personal Care",objective:"Launch a science-backed vitamin C serum and acquire 3,000 first-time buyers",audience:"Skincare-educated women and men, 25-45, ingredient-conscious, willing to invest in quality",channels:["Google Shopping","Dermatologist Partnerships","Skincare YouTube","Email List"],budget:"$75,000",budgetAllocation:[{label:"Google Shopping",pct:45},{label:"Dermatologist Collab",pct:20},{label:"YouTube Beauty",pct:25},{label:"Email Marketing",pct:10}],metrics:{reach:"1.1M",ctr:"2.9%",engagement:"5.1%",conversions:"621",sales:"$96,255"},chartData:[{label:"Reach Goal",value:55},{label:"CTR Goal",value:72},{label:"Conv. Goal",value:21},{label:"ROI Goal",value:60}],customerComments:["I wanted to see the clinical study but the link on the website was broken.","The dermatologist video was compelling but then the ad creative looked totally different.","Google Shopping showed $68 but checkout was $89 after adding serum + 'essential' dropper.","Why is the concentration not listed anywhere on the product page?","Amazing results in 3 weeks — but I almost didn't buy because I couldn't find ingredients."],social:[{platform:"YouTube",icon:"▶",value:"480K",label:"Views"},{platform:"Instagram",icon:"📸",value:"340K",label:"Impressions"},{platform:"TikTok",icon:"🎵",value:"88K",label:"Views"},{platform:"Facebook",icon:"👥",value:"110K",label:"Reach"},{platform:"Pinterest",icon:"📌",value:"38K",label:"Saves"}],mistake:"Price Deception via Google Shopping — Checkout Price Mismatch",clues:[{title:"Price Discrepancy Audit",desc:"Google Shopping listed the serum at $68. The actual checkout total for the standard kit was $89. This $21 discrepancy violated Google's Price Accuracy policies and was the top reason cited in 68% of abandoned carts.",hint:"What price did customers expect vs. what did they see at checkout?"},{title:"Clinical Credibility Gap",desc:"The dermatologist content mentioned a 'double-blind 12-week clinical study.' The product page's link to said study returned a 404 error for the entire campaign period. Trust score on independent review sites dropped 18 points in 60 days.",hint:"When customers tried to verify the science claims, what happened?"},{title:"Ingredient Transparency Deficit",desc:"The ingredient-conscious target audience found that vitamin C concentration (%) was not listed on the product page, Amazon listing, or packaging — a critical purchase signal for this demographic.",hint:"What information does this specific audience need before they'll buy a serum?"}],suspects:[{title:"Google Shopping Price Bait",desc:"$68 shown on Google, $89 at checkout — a $21 gap causing cart abandonment and policy violations.",icon:"🏷"},{title:"Broken Clinical Study Link",desc:"Science claims couldn't be verified — the linked study returned a 404 for the entire campaign.",icon:"🔬"},{title:"Missing Ingredient Concentration",desc:"The ingredient-savvy audience needed % concentration data that didn't exist anywhere.",icon:"🧴"},{title:"Brand Visual Inconsistency",desc:"Dermatologist content and ad creative used completely different visual identities.",icon:"🎨"}],correctSuspect:0,explanation:"LumaPeak's primary conversion killer was a price discrepancy between Google Shopping ($68) and actual checkout ($89). For a science-driven skincare brand targeting educated consumers, this type of price deception is catastrophic. It triggers cart abandonment at the final purchase moment and signals dishonesty to a trust-dependent audience. Additionally, this violated Google's Shopping policies, putting the entire ad account at risk.",improvements:["Update Google Shopping feed to reflect true all-inclusive price, or list components as separate SKUs","Fix or remove all broken links — conduct a site-wide link audit before any campaign launch","Add vitamin C concentration % prominently to all product listings and packaging","Redesign checkout to show price breakdown transparently, with dropper as optional add-on","Commission and publish the full clinical study results on a dedicated science page"],difficulty:3},{id:9,company:"DriftWave Audio",industry:"Consumer Electronics",objective:"Sell 5,000 units of a new wireless noise-cancelling headphone in Q4",audience:"Music enthusiasts and remote workers, 20-45, audiophile-curious, premium buyers",channels:["Amazon Ads","YouTube Reviews","Twitter/X Promoted","Spotify Audio Ads"],budget:"$180,000",budgetAllocation:[{label:"Amazon Ads",pct:30},{label:"YouTube Reviews",pct:35},{label:"Twitter/X Promoted",pct:20},{label:"Spotify Audio Ads",pct:15}],metrics:{reach:"8.4M",ctr:"0.4%",engagement:"1.8%",conversions:"1,240",sales:"$434,000"},chartData:[{label:"Reach Goal",value:99},{label:"CTR Goal",value:22},{label:"Conv. Goal",value:25},{label:"ROI Goal",value:70}],customerComments:["Watched 3 YouTube reviews — all said the same thing, they felt scripted.","Amazon reviews were suspiciously all 5-star from accounts with 1 review each.","I wanted to hear a comparison with Sony WH-1000XM5 but none of the reviews did one.","Looked fake because every 'reviewer' used the exact same demo song.","Good product but I don't trust the reviews — ended up buying Sony."],social:[{platform:"YouTube",icon:"▶",value:"5.8M",label:"Views"},{platform:"Twitter/X",icon:"🐦",value:"1.2M",label:"Impressions"},{platform:"Spotify",icon:"🎵",value:"820K",label:"Ad Plays"},{platform:"Instagram",icon:"📸",value:"290K",label:"Impressions"},{platform:"Amazon",icon:"📦",value:"180K",label:"Product Views"}],mistake:"Inauthentic Review Strategy Destroying Buyer Trust",clues:[{title:"YouTube Review Script Analysis",desc:"All 6 sponsored YouTube reviewers received identical briefing scripts and used the same demo song. Comments sections on all 6 videos contained variations of 'this feels like an ad' — combined negative sentiment: 38%.",hint:"Were the YouTube reviews genuine or orchestrated? How did viewers respond?"},{title:"Amazon Review Pattern",desc:"The product launched with 147 reviews averaging 4.9 stars. Investigation found 89% of these accounts had posted only 1 review (this product) and were created within 3 months of launch. Amazon flagged the listing twice for manipulation.",hint:"What does the pattern of Amazon reviews actually look like?"},{title:"Competitive Comparison Absence",desc:"In a market where Sony, Bose, and Sennheiser dominate, 100% of sponsored reviews avoided competitive comparison — a major red flag to audiophile buyers who make purchase decisions based on comparisons.",hint:"What would a truly confident product review include that these didn't?"}],suspects:[{title:"Scripted Inauthentic Reviews",desc:"Identical reviewer scripts destroyed credibility — 38% negative sentiment in comments.",icon:"📝"},{title:"Fake Amazon Review Network",desc:"89% of launch reviews came from suspicious single-review accounts — flagged by Amazon.",icon:"⭐"},{title:"No Competitive Benchmarking",desc:"Avoiding Sony/Bose comparisons signaled product insecurity to the audiophile community.",icon:"🆚"},{title:"Spotify Audio Inefficiency",desc:"Audio ads for headphones on Spotify reached users with no visual product reference.",icon:"🎵"}],correctSuspect:0,explanation:"DriftWave attempted to manufacture social proof rather than earn it. The orchestrated YouTube reviews with identical scripts and the suspicious Amazon review cluster backfired catastrophically with their target audience — audiophiles who are among the most review-savvy consumers on the internet. Real reviews from real users, even if fewer and mixed, would have generated higher conversion than the elaborate fake review infrastructure.",improvements:["Brief YouTube creators with product info and guidelines but allow 100% editorial independence","Send product samples to 200+ real customers in exchange for honest, uncompensated reviews","Commission one independent audiophile comparison review vs. Sony/Bose — publish it transparently","Remove all suspicious Amazon reviews and implement an ethical post-purchase review request email","Create a 'blind test challenge' campaign where real consumers compare DriftWave vs. competitors"],difficulty:5},{id:10,company:"GreenGrid Solar",industry:"Clean Energy",objective:"Generate homeowner inquiries for solar panel installations in 5 target states",audience:"Homeowners, 35-65, environmentally motivated, above-average income, long-horizon thinkers",channels:["Facebook","Google Display","Local TV Ads","Door-to-Door"],budget:"$250,000",budgetAllocation:[{label:"Facebook Ads",pct:35},{label:"Google Display",pct:30},{label:"Local TV",pct:20},{label:"Door-to-Door",pct:15}],metrics:{reach:"6.8M",ctr:"1.2%",engagement:"2.8%",conversions:"3,880",sales:"$0"},chartData:[{label:"Reach Goal",value:98},{label:"CTR Goal",value:62},{label:"Lead Goal",value:88},{label:"Install Goal",value:0}],customerComments:["I submitted my info in November. It's now March. Still waiting for a quote.","The door-to-door agent couldn't answer basic questions about financing.","Website form says 'get your quote in 24 hours' — took 6 weeks.","I filled out 3 different forms because I thought each one was lost. Got 3 separate calls.","Great pitch, terrible follow-through. Just went with SunPower."],social:[{platform:"Facebook",icon:"👥",value:"3.8M",label:"Reach"},{platform:"Google",icon:"🔍",value:"1.9M",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"220K",label:"Views"},{platform:"Instagram",icon:"📸",value:"180K",label:"Impressions"},{platform:"Twitter/X",icon:"🐦",value:"44K",label:"Impressions"}],mistake:"Broken Quote Fulfillment Pipeline — Promises Made, None Kept",clues:[{title:"Lead-to-Quote Time Analysis",desc:"Advertised quote delivery time: 24 hours. Actual average: 38 days. The quote calculation process required manual satellite analysis by a team of 3 engineers — creating a bottleneck that couldn't scale beyond 80 quotes/month. Campaign generated 3,880 leads.",hint:"The ads promise quick quotes. What's the actual operational capacity?"},{title:"Duplicate Lead Problem",desc:"19% of leads submitted the inquiry form 2-4 times because they received no confirmation or acknowledgment. This created duplicate records in the CRM and wasted sales team time.",hint:"What happened to prospects between form submission and first contact?"},{title:"Door-to-Door Agent Training Gap",desc:"Post-visit surveys of 210 door-to-door interactions found that 71% of agents couldn't answer questions about: (1) federal solar tax credits, (2) net metering policies, or (3) financing options — the three top purchase-decision questions.",hint:"What happened when interested homeowners asked specific buying questions in person?"}],suspects:[{title:"Unscalable Quote Process",desc:"3,880 leads generated but capacity for only 80/month quotes — a 4,750% backlog.",icon:"📋"},{title:"No Lead Confirmation System",desc:"Zero automated acknowledgment after form submission caused duplicate submissions and frustration.",icon:"✉"},{title:"Undertrained Door-to-Door Agents",desc:"71% of field agents couldn't answer the top 3 purchase-decision questions.",icon:"🚪"},{title:"Misaligned TV Ad Reach",desc:"Local TV reached renters and non-homeowners — the wrong audience for solar installation.",icon:"📺"}],correctSuspect:0,explanation:"GreenGrid built a high-performing demand generation machine (3,880 leads) but never built the infrastructure to fulfill that demand. Promising '24-hour quotes' while having physical capacity for only 80/month was not just misleading — it was operationally catastrophic. In solar, the average sales cycle is 3-4 months. Starting that cycle with a broken promise and 38-day silence eliminates the relationship before it begins.",improvements:["Develop an automated instant solar estimate tool using satellite imagery API (Google Solar API)","Implement immediate automated email confirmation with timeline expectations after every form submission","Pause campaign scale until operational capacity can handle 500+ quotes/month","Create a comprehensive door-to-door training program covering financing, tax credits, and net metering","Implement lead deduplication logic in CRM to catch and merge repeat submissions automatically"],difficulty:4},{id:11,company:"PixelForge Game Studio",industry:"Video Games",objective:"Drive pre-orders for a new indie RPG game targeting core gamers",audience:"Core gamers, 18-35, RPG fans, PC/console players, community-driven buyers",channels:["Steam Store Page","Twitch Sponsorships","Reddit GameDev","Discord Community"],budget:"$55,000",budgetAllocation:[{label:"Steam / App Store",pct:15},{label:"Twitch Sponsorships",pct:40},{label:"Reddit Ads",pct:25},{label:"Discord Community",pct:20}],metrics:{reach:"2.8M",ctr:"1.6%",engagement:"8.4%",conversions:"440",sales:"$13,200"},chartData:[{label:"Reach Goal",value:78},{label:"CTR Goal",value:52},{label:"Pre-order Goal",value:15},{label:"ROI Goal",value:22}],customerComments:["I watched the stream and loved it — but there was no gameplay footage, just cutscenes.","Can't find system requirements anywhere. My PC might not run it.","Pre-order bonus wasn't explained. I don't know what I get for pre-ordering.","The Discord server had 40,000 members but nobody responded to my questions for 3 days.","No reviews, no demo, no release date clarity — too risky to pre-order."],social:[{platform:"Twitch",icon:"🟣",value:"1.8M",label:"Viewers"},{platform:"Reddit",icon:"🟠",value:"620K",label:"Impressions"},{platform:"Discord",icon:"💬",value:"40K",label:"Members"},{platform:"Twitter/X",icon:"🐦",value:"180K",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"88K",label:"Views"}],mistake:"No Authentic Gameplay Footage — Pre-orders Require Proof",clues:[{title:"Content Type Analysis",desc:"100% of Twitch-sponsored content used cinematic cutscenes and stylized trailers. Zero minutes of actual gameplay footage were shown. A study of 1,200 RPG buyers found 86% cited 'gameplay demo or extensive footage' as a prerequisite for pre-ordering.",hint:"What type of content did the gaming audience actually need to make a purchase decision?"},{title:"Pre-order Value Proposition Gap",desc:"The pre-order page mentioned 'exclusive pre-order bonus' but provided no specifics. A/B testing of competitor pre-order pages shows that specific, tangible bonuses (named DLC, art book, early access) convert 3.2x better than vague bonus descriptions.",hint:"What does 'pre-order bonus' actually mean to someone considering buying?"},{title:"Discord Community Abandonment",desc:"The 40,000-member Discord server had no active moderation or developer presence. Average response time to questions was 71 hours. 60% of questions were unanswered.",hint:"What happened when the passionate gaming community tried to engage with the developer?"}],suspects:[{title:"No Gameplay Footage",desc:"86% of RPG buyers require gameplay footage before pre-ordering — shown zero during the campaign.",icon:"🎮"},{title:"Vague Pre-order Bonus",desc:"Unspecified 'exclusive bonus' couldn't create urgency or justify the purchase commitment.",icon:"🎁"},{title:"Abandoned Discord Community",desc:"40K engaged fans had 71-hour average response times, killing developer-community trust.",icon:"💬"},{title:"No System Requirements",desc:"PC gamers couldn't evaluate compatibility — a purchase blocker for 40% of the audience.",icon:"💻"}],correctSuspect:0,explanation:"PixelForge committed the classic indie game marketing sin: showing what the game looks like (cutscenes) instead of showing what the game feels like (gameplay). In RPG communities, gameplay footage isn't just preferred — it's required. Asking fans to pre-order based on cinematic trailers alone is asking for blind trust that unknown studios haven't yet earned. The 8.4% engagement rate shows the community was deeply interested — but without the evidence they needed, pre-ordering felt too risky.",improvements:["Create a 15-minute authentic gameplay walkthrough video showing core mechanics, UI, and combat","Release a free playable demo on Steam to let players experience before committing","Define and prominently display pre-order bonuses: specific named DLC, item names, and value","Assign a full-time community manager to the Discord with same-day response commitment","Add system requirements, release date, and post-launch support commitment to all pre-order pages"],difficulty:3},{id:12,company:"ZenFlow Meditation App",industry:"Health & Wellness",objective:"Grow premium subscribers from 12,000 to 50,000 in 4 months",audience:"Stressed adults, 25-50, career-focused, sleep-deprived, mental health-aware",channels:["Apple Search Ads","Instagram Stories","Spotify Podcast Ads","App Store Optimization"],budget:"$110,000",budgetAllocation:[{label:"Apple Search Ads",pct:40},{label:"Instagram Stories",pct:35},{label:"Spotify Podcast",pct:15},{label:"ASO Optimization",pct:10}],metrics:{reach:"4.2M",ctr:"2.8%",engagement:"6.3%",conversions:"2,840",sales:"$142,000"},chartData:[{label:"Reach Goal",value:80},{label:"CTR Goal",value:74},{label:"Sub Goal",value:28},{label:"Retention 30d",value:18}],customerComments:["Downloaded it, loved it, hit the paywall after 3 sessions. Felt manipulated.","Why is the free tier so limited? I can't even try the sleep content without paying.","I'd pay if I could try it for 2 weeks, not 3 days.","The 7-day free trial was fine but then charged me immediately with no reminder email.","Cancelled after 2 months — same 40 meditations every time. Nothing new."],social:[{platform:"Instagram",icon:"📸",value:"2.1M",label:"Impressions"},{platform:"Spotify",icon:"🎵",value:"840K",label:"Ad Plays"},{platform:"Apple",icon:"🍎",value:"680K",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"88K",label:"Views"},{platform:"TikTok",icon:"🎵",value:"220K",label:"Views"}],mistake:"Aggressive Paywall Triggering High Churn Before Value Realization",clues:[{title:"Trial-to-Paid Conversion Funnel",desc:"App analytics show 68% of free trial users hit the paywall before completing a single 'habit loop' (typically 7-10 sessions needed to feel the product's core value). Only 12% of trialists converted to paid — vs. 28% industry average for wellness apps.",hint:"At what point in the user journey does the paywall appear, and what has the user experienced by then?"},{title:"Retention Cohort Analysis",desc:"Month 1 retention: 62%. Month 2: 31%. Month 3: 11%. Exit surveys reveal top churn reasons: (1) Paywall too early — 44%, (2) Content doesn't refresh — 38%, (3) No personalization — 18%.",hint:"What do the retention numbers say about the product experience over time?"},{title:"Silent Trial End Charge",desc:"The 7-day trial converted to paid without any pre-expiry reminder email. Post-charge churn rate was 74% for users who weren't reminded — vs. 22% for users who received a 2-day warning email (sent to 15% of trial users in an A/B test).",hint:"How were users treated at the moment their trial ended?"}],suspects:[{title:"Aggressive Paywall Timing",desc:"Users hit the paywall before experiencing the core value — 68% before completing habit formation.",icon:"🚧"},{title:"No Trial Expiry Reminder",desc:"Silent auto-charge after trial caused 74% post-charge churn — easily fixable with one email.",icon:"🔔"},{title:"Stale Content Library",desc:"Only 40 meditations with no refresh caused high churn at Month 2-3 among engaged users.",icon:"📚"},{title:"Missing Personalization",desc:"No adaptive content recommendations led users to the same content repeatedly.",icon:"🎯"}],correctSuspect:0,explanation:"ZenFlow's marketing was excellent — 2,840 new subscribers shows strong acquisition. But the business was a leaking bucket. The aggressive paywall timing cut users off before they could build the habit that creates genuine willingness to pay. Meditation and wellness apps live or die by habit formation — the product must become part of the user's daily routine before asking for money. Fix the paywall timing, and the same marketing spend generates dramatically higher LTV.",improvements:["Extend free tier to 14 days with access to core content — let habit formation begin","Send a 3-email trial expiry sequence: 7-day warning -> 2-day warning -> charge confirmation","Add 5+ new meditations weekly to give long-term subscribers ongoing value","Implement an onboarding streak — 10-day meditation challenge before paywall appears","Build adaptive recommendation engine based on stress levels, sleep patterns, and session history"],difficulty:3},{id:13,company:"ClarityLens Eyewear",industry:"Fashion / Healthcare",objective:"Compete with Warby Parker by capturing online prescription eyewear market share",audience:"Glasses-wearers, 22-50, style-conscious, price-sensitive but quality-aware",channels:["Google Search","Instagram Shopping","TikTok Fashion","Affiliate Partners"],budget:"$95,000",budgetAllocation:[{label:"Google Search",pct:50},{label:"Instagram Shop",pct:25},{label:"TikTok Fashion",pct:15},{label:"Affiliates",pct:10}],metrics:{reach:"3.6M",ctr:"1.9%",engagement:"4.7%",conversions:"388",sales:"$61,400"},chartData:[{label:"Reach Goal",value:88},{label:"CTR Goal",value:62},{label:"Conv. Goal",value:8},{label:"ROI Goal",value:45}],customerComments:["I need to know how frames look on MY face, not a model's.","The virtual try-on kept crashing on my iPhone 13.","Ordered progressive lenses — arrived in 6 weeks. Warby Parker does 5 days.","My prescription upload was rejected twice with no explanation why.","The frames were great but lens quality was noticeably worse than described."],social:[{platform:"Instagram",icon:"📸",value:"1.6M",label:"Impressions"},{platform:"TikTok",icon:"🎵",value:"880K",label:"Views"},{platform:"Google",icon:"🔍",value:"820K",label:"Impressions"},{platform:"Pinterest",icon:"📌",value:"88K",label:"Saves"},{platform:"YouTube",icon:"▶",value:"44K",label:"Views"}],mistake:"Broken Virtual Try-On Feature Killing Conversion at Decision Moment",clues:[{title:"Virtual Try-On Crash Data",desc:"App analytics show the virtual try-on feature — prominently advertised in all campaign creatives — crashed in 58% of sessions on iOS 16 and 17, and 72% of Android sessions. This feature was the #1 cited purchase driver in pre-launch customer research.",hint:"The ads promised a key feature. Did that feature actually work when customers tried it?"},{title:"Conversion Funnel Dropoff",desc:"94% of users who clicked 'Try On' and encountered an error exited immediately and did not return within 30 days. Conversion rate for users who successfully completed a try-on was 18% — vs. 1.8% overall site average.",hint:"Compare the conversion rate of users who could use the feature vs. those who couldn't"},{title:"Competitor Comparison Timeline",desc:"ClarityLens's 42-day average prescription delivery vs. Warby Parker's 5-10 days was the #2 cited reason for abandonment in exit surveys. The campaign copy made no mention of production timelines.",hint:"What delivery expectations did the customer have, and what did the company actually deliver?"}],suspects:[{title:"Broken Virtual Try-On",desc:"The campaign's signature feature crashed 58-72% of the time — converting 94% of failures to permanent abandonment.",icon:"🥽"},{title:"42-Day Delivery Timeline",desc:"6-week delivery vs. competitors' 5-day delivery was never disclosed in marketing — creating betrayal at checkout.",icon:"📦"},{title:"Prescription Upload Failures",desc:"Unexplained prescription rejections created frustration and abandonment at the final conversion step.",icon:"📋"},{title:"Lens Quality Mismatch",desc:"Advertised lens quality didn't match the delivered product, generating negative reviews.",icon:"👓"}],correctSuspect:0,explanation:"ClarityLens's campaign was built around the virtual try-on as its primary conversion driver — research showed customers cited it as their #1 reason to choose ClarityLens over competitors. But this flagship feature was broken on 58-72% of devices, creating a catastrophic experience at the exact decision moment. Users who successfully used the try-on converted at 18% — 10x the site average. Launching a campaign centered on a broken feature is one of the most expensive QA failures in e-commerce.",improvements:["Complete a full cross-device QA audit of virtual try-on — do not advertise until it works on 95%+ of sessions","Offer a '5 frames free home try-on kit' as an alternative for users where virtual try-on fails","Partner with an optical lab to reduce delivery timeline to under 14 days before competing aggressively","Create a transparent 'How it works' page explaining the custom prescription process and realistic timeline","Implement prescription upload validation with real-time feedback on rejection reasons"],difficulty:4},{id:14,company:"Helix Protein Co.",industry:"Health & Sports Nutrition",objective:"Launch a plant-based protein powder and challenge Orgain and Garden of Life in D2C",audience:"Health-conscious adults, 22-45, plant-based or flexitarian diet, gym-goers and athletes",channels:["Google Shopping","Amazon DSP","Fitness Influencers","Podcast Sponsorships"],budget:"$130,000",budgetAllocation:[{label:"Google Shopping",pct:35},{label:"Amazon DSP",pct:25},{label:"Fitness Influencers",pct:30},{label:"Podcast Ads",pct:10}],metrics:{reach:"7.2M",ctr:"2.3%",engagement:"5.6%",conversions:"1,820",sales:"$109,200"},chartData:[{label:"Reach Goal",value:90},{label:"CTR Goal",value:72},{label:"Conv. Goal",value:35},{label:"ROI Goal",value:58}],customerComments:["Tastes amazing but the texture is gritty. Nothing in the reviews warned me.","Amazon listing says 25g protein per serving — the label says 21g. Which is right?","Subscribed on the website for auto-ship. Charged me but never shipped month 2.","The influencer said it has no artificial sweeteners, but stevia is in the ingredient list.","Can't reach customer support — contact form errors out every time."],social:[{platform:"Instagram",icon:"📸",value:"3.8M",label:"Impressions"},{platform:"YouTube",icon:"▶",value:"1.2M",label:"Views"},{platform:"Amazon",icon:"📦",value:"480K",label:"Product Views"},{platform:"TikTok",icon:"🎵",value:"680K",label:"Views"},{platform:"Podcast",icon:"🎙",value:"320K",label:"Listeners"}],mistake:"Product Claim Inconsistencies Across Channels Destroying Trust",clues:[{title:"Protein Content Discrepancy",desc:"Google Shopping and Amazon listing stated '25g protein per serving.' The physical product label stated '21g protein per serving.' FDA regulations classify this as a label misrepresentation. Customer refund claims citing the discrepancy reached 22% of total orders.",hint:"Compare the protein content claimed in ads to the actual product label"},{title:"Influencer Claim Accuracy",desc:"Three fitness influencers stated 'no artificial sweeteners' — stevia extract was listed ingredient #3. While stevia is derived from a plant, most certified nutritionists classify it as an artificial sweetener alternative. Trust metrics dropped 28% in post-campaign brand tracking.",hint:"Were the influencers' specific product claims accurate?"},{title:"Subscription Fulfillment Failure",desc:"The auto-ship subscription program had a billing system that charged customers but a separate, manual fulfillment system. Month 2 shipments were missed for 34% of subscribers due to sync failure. Customer service contact form was also broken.",hint:"What happened to customers who signed up for the subscription program after month 1?"}],suspects:[{title:"Protein Content Claim Mismatch",desc:"Ads claimed 25g protein; product label said 21g — a material misrepresentation causing 22% refund rate.",icon:"🥛"},{title:"Inaccurate Influencer Claims",desc:"'No artificial sweeteners' claim was disputed by the ingredient list — damaging trust with informed buyers.",icon:"📣"},{title:"Broken Subscription Fulfillment",desc:"34% of month-2 subscribers weren't shipped products — and couldn't reach support to fix it.",icon:"📦"},{title:"No Texture/Taste Transparency",desc:"Gritty texture went unmentioned in all review content — creating negative surprise at delivery.",icon:"😖"}],correctSuspect:0,explanation:"Helix's critical failure was a factual product claim inconsistency — the 25g vs. 21g protein discrepancy. This is not just a marketing problem; it's an FDA compliance issue that exposes the company to regulatory action. The 22% refund rate directly attributable to this discrepancy destroyed the campaign economics. When combined with inaccurate influencer claims and broken fulfillment infrastructure, Helix created a trust-destruction machine at scale.",improvements:["Conduct immediate audit of all product claims across all channels and align with physical label","Develop influencer briefing sheets that fact-check all specific product claims before publishing","Fix the subscription billing-to-fulfillment sync issue before accepting new subscribers","Repair the customer service contact form and add live chat support for subscription customers","Create a transparency page: full nutritional panel, sourcing details, and honest taste/texture notes"],difficulty:5},{id:15,company:"ArcLight Virtual Events",industry:"Events & Entertainment",objective:"Sell 10,000 virtual conference tickets for a 3-day technology summit",audience:"Tech professionals and entrepreneurs, 25-50, continuous learners, networkers",channels:["LinkedIn","Email Partnerships","Twitter/X","Tech Podcast Ads"],budget:"$80,000",budgetAllocation:[{label:"LinkedIn Ads",pct:45},{label:"Email Partnerships",pct:25},{label:"Twitter/X Ads",pct:20},{label:"Podcast Ads",pct:10}],metrics:{reach:"4.8M",ctr:"1.7%",engagement:"4.2%",conversions:"1,840",sales:"$276,000"},chartData:[{label:"Ticket Goal",value:18},{label:"CTR Goal",value:56},{label:"Conv. Goal",value:18},{label:"ROI Goal",value:82}],customerComments:["I bought a ticket 8 weeks ago. Who are the speakers? Still not announced.","The conference website looks like it was made in 2008. Couldn't find the agenda.","Couldn't tell the difference between the $99 and $499 ticket tier benefits.","Tried to ask in the pre-event community — nobody from ArcLight replied.","Is this a real event? Googling the company returns almost nothing. Felt like a scam."],social:[{platform:"LinkedIn",icon:"💼",value:"2.4M",label:"Impressions"},{platform:"Twitter/X",icon:"🐦",value:"1.1M",label:"Impressions"},{platform:"Podcast",icon:"🎙",value:"580K",label:"Listeners"},{platform:"YouTube",icon:"▶",value:"44K",label:"Views"},{platform:"Instagram",icon:"📸",value:"88K",label:"Impressions"}],mistake:"Pre-Sale Trust Collapse — Selling Before Social Proof Exists",clues:[{title:"Speaker Announcement Timeline",desc:"Tickets went on sale 10 weeks before any speaker was announced. A survey of 400 potential attendees showed that 88% said 'speaker lineup' was their #1 purchase decision factor. 2,200 people clicked the ticket page but left without purchasing in the 6-week window before first speaker announced.",hint:"What was the audience's #1 purchase signal, and when was it revealed relative to ticket sales?"},{title:"Brand Authority Gap",desc:"ArcLight Virtual Events had no traceable event history (first event), no speaker testimonials, no media coverage, and a domain registered 4 months before campaign launch. Trust audit score: 2.1/10.",hint:"Why might potential buyers question whether this event is legitimate or worth the money?"},{title:"Ticket Tier Value Confusion",desc:"The $99 'Standard' vs. $499 'Premium' tier had benefits listed in identical vague language. No specific differentiation caused 76% of buyers to choose Standard by default.",hint:"Can potential buyers easily understand why someone would pay 5x more for the premium tier?"}],suspects:[{title:"Selling Before Social Proof",desc:"Tickets launched before speakers were announced — the #1 purchase trigger for 88% of the audience.",icon:"🎤"},{title:"Unestablished Brand Trust",desc:"No event history, no press, domain less than 5 months old — buyers couldn't verify the event was legitimate.",icon:"🏛"},{title:"Unclear Ticket Tier Benefits",desc:"Vague tier descriptions led 76% to default to Standard, under-monetizing premium intent.",icon:"🎟"},{title:"Outdated Event Website",desc:"Poor website design damaged perceived event quality and legitimacy.",icon:"💻"}],correctSuspect:0,explanation:"ArcLight tried to sell tickets to an event that, from the buyer's perspective, barely existed. No speakers, no history, no agenda, no social proof, and a brand new company — asking professionals to spend $99-$499 required a leap of faith that the audience wisely refused to take. In event marketing, trust is the product. The campaign should have launched after securing 3-5 credible speakers, gathering 10+ testimonials from pilot attendees, and establishing basic event credibility.",improvements:["Announce keynote speakers 12+ weeks before ticket sales launch — build anticipation first","Create an 'Early Access' waitlist to gauge demand and collect social proof before sales open","Redesign ticket page with clear, specific benefit bullets for each tier (named sessions, recordings, etc.)","Publish an FAQ, refund policy, and organizer background to address legitimacy concerns proactively","Secure 3 recognizable media/brand partners whose logos can appear on the event page immediately"],difficulty:4}];
+
+let state={currentCase:null,cluesUnlocked:[false,false,false],selectedSuspect:null,isCorrect:false,score:0,usedCaseIds:[]};
+
+function gid(id){return document.getElementById(id)}
+function showToast(msg,dur=3000){const t=gid('toast');t.textContent=msg;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>{t.style.display='none'},dur)}
+
+const SCREENS=['assignment','board','investigate','solve','closed','report'];
+function setScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  gid('screen-'+name).classList.add('active');
+  const idx=SCREENS.indexOf(name);
+  document.querySelectorAll('.progress-dot').forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i<idx) d.classList.add('done');
+    else if(i===idx) d.classList.add('active');
+  });
+  gid('app-header').style.display=(name==='assignment')?'none':'flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pickCase(){
+  let avail=CASES.filter(c=>!state.usedCaseIds.includes(c.id));
+  if(!avail.length){state.usedCaseIds=[];avail=CASES;}
+  const c=avail[Math.floor(Math.random()*avail.length)];
+  state.usedCaseIds.push(c.id);
+  return c;
+}
+
+function diffDots(lvl){
+  let h='';for(let i=0;i<5;i++)h+=`<div class="diff-segment${i<lvl?' filled':''}"></div>`;return h;
+}
+
+function loadCase(c){
+  state.currentCase=c;
+  state.cluesUnlocked=[false,false,false];
+  state.selectedSuspect=null;
+  state.isCorrect=false;
+  gid('header-case-num').textContent='CASE #'+String(c.id).padStart(3,'0');
+  gid('prev-number').textContent='CASE #'+String(c.id).padStart(3,'0');
+  gid('prev-industry').textContent=c.industry;
+  gid('prev-difficulty').innerHTML=diffDots(c.difficulty);
+  gid('prev-company').textContent=c.company;
+  gid('prev-objective').textContent=c.objective;
+  gid('prev-budget').textContent=c.budget;
+  gid('prev-audience').textContent=c.audience;
+  gid('prev-channels').textContent=c.channels.join(', ');
+}
+
+function renderBoard(c){
+  gid('board-case-title').textContent='Case: '+c.company;
+  gid('board-case-sub').textContent=c.objective;
+  const mg=gid('metrics-grid');mg.innerHTML='';
+  [{k:'reach',l:'Reach',b:50},{k:'ctr',l:'CTR',b:30},{k:'engagement',l:'Engagement',b:40},{k:'conversions',l:'Conversions',b:25},{k:'sales',l:'Total Sales',b:55}].forEach((m,i)=>{
+    const d=document.createElement('div');d.className='metric-card';
+    d.innerHTML=`<div class="metric-value">${c.metrics[m.k]}</div><div class="metric-label">${m.l}</div><div class="metric-bar-wrap"><div class="metric-bar" style="--bar-w:${m.b}%;--bar-delay:${i*0.15}s"></div></div>`;
+    mg.appendChild(d);
+  });
+  const cc=gid('circular-charts');cc.innerHTML='';
+  c.chartData.forEach(d=>{
+    const r=40,circ=2*Math.PI*r,off=circ-(circ*d.value/100);
+    const col=d.value>=70?'#00e5a0':d.value>=40?'#00d4ff':'#ff4466';
+    const el=document.createElement('div');el.className='chart-ring';
+    el.innerHTML=`<svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="#2a4a66" stroke-width="8"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="${col}" stroke-width="8" stroke-dasharray="${circ}" stroke-dashoffset="${circ}" style="transition:stroke-dashoffset 1.2s ease;stroke-linecap:round"/><text x="50" y="55" text-anchor="middle" fill="${col}" font-size="16" font-family="Courier Prime,monospace" font-weight="700">${d.value}%</text></svg><div class="ring-label">${d.label}</div>`;
+    cc.appendChild(el);
+    setTimeout(()=>{el.querySelector('circle:nth-child(2)').style.strokeDashoffset=off;},400);
+  });
+  const bb=gid('budget-bars');bb.innerHTML='';
+  c.budgetAllocation.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='budget-row';
+    d.innerHTML=`<div class="budget-label">${item.label}</div><div class="budget-track"><div class="budget-fill" style="--pct:${item.pct}%;--delay:${i*0.2}s"></div></div><div class="budget-pct">${item.pct}%</div>`;
+    bb.appendChild(d);
+  });
+  const eb=gid('evidence-board');eb.innerHTML='';
+  [{type:'Company Profile',title:c.company,val:`Industry: ${c.industry}\nBudget: ${c.budget}`,pin:'pushpin-cyan',rot:-2},{type:'Target Audience',title:'Who We Are Targeting',val:c.audience,pin:'pushpin-gold',rot:1.5},{type:'Marketing Channels',title:'Channels Used',val:c.channels.join('\n'),pin:'pushpin-red',rot:-1},{type:'Campaign KPIs',title:'Performance Data',val:`Reach: ${c.metrics.reach}\nCTR: ${c.metrics.ctr}\nEngagement: ${c.metrics.engagement}`,pin:'pushpin-green',rot:2},{type:'Budget Allocation',title:'Spend Breakdown',val:c.budgetAllocation.map(b=>`${b.label}: ${b.pct}%`).join('\n'),pin:'pushpin-cyan',rot:-1.5},{type:'Revenue Report',title:'Sales Generated',val:`Total Sales: ${c.metrics.sales}\nConversions: ${c.metrics.conversions}`,pin:'pushpin-gold',rot:1}].forEach(item=>{
+    const card=document.createElement('div');card.className='evidence-card';card.style.setProperty('--rot',item.rot);
+    card.innerHTML=`<div class="pushpin ${item.pin}"></div><div class="evidence-type-label">${item.type}</div><div class="evidence-title">${item.title}</div><div class="evidence-value">${item.val.replace(/\n/g,'<br>')}</div>`;
+    eb.appendChild(card);
+  });
+  const sg=gid('social-grid');sg.innerHTML='';
+  c.social.forEach(s=>{
+    const d=document.createElement('div');d.className='social-card';
+    d.innerHTML=`<div class="social-platform">${s.icon}</div><div class="social-value">${s.value}</div><div class="social-label">${s.platform}</div><div class="social-label">${s.label}</div>`;
+    sg.appendChild(d);
+  });
+}
+
+function updateClueUI(){
+  const count=state.cluesUnlocked.filter(Boolean).length;
+  gid('clue-count-display').textContent=count+' / 3';
+  gid('clue-progress-bar').style.width=(count/3*100)+'%';
+  const allRevealed=count===3;
+  const btn=gid('btn-to-solve');
+  const hint=gid('solve-hint');
+  if(allRevealed){btn.disabled=false;btn.style.opacity='1';hint.textContent='All clues revealed — ready to solve!';hint.style.color='var(--success)'}
+  else{btn.disabled=true;btn.style.opacity='0.4';hint.textContent=`Reveal all 3 clues (${count}/3 revealed)`;hint.style.color='var(--steel-mid)'}
+}
+
+function renderInvestigation(c){
+  updateClueUI();
+  const cg=gid('clue-grid');cg.innerHTML='';
+  c.clues.forEach((clue,i)=>{
+    const card=document.createElement('div');card.className='clue-card'+(state.cluesUnlocked[i]?' unlocked':'');
+    card.innerHTML=`<div class="clue-lock">${state.cluesUnlocked[i]?'🔓':'🔒'}</div><div class="clue-number">CLUE ${i+1} OF 3</div><div class="clue-title">${clue.title}</div><div class="clue-desc">${clue.desc}</div><div class="clue-hint">Hint: ${clue.hint}</div>`;
+    card.addEventListener('click',()=>{
+      if(state.cluesUnlocked[i])return;
+      state.cluesUnlocked[i]=true;
+      renderInvestigation(c);
+      showToast('Clue '+( i+1)+' unlocked: '+clue.title);
+    });
+    cg.appendChild(card);
+  });
+  const dc=gid('drag-cards-container');dc.innerHTML='';
+  [{l:'Campaign Reach',v:c.metrics.reach,icon:'📡'},{l:'CTR',v:c.metrics.ctr,icon:'🖱'},{l:'Engagement',v:c.metrics.engagement,icon:'💬'},{l:'Conversions',v:c.metrics.conversions,icon:'✅'},{l:'Total Sales',v:c.metrics.sales,icon:'💰'},{l:'Primary Channel',v:c.channels[0],icon:'📺'}].forEach((item,i)=>{
+    const card=document.createElement('div');card.className='evidence-card';
+    card.style.setProperty('--rot',(i%2===0?-1:1)*(Math.random()*2+0.5));card.style.width='150px';
+    card.innerHTML=`<div class="pushpin pushpin-cyan"></div><div class="evidence-type-label">${item.l}</div><div class="evidence-value" style="font-size:18px;font-weight:700;color:#1a0c02">${item.icon} ${item.v}</div>`;
+    setupDrag(card);dc.appendChild(card);
+  });
+  const com=gid('customer-comments');com.innerHTML='';
+  c.customerComments.forEach(cm=>{
+    const d=document.createElement('div');d.className='comment-bubble';d.innerHTML=`<div class="comment-text">${cm}</div>`;com.appendChild(d);
+  });
+}
+
+let dragCard=null,dragOX=0,dragOY=0;
+function setupDrag(card){
+  card.addEventListener('mousedown',e=>{
+    dragCard=card;const rect=card.getBoundingClientRect();dragOX=e.clientX-rect.left;dragOY=e.clientY-rect.top;
+    card.classList.add('dragging');card.style.position='absolute';card.style.zIndex='100';
+    const board=gid('drag-board');const br=board.getBoundingClientRect();
+    card.style.left=(e.clientX-br.left-dragOX)+'px';card.style.top=(e.clientY-br.top-dragOY)+'px';
+    if(!board.contains(card))board.appendChild(card);e.preventDefault();
+  });
+}
+document.addEventListener('mousemove',e=>{
+  if(!dragCard)return;const board=gid('drag-board');if(!board)return;
+  const br=board.getBoundingClientRect();
+  dragCard.style.left=(e.clientX-br.left-dragOX)+'px';dragCard.style.top=(e.clientY-br.top-dragOY)+'px';
+});
+document.addEventListener('mouseup',()=>{if(!dragCard)return;dragCard.classList.remove('dragging');dragCard.style.zIndex='';dragCard=null;});
+
+function renderSolve(c){
+  gid('solve-summary').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px"><div class="case-meta-item"><div class="case-meta-label">Company</div><div class="case-meta-value">${c.company}</div></div><div class="case-meta-item"><div class="case-meta-label">Industry</div><div class="case-meta-value">${c.industry}</div></div><div class="case-meta-item"><div class="case-meta-label">Budget</div><div class="case-meta-value">${c.budget}</div></div><div class="case-meta-item"><div class="case-meta-label">Clues Found</div><div class="case-meta-value glow-text">3 / 3</div></div></div>`;
+  const sg=gid('suspect-grid');sg.innerHTML='';
+  gid('solve-feedback').style.display='none';gid('solve-continue-wrap').style.display='none';
+  state.selectedSuspect=null;state.isCorrect=false;
+  c.suspects.forEach((s,i)=>{
+    const card=document.createElement('div');card.className='suspect-card';card.dataset.idx=i;
+    card.innerHTML=`<div class="suspect-check">○</div><div class="suspect-icon">${s.icon}</div><div class="suspect-title">${s.title}</div><div class="suspect-desc">${s.desc}</div>`;
+    card.addEventListener('click',()=>{
+      if(state.isCorrect)return;
+      document.querySelectorAll('.suspect-card').forEach(c=>{c.classList.remove('selected','correct','wrong');c.querySelector('.suspect-check').textContent='○';});
+      card.classList.add('selected');card.querySelector('.suspect-check').textContent='✓';
+      state.selectedSuspect=i;
+      const ok=(i===c.correctSuspect);state.isCorrect=ok;
+      setTimeout(()=>{
+        if(ok){
+          card.classList.remove('selected');card.classList.add('correct');
+          state.score=Math.round(70+(state.cluesUnlocked.filter(Boolean).length/3)*30);
+          const fb=gid('solve-feedback');fb.style.display='block';fb.style.borderColor='var(--success)';fb.style.background='rgba(0,229,160,0.05)';
+          gid('feedback-title').textContent='Correct! You cracked the case!';gid('feedback-title').style.color='var(--success)';
+          gid('feedback-text').textContent='Primary mistake identified: "'+c.suspects[c.correctSuspect].title+'" — '+c.suspects[c.correctSuspect].desc;
+          gid('solve-continue-wrap').style.display='block';showToast('Correct! Well deduced, Detective!',4000);
+        } else {
+          card.classList.remove('selected');card.classList.add('wrong');
+          const fb=gid('solve-feedback');fb.style.display='block';fb.style.borderColor='var(--danger)';fb.style.background='rgba(255,68,102,0.05)';
+          gid('feedback-title').textContent='Not quite. Try another option.';gid('feedback-title').style.color='var(--danger)';
+          gid('feedback-text').textContent='Review your clues again. Consider which mistake had the biggest impact on campaign performance.';
+          showToast('Keep investigating!');setTimeout(()=>{card.classList.remove('wrong');state.isCorrect=false;},800);
+        }
+      },200);
+    });
+    sg.appendChild(card);
+  });
+}
+
+function showCaseClosed(){
+  gid('score-display').textContent=state.score+'%';
+  gid('score-detail').textContent=state.score>=90?'Master Detective — flawless investigation!':state.score>=70?'Senior Detective — solid case work!':'Junior Detective — good first case!';
+  const con=gid('confetti-container');con.innerHTML='';
+  const colors=['#00d4ff','#f0c040','#00e5a0','#ff9a00','#8faabb','#ffffff'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    p.style.left=Math.random()*100+'vw';p.style.top='-20px';p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.width=(Math.random()*10+4)+'px';p.style.height=(Math.random()*10+4)+'px';
+    p.style.animationDuration=(Math.random()*3+2)+'s';p.style.animationDelay=Math.random()*2+'s';
+    p.style.borderRadius=Math.random()>0.5?'50%':'2px';con.appendChild(p);
+  }
+}
+
+function renderReport(c){
+  gid('report-mistake-card').innerHTML=`<div class="report-section-title">Primary Mistake Identified</div><div class="mistake-reveal"><div class="mistake-label">Core Marketing Failure</div><div class="mistake-text"><strong>${c.mistake}</strong></div></div><div style="padding-left:12px"><p style="font-size:14px;color:var(--steel-light);line-height:1.8">${c.suspects[c.correctSuspect].desc}</p></div><div class="divider"></div><div style="padding-left:12px"><div class="case-meta-label" style="margin-bottom:8px">Three Supporting Clues</div>${c.clues.map((cl,i)=>`<div style="margin-bottom:12px;padding:12px;background:rgba(0,212,255,0.05);border:1px solid var(--steel-dark);border-radius:8px"><strong style="color:var(--cyan-bright);font-size:13px">${cl.title}</strong><p style="font-size:13px;color:var(--steel-light);margin-top:6px;line-height:1.6">${cl.desc}</p></div>`).join('')}</div>`;
+  gid('report-explanation-card').innerHTML=`<div class="report-section-title">Full Case Explanation</div><p class="report-explanation">${c.explanation}</p><div class="divider"></div><div style="padding-left:12px"><div class="case-meta-label" style="margin-bottom:10px">All Four Suspects</div>${c.suspects.map((s,i)=>`<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--steel-dark)"><span style="font-size:20px">${s.icon}</span><div><div style="font-weight:600;color:${i===c.correctSuspect?'var(--success)':'var(--text-primary)'};margin-bottom:4px">${s.title}${i===c.correctSuspect?' (PRIMARY MISTAKE)':''}</div><div style="font-size:13px;color:var(--steel-mid)">${s.desc}</div></div></div>`).join('')}</div>`;
+  gid('report-improvements-card').innerHTML=`<div class="report-section-title">Suggested Improvements</div><ul class="improvement-list">${c.improvements.map(imp=>`<li>${imp}</li>`).join('')}</ul>`;
+  gid('report-data-card').innerHTML=`<div class="report-section-title">Full Data Review</div><div style="padding-left:12px"><div class="case-meta-label" style="margin-bottom:12px">Campaign Metrics</div><div class="metrics-grid" style="margin-bottom:20px">${Object.entries(c.metrics).map(([k,v])=>`<div class="metric-card"><div class="metric-value">${v}</div><div class="metric-label">${k.replace(/([A-Z])/g,' $1').toUpperCase()}</div></div>`).join('')}</div><div class="divider"></div><div class="case-meta-label" style="margin-bottom:12px">Customer Feedback</div><div class="customer-comments">${c.customerComments.map(cm=>`<div class="comment-bubble"><div class="comment-text">${cm}</div></div>`).join('')}</div><div class="divider"></div><div class="case-meta-label" style="margin-bottom:12px">Social Media</div><div class="social-grid">${c.social.map(s=>`<div class="social-card"><div class="social-platform">${s.icon}</div><div class="social-value">${s.value}</div><div class="social-label">${s.platform}</div><div class="social-label">${s.label}</div></div>`).join('')}</div></div>`;
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tab=btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');gid('tab-'+tab).classList.add('active');
+  });
+});
+
+function startNewCase(){const c=pickCase();loadCase(c);setScreen('assignment');}
+
+function acceptCase(){
+  const c=state.currentCase;
+  renderBoard(c);renderInvestigation(c);renderSolve(c);renderReport(c);setScreen('board');
+}
+
+gid('btn-accept').addEventListener('click',acceptCase);
+gid('btn-new-case').addEventListener('click',startNewCase);
+gid('btn-to-investigate').addEventListener('click',()=>setScreen('investigate'));
+gid('btn-to-investigate2').addEventListener('click',()=>setScreen('investigate'));
+gid('btn-back-board').addEventListener('click',()=>setScreen('board'));
+gid('btn-to-solve').addEventListener('click',()=>{if(!state.cluesUnlocked.every(Boolean)){showToast('Reveal all 3 clues first!');return;}setScreen('solve');});
+gid('btn-to-solve2').addEventListener('click',()=>{if(!state.cluesUnlocked.every(Boolean)){showToast('Reveal all 3 clues first!');return;}setScreen('solve');});
+gid('btn-back-investigate').addEventListener('click',()=>setScreen('investigate'));
+gid('btn-to-closed').addEventListener('click',()=>{setScreen('closed');showCaseClosed();});
+gid('btn-view-report').addEventListener('click',()=>setScreen('report'));
+gid('btn-new-from-closed').addEventListener('click',startNewCase);
+gid('btn-new-from-report').addEventListener('click',startNewCase);
+gid('btn-new-case-final').addEventListener('click',startNewCase);
+
+(function init(){const c=pickCase();loadCase(c);setScreen('assignment');})();
+</script>
+</body>
+</html>
