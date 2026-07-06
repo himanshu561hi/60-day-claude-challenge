@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧩 Prompt Puzzle — Master AI Prompting Through Play</title>
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-elevated: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --brand-primary: #3b82f6;
+            --brand-secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-header {
+            padding: 1.5rem 2rem;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--bg-elevated);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .hud { display: flex; gap: 1.5rem; align-items: center; }
+        .hud-stat {
+            background: rgba(255,255,255,0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--bg-elevated);
+            display: flex; gap: 0.5rem; align-items: center;
+        }
+        .hud-stat span { color: var(--brand-primary); }
+        
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--bg-elevated);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        .scenario-header { margin-bottom: 1.5rem; }
+        .scenario-header h2 { margin: 0 0 0.5rem 0; color: var(--brand-primary); }
+        .scenario-goal {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--bg-elevated);
+        }
+        .btn-outline:hover { background: var(--bg-elevated); border-color: var(--text-secondary); }
+        
+        .drag-container { display: flex; flex-direction: column; gap: 1.5rem; }
+        .source-zone, .drop-zone {
+            min-height: 120px;
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-content: flex-start;
+        }
+        .source-zone { background: rgba(0,0,0,0.2); border: 2px solid transparent; }
+        .drop-zone {
+            background: rgba(59, 130, 246, 0.05);
+            border: 2px dashed var(--brand-primary);
+            transition: all 0.2s ease;
+        }
+        .drop-zone.drag-over { background: rgba(59, 130, 246, 0.15); border-color: var(--brand-secondary); }
+        
+        .draggable-block {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.1s;
+        }
+        .draggable-block:active { cursor: grabbing; transform: scale(0.95); }
+        
+        .clean-container { line-height: 2.5; font-size: 1.1rem; }
+        .clean-part {
+            padding: 0.4rem 0.6rem;
+            margin: 0 0.2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            display: inline-block;
+        }
+        .clean-part:hover { background: rgba(255,255,255,0.1); }
+        .clean-part.marked-remove {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            border-color: var(--danger);
+        }
+        
+        .choose-options { display: flex; flex-direction: column; gap: 1rem; }
+        .choose-option {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--bg-elevated);
+            padding: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .choose-option:hover { background: rgba(255,255,255,0.05); border-color: var(--brand-primary); }
+        .choose-option.correct { background: rgba(16, 185, 129, 0.2); border-color: var(--success); }
+        .choose-option.incorrect { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
+        
+        .feedback-panel { margin-top: 2rem; display: none; animation: fadeIn 0.4s ease; }
+        .feedback-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .comparison-card { background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; }
+        .comparison-card.weak { border-top: 4px solid var(--danger); }
+        .comparison-card.optimized { border-top: 4px solid var(--success); }
+        .principle-box {
+            background: rgba(139, 92, 246, 0.1); border: 1px solid var(--brand-secondary);
+            padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem;
+            display: flex; gap: 1rem; align-items: flex-start;
+        }
+        
+        .notification-container {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 1000;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .notification {
+            background: var(--bg-elevated); color: white; padding: 1rem 1.5rem;
+            border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 0.75rem;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            border-left: 4px solid var(--brand-primary);
+        }
+        .notification.success { border-color: var(--success); }
+        .notification.error { border-color: var(--danger); }
+        .notification.bonus { border-color: var(--warning); }
+        
+        .report-header { text-align: center; margin-bottom: 2rem; }
+        .score-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem auto; font-size: 3rem; font-weight: bold;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+        .score-inner {
+            background: var(--bg-surface); width: 130px; height: 130px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-box {
+            background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; text-align: center;
+        }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--brand-primary); margin-top: 0.5rem; }
+        
+        .hidden { display: none !important; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); pointer-events: none; } }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .animate-pop { animation: pop 0.3s ease; }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">🧩 Prompt Puzzle</div>
+        <div class="hud hidden" id="gameHud">
+            <div class="hud-stat">⏳ <span id="timeStat">00:00</span></div>
+            <div class="hud-stat">🎯 <span id="accuracyStat">100%</span></div>
+            <div class="hud-stat">🏆 <span id="scoreStat">0</span></div>
+        </div>
+    </header>
+
+    <div class="container" id="mainContainer">
+        <div class="card" id="startScreen">
+            <div style="text-align: center;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Master AI Prompting Through Play</h1>
+                <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                    Domain: <strong>Code Generation</strong> | Difficulty: <strong>Intermediate</strong>
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: left; margin-bottom: 2.5rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px;">
+                    <div>
+                        <h3>🧩 Build</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Assemble perfect prompts from scattered blocks.</p>
+                    </div>
+                    <div>
+                        <h3>🧹 Clean</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Remove the noise and filler from bloated prompts.</p>
+                    </div>
+                    <div>
+                        <h3>🎯 Choose</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Identify the optimal prompt from tricky alternatives.</p>
+                    </div>
+                </div>
+                <button class="btn" style="font-size: 1.2rem; padding: 1rem 3rem;" onclick="startGame()">Start Challenge</button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="gameScreen">
+            <div class="scenario-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 id="scenarioTitle">Scenario 1 / 6</h2>
+                    <span id="scenarioTypeBadge" style="background: var(--brand-secondary); padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: bold;">BUILD</span>
+                </div>
+                <div class="scenario-goal">
+                    <strong>Goal Output:</strong> <span id="scenarioGoalText"></span>
+                </div>
+            </div>
+
+            <div id="interactionArea">
+                <div id="buildArea" class="drag-container hidden">
+                    <p style="margin:0; color: var(--text-secondary);">Drag essential blocks to the target area.</p>
+                    <div class="drop-zone" id="buildTarget"></div>
+                    <div class="source-zone" id="buildSource"></div>
+                </div>
+
+                <div id="cleanArea" class="clean-container hidden">
+                    <p style="margin-top:0; color: var(--text-secondary);">Click on parts of the prompt to mark them for removal (strip the filler).</p>
+                    <div id="cleanTextContainer"></div>
+                </div>
+
+                <div id="chooseArea" class="choose-options hidden">
+                    <p style="margin-top:0; color: var(--text-secondary);">Select the most effective prompt.</p>
+                    <div id="chooseButtonsContainer"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-outline" id="hintBtn" onclick="useHint()">💡 Hint (-50 pts)</button>
+                <button class="btn hidden" id="submitBtn" onclick="checkAnswer()">Submit Solution</button>
+            </div>
+
+            <div class="feedback-panel" id="feedbackPanel">
+                <div class="principle-box">
+                    <div style="font-size: 2rem;">🧠</div>
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">Prompt Principle</h3>
+                        <p style="margin: 0; color: var(--text-secondary);" id="feedbackPrinciple"></p>
+                    </div>
+                </div>
+                
+                <div class="feedback-grid">
+                    <div class="comparison-card weak">
+                        <h4 style="color: var(--danger); margin-top: 0;">Weak Approach</h4>
+                        <div style="font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; border-left: 2px solid var(--danger);">
+                            <strong style="color: var(--text-secondary);">Prompt:</strong><br>
+                            <span id="feedbackWeakPrompt"></span>
+                        </div>
+                        <div style="font-size: 0.9rem;">
+                            <strong style="color: var(--text-secondary);">AI Output:</strong><br>
+                            <span id="feedbackWeakOutput" style="font-family: monospace; color: var(--danger); white-space: pre-wrap;"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-card optimized">
+                        <h4 style="color: var(--success); margin-top: 0;">Optimized Approach</h4>
+                        <div style="font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; border-left: 2px solid var(--success);">
+                            <strong style="color: var(--text-secondary);">Prompt:</strong><br>
+                            <span id="feedbackOptimizedPrompt"></span>
+                        </div>
+                        <div style="font-size: 0.9rem;">
+                            <strong style="color: var(--text-secondary);">AI Output:</strong><br>
+                            <span id="feedbackOptimizedOutput" style="font-family: monospace; color: var(--success); white-space: pre-wrap;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 1.5rem;">
+                    <button class="btn" onclick="nextScenario()">Next Scenario ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card hidden" id="reportScreen">
+            <div class="report-header">
+                <h2>Performance Report</h2>
+                <div class="score-circle">
+                    <div class="score-inner" id="finalScore">0</div>
+                </div>
+                <h3 id="rankTitle" style="color: var(--brand-primary); font-size: 1.5rem;">Prompt Padawan</h3>
+                <p id="personalizedFeedback" style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;"></p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Accuracy</div>
+                    <div class="stat-value" id="reportAccuracy">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Time Spent</div>
+                    <div class="stat-value" id="reportTime">00:00</div>
+                </div>
+                <div class="stat-box">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Hints Used</div>
+                    <div class="stat-value" id="reportHints">0</div>
+                </div>
+            </div>
+
+            <div class="principle-box" style="margin-bottom: 2rem;">
+                <div style="font-size: 2rem;">🚀</div>
+                <div>
+                    <h3 style="margin: 0 0 0.5rem 0;">Next Milestone</h3>
+                    <p style="margin: 0; color: var(--text-secondary);">Practice combining multiple constraints (e.g., format + length + tone) into a single concise instruction.</p>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn" onclick="location.reload()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notifContainer"></div>
+
+    <script>
+        const rawScenarios = [
+            {
+                type: "build",
+                desiredOutput: "A Python function that reads a CSV file and returns a dictionary of column averages.",
+                correctBlocks: ["Write a Python function", "that takes a CSV file path as input", "and calculates the average for each numeric column.", "Return the results as a dictionary.", "Ignore missing values."],
+                distractorBlocks: ["Use pandas dataframes for everything.", "Make it object-oriented.", "Print the results to the console."],
+                weakPrompt: "Write code to average csv columns.",
+                optimizedPrompt: "Write a Python function that takes a CSV file path as input and calculates the average for each numeric column. Return the results as a dictionary. Ignore missing values.",
+                weakOutput: "def avg_csv(file):\n    pass # basic implementation",
+                optimizedOutput: "def calculate_csv_averages(filepath):\n    # robust implementation returning dict",
+                promptPrinciple: "Be specific about inputs, outputs, and edge cases."
+            },
+            {
+                type: "clean",
+                desiredOutput: "A React component for a styled submit button with a loading state.",
+                promptParts: [
+                    { text: "Create a React functional component for a submit button. ", isEssential: true },
+                    { text: "It must be the best button ever seen. ", isEssential: false },
+                    { text: "Include a 'loading' prop that disables the button and shows a spinner. ", isEssential: true },
+                    { text: "I think buttons are very useful. ", isEssential: false },
+                    { text: "Use inline styles for a blue background and white text.", isEssential: true }
+                ],
+                weakPrompt: "Make a React button that loads.",
+                optimizedPrompt: "Create a React functional component for a submit button. Include a 'loading' prop that disables the button and shows a spinner. Use inline styles for a blue background and white text.",
+                weakOutput: "const Button = () => <button>Submit</button>;",
+                optimizedOutput: "const SubmitButton = ({ loading, children }) => {\n  return <button style={{...}}>...</button>;\n}",
+                promptPrinciple: "Remove unnecessary conversational filler and subjective instructions."
+            },
+            {
+                type: "choose",
+                desiredOutput: "A SQL query to find the top 5 customers by total spending in the last 30 days.",
+                options: [
+                    { text: "Give me a SQL query for top 5 customers.", isBest: false, feedback: "Too vague, missing timeframe and spending context." },
+                    { text: "Write a SQL query using the Orders and Customers tables to find the 5 customers with the highest total order amount in the last 30 days.", isBest: true, feedback: "Excellent! Specifies tables, logic, limit, and timeframe." },
+                    { text: "Write a complex SQL query using CTEs, window functions, and multiple subqueries to extract the top 5 customers based on their 30-day spending habits.", isBest: false, feedback: "Over-engineered. Simple GROUP BY and ORDER BY would suffice." }
+                ],
+                weakPrompt: "Give me a SQL query for top 5 customers.",
+                optimizedPrompt: "Write a SQL query using the Orders and Customers tables to find the 5 customers with the highest total order amount in the last 30 days.",
+                weakOutput: "SELECT * FROM Customers LIMIT 5;",
+                optimizedOutput: "SELECT c.id, sum(o.amount) FROM ...",
+                promptPrinciple: "Provide necessary database context and specific criteria."
+            },
+            {
+                type: "build",
+                desiredOutput: "A bash script to back up a specific directory to a tar archive, appending the current date to the filename.",
+                correctBlocks: ["Write a bash script", "to back up a directory specified as a parameter.", "Compress it into a .tar.gz file.", "Append the current date in YYYY-MM-DD format to the output filename."],
+                distractorBlocks: ["Use Python instead of bash.", "Upload the backup to AWS S3.", "Make it run every day automatically."],
+                weakPrompt: "Write a script to backup a folder.",
+                optimizedPrompt: "Write a bash script to back up a directory specified as a parameter. Compress it into a .tar.gz file. Append the current date in YYYY-MM-DD format to the output filename.",
+                weakOutput: "tar -cvf backup.tar /folder",
+                optimizedOutput: "#!/bin/bash\ntar -czvf \"backup-$(date +%F).tar.gz\" \"$1\"",
+                promptPrinciple: "Clearly define expected formatting, parameters, and outputs."
+            },
+            {
+                type: "clean",
+                desiredOutput: "Regex expression to validate an email address.",
+                promptParts: [
+                    { text: "Write a regular expression ", isEssential: true },
+                    { text: "for validating email addresses. ", isEssential: true },
+                    { text: "Emails are usually things like name@domain.com. ", isEssential: false },
+                    { text: "It should allow alphanumeric characters, dots, and plus signs before the @. ", isEssential: true },
+                    { text: "I have been stuck on this for 3 hours. ", isEssential: false },
+                    { text: "The domain must have at least a 2-character TLD.", isEssential: true }
+                ],
+                weakPrompt: "Write an email regex.",
+                optimizedPrompt: "Write a regular expression for validating email addresses. It should allow alphanumeric characters, dots, and plus signs before the @. The domain must have at least a 2-character TLD.",
+                weakOutput: "^.*@.*$",
+                optimizedOutput: "^[a-zA-Z0-9.+]+\\@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$",
+                promptPrinciple: "Focus strictly on technical constraints, avoid unnecessary backstory."
+            },
+            {
+                type: "choose",
+                desiredOutput: "A Git command to undo the last commit but keep the files staged.",
+                options: [
+                    { text: "How do I undo my last git commit?", isBest: false, feedback: "Ambiguous. Could lead to hard reset and lost work." },
+                    { text: "Provide the git command to remove the most recent commit while keeping the changes staged in the index.", isBest: true, feedback: "Perfect. Specifies the exact state you want the files in after the undo." },
+                    { text: "Explain the entire git reflog and reset mechanisms to show me how to safely traverse back one commit.", isBest: false, feedback: "Over-engineered and asks for an explanation rather than the command." }
+                ],
+                weakPrompt: "How do I undo my last git commit?",
+                optimizedPrompt: "Provide the git command to remove the most recent commit while keeping the changes staged in the index.",
+                weakOutput: "$ git reset HEAD~1 (might unstage)",
+                optimizedOutput: "$ git reset --soft HEAD~1",
+                promptPrinciple: "Be explicit about side effects (e.g., keeping files staged)."
+            }
+        ];
+
+        let scenarios = [];
+        let currentIdx = 0;
+        let score = 0;
+        let mistakes = 0;
+        let hintsUsed = 0;
+        let startTime;
+        let timerInterval;
+        let timeElapsed = 0;
+        let currentScenarioSolved = false;
+
+        function shuffle(array) {
+            let currentIndex = array.length,  randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function showNotif(msg, type='info') {
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'bonus') icon = '⚡';
+            notif.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+            document.getElementById('notifContainer').appendChild(notif);
+            setTimeout(() => { notif.remove(); }, 3000);
+        }
+
+        function updateHud() {
+            document.getElementById('scoreStat').innerText = score;
+            let acc = Math.max(0, 100 - (mistakes * 10));
+            document.getElementById('accuracyStat').innerText = acc + '%';
+            document.getElementById('scoreStat').classList.add('animate-pop');
+            setTimeout(() => document.getElementById('scoreStat').classList.remove('animate-pop'), 300);
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameHud').classList.remove('hidden');
+            
+            scenarios = shuffle([...rawScenarios]);
+            currentIdx = 0;
+            score = 0;
+            mistakes = 0;
+            hintsUsed = 0;
+            timeElapsed = 0;
+            updateHud();
+            
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                timeElapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = String(Math.floor(timeElapsed / 60)).padStart(2, '0');
+                const secs = String(timeElapsed % 60).padStart(2, '0');
+                document.getElementById('timeStat').innerText = `${mins}:${secs}`;
+            }, 1000);
+
+            loadScenario();
+        }
+
+        function loadScenario() {
+            currentScenarioSolved = false;
+            const scen = scenarios[currentIdx];
+            document.getElementById('scenarioTitle').innerText = `Scenario ${currentIdx + 1} / ${scenarios.length}`;
+            document.getElementById('scenarioTypeBadge').innerText = scen.type.toUpperCase();
+            document.getElementById('scenarioGoalText').innerText = scen.desiredOutput;
+            
+            document.getElementById('feedbackPanel').style.display = 'none';
+            document.getElementById('submitBtn').classList.remove('hidden');
+            document.getElementById('hintBtn').classList.remove('hidden');
+            
+            document.getElementById('buildArea').classList.add('hidden');
+            document.getElementById('cleanArea').classList.add('hidden');
+            document.getElementById('chooseArea').classList.add('hidden');
+
+            if (scen.type === 'build') {
+                document.getElementById('submitBtn').classList.remove('hidden');
+                initBuildMode(scen);
+            } else if (scen.type === 'clean') {
+                document.getElementById('submitBtn').classList.remove('hidden');
+                initCleanMode(scen);
+            } else if (scen.type === 'choose') {
+                document.getElementById('submitBtn').classList.add('hidden');
+                initChooseMode(scen);
+            }
+        }
+
+        let draggedItem = null;
+        function initBuildMode(scen) {
+            document.getElementById('buildArea').classList.remove('hidden');
+            const source = document.getElementById('buildSource');
+            const target = document.getElementById('buildTarget');
+            source.innerHTML = ''; target.innerHTML = '';
+            
+            const allBlocks = shuffle([
+                ...scen.correctBlocks.map(b => ({ text: b, isCorrect: true })),
+                ...scen.distractorBlocks.map(b => ({ text: b, isCorrect: false }))
+            ]);
+
+            allBlocks.forEach(blockData => {
+                const el = document.createElement('div');
+                el.className = 'draggable-block';
+                el.draggable = true;
+                el.innerText = blockData.text;
+                el.dataset.correct = blockData.isCorrect;
+                
+                el.addEventListener('dragstart', function(e) {
+                    draggedItem = this;
+                    setTimeout(() => this.style.opacity = '0.5', 0);
+                });
+                el.addEventListener('dragend', function() {
+                    draggedItem = null;
+                    this.style.opacity = '1';
+                });
+                source.appendChild(el);
+            });
+        }
+        
+        document.querySelectorAll('.drop-zone, .source-zone').forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                if(zone.classList.contains('drop-zone')) zone.classList.add('drag-over');
+            });
+            zone.addEventListener('dragleave', e => {
+                if(zone.classList.contains('drop-zone')) zone.classList.remove('drag-over');
+            });
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                if(zone.classList.contains('drop-zone')) zone.classList.remove('drag-over');
+                if (draggedItem && !currentScenarioSolved) {
+                    zone.appendChild(draggedItem);
+                }
+            });
+        });
+
+        function initCleanMode(scen) {
+            document.getElementById('cleanArea').classList.remove('hidden');
+            const container = document.getElementById('cleanTextContainer');
+            container.innerHTML = '';
+            
+            scen.promptParts.forEach((part) => {
+                const el = document.createElement('span');
+                el.className = 'clean-part';
+                el.innerText = part.text;
+                el.dataset.essential = part.isEssential;
+                el.onclick = () => {
+                    if(!currentScenarioSolved) {
+                        el.classList.toggle('marked-remove');
+                    }
+                };
+                container.appendChild(el);
+            });
+        }
+
+        function initChooseMode(scen) {
+            document.getElementById('chooseArea').classList.remove('hidden');
+            const container = document.getElementById('chooseButtonsContainer');
+            container.innerHTML = '';
+            
+            const options = shuffle([...scen.options]);
+            
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'choose-option';
+                btn.innerText = opt.text;
+                btn.onclick = () => {
+                    if(currentScenarioSolved) return;
+                    if(opt.isBest) {
+                        btn.classList.add('correct');
+                        showNotif('Correct! +1000 pts', 'success');
+                        score += 1000;
+                        handleScenarioSolved();
+                    } else {
+                        btn.classList.add('incorrect');
+                        showNotif(opt.feedback, 'error');
+                        mistakes++;
+                        score = Math.max(0, score - 200);
+                        updateHud();
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function useHint() {
+            if(currentScenarioSolved) return;
+            score = Math.max(0, score - 50);
+            hintsUsed++;
+            updateHud();
+            const scen = scenarios[currentIdx];
+            showNotif("Hint: " + scen.promptPrinciple, 'info');
+        }
+
+        function checkAnswer() {
+            if(currentScenarioSolved) return;
+            const scen = scenarios[currentIdx];
+            
+            if (scen.type === 'build') {
+                const targetBlocks = Array.from(document.getElementById('buildTarget').children);
+                let hasIncorrect = false;
+                
+                targetBlocks.forEach(el => {
+                    if (el.dataset.correct === 'false') hasIncorrect = true;
+                });
+                
+                const totalCorrectNeeded = scen.correctBlocks.length;
+                const correctInTarget = targetBlocks.filter(el => el.dataset.correct === 'true').length;
+                
+                if (hasIncorrect || correctInTarget < totalCorrectNeeded) {
+                    showNotif('Incorrect configuration. Check distractor blocks or missing blocks.', 'error');
+                    mistakes++;
+                    score = Math.max(0, score - 200);
+                    updateHud();
+                    return;
+                }
+            } else if (scen.type === 'clean') {
+                const parts = Array.from(document.getElementById('cleanTextContainer').children);
+                let isCorrect = true;
+                
+                parts.forEach(el => {
+                    const isEssential = el.dataset.essential === 'true';
+                    const isRemoved = el.classList.contains('marked-remove');
+                    if ((isEssential && isRemoved) || (!isEssential && !isRemoved)) {
+                        isCorrect = false;
+                    }
+                });
+                
+                if(!isCorrect) {
+                    showNotif('You missed some filler, or removed essential context!', 'error');
+                    mistakes++;
+                    score = Math.max(0, score - 200);
+                    updateHud();
+                    return;
+                }
+            }
+            
+            showNotif('Perfect! +1000 pts', 'success');
+            score += 1000;
+            handleScenarioSolved();
+        }
+
+        function handleScenarioSolved() {
+            currentScenarioSolved = true;
+            document.getElementById('submitBtn').classList.add('hidden');
+            document.getElementById('hintBtn').classList.add('hidden');
+            
+            if(scenarios[currentIdx].type !== 'choose') {
+                let bonus = Math.floor(Math.random() * 100) + 50;
+                score += bonus;
+                showNotif(`Speed Bonus! +${bonus} pts`, 'bonus');
+            }
+            
+            updateHud();
+            
+            const scen = scenarios[currentIdx];
+            document.getElementById('feedbackPrinciple').innerText = scen.promptPrinciple;
+            document.getElementById('feedbackWeakPrompt').innerText = scen.weakPrompt;
+            document.getElementById('feedbackWeakOutput').innerText = scen.weakOutput;
+            document.getElementById('feedbackOptimizedPrompt').innerText = scen.optimizedPrompt;
+            document.getElementById('feedbackOptimizedOutput').innerText = scen.optimizedOutput;
+            
+            document.getElementById('feedbackPanel').style.display = 'block';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function nextScenario() {
+            currentIdx++;
+            if (currentIdx >= scenarios.length) {
+                endGame();
+            } else {
+                loadScenario();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('reportScreen').classList.remove('hidden');
+            
+            document.getElementById('finalScore').innerText = score;
+            const mins = String(Math.floor(timeElapsed / 60)).padStart(2, '0');
+            const secs = String(timeElapsed % 60).padStart(2, '0');
+            document.getElementById('reportTime').innerText = `${mins}:${secs}`;
+            
+            let accuracy = Math.max(0, 100 - (mistakes * 5));
+            document.getElementById('reportAccuracy').innerText = accuracy + '%';
+            document.getElementById('reportHints').innerText = hintsUsed;
+            
+            let rank = "Prompt Padawan";
+            let msg = "You're getting the hang of it, but there's room to grow!";
+            if (score > 5500) { rank = "Prompt Architect"; msg = "Outstanding! You communicate with AI precisely and efficiently."; }
+            else if (score > 4000) { rank = "Prompt Engineer"; msg = "Great job! You know how to filter noise and get what you want."; }
+            
+            document.getElementById('rankTitle').innerText = rank;
+            document.getElementById('personalizedFeedback').innerText = msg;
+        }
+
+    </script>
+</body>
+</html>
