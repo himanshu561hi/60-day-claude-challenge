@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A psychology-inspired self-reflection experience that explores thinking patterns.">
+    <title>Cognitive Pattern Explorer</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #a3b1af;
+            --accent-color: #4a90e2;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --radius: 16px;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --progress-bg: rgba(0,0,0,0.08);
+        }
+
+        [data-theme="stress"] {
+            --bg-color: #1a252c;
+            --text-color: #e0e6ed;
+            --primary-color: #5c7482;
+            --accent-color: #e76f51;
+            --card-bg: #26343f;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --progress-bg: rgba(255,255,255,0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.8s ease, color 0.8s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.15rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0.5rem 0;
+            width: 100%;
+            text-align: left;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-btn {
+            text-align: center;
+        }
+
+        .btn:hover, .btn:focus {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent-color);
+        }
+
+        .btn.primary {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .btn.primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid.two-cols {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            transition: background-color 0.8s ease, box-shadow 0.8s ease;
+        }
+
+        /* Drag and Drop Styles */
+        .dnd-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .dnd-zone {
+            min-height: 160px;
+            background-color: var(--progress-bg);
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .dnd-zone.drag-over {
+            background-color: rgba(74, 144, 226, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .draggable {
+            background-color: var(--card-bg);
+            padding: 1.2rem;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: grab;
+            user-select: none;
+            border: 1px solid var(--primary-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .draggable::before {
+            content: '⋮⋮';
+            margin-right: 1rem;
+            opacity: 0.4;
+            font-weight: bold;
+            letter-spacing: -2px;
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+        }
+
+        .draggable.dragging {
+            opacity: 0.6;
+            transform: scale(1.02);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--progress-bg);
+            border-radius: 4px;
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 4px;
+        }
+
+        .results-section {
+            margin-top: 2.5rem;
+        }
+
+        .trait-bar-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .trait-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .trait-bar-bg {
+            height: 12px;
+            background-color: var(--progress-bg);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .trait-bar-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 6px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: rgba(74, 144, 226, 0.1);
+            color: var(--accent-color);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .screen {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+            .progress-fill, .trait-bar-fill, .btn, body, .card {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Start Screen -->
+    <div id="screen-start" class="screen active">
+        <h1>Cognitive Pattern Explorer</h1>
+        <div class="card">
+            <span class="tag">Self-Reflection Experience</span>
+            <p>Welcome to a calm space for understanding your thought processes. This experience is designed to gently explore your natural thinking tendencies through interactive scenarios.</p>
+            <p style="font-size: 0.95rem; opacity: 0.7;"><em>Note: This is an educational tool for personal insight, not a clinical assessment.</em></p>
+            
+            <h3 style="margin-top: 2.5rem;">How is your mind feeling right now?</h3>
+            <div class="options-grid two-cols">
+                <button class="btn start-btn" onclick="startExperience('calm')">Calm & Centered</button>
+                <button class="btn start-btn" onclick="startExperience('stress')">Overwhelmed or Racing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 1: Scenarios -->
+    <div id="screen-ch1" class="screen">
+        <div class="progress-bar"><div class="progress-fill" id="ch1-progress"></div></div>
+        <h2>Chapter 1: Discover Your Thinking Style</h2>
+        <div class="card">
+            <p id="ch1-scenario" style="font-size: 1.25rem; font-weight: 500; margin-bottom: 2rem;">Scenario loading...</p>
+            <div class="options-grid" id="ch1-options">
+                <!-- Options injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 2: Priorities -->
+    <div id="screen-ch2" class="screen">
+        <div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div>
+        <h2>Chapter 2: Choose Your Priorities</h2>
+        <div class="card">
+            <p>When faced with a complex situation, what matters most to you? Drag these cards to rank them (top is your highest priority).</p>
+            
+            <div class="dnd-container">
+                <div>
+                    <h3 style="font-size: 1rem; opacity: 0.8; margin-bottom: 0.5rem;">Available priorities</h3>
+                    <div class="dnd-zone" id="priority-pool">
+                        <!-- Draggables injected here -->
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 1rem; opacity: 0.8; margin-bottom: 0.5rem;">Your Sequence (Top = Highest)</h3>
+                    <div class="dnd-zone" id="priority-target">
+                        <!-- Drop here -->
+                    </div>
+                </div>
+            </div>
+            <button class="btn primary" style="margin-top: 2rem;" onclick="finishChapter2()">Continue to Chapter 3</button>
+        </div>
+    </div>
+
+    <!-- Chapter 3: Timeline -->
+    <div id="screen-ch3" class="screen">
+        <div class="progress-bar"><div class="progress-fill" style="width: 75%"></div></div>
+        <h2>Chapter 3: Map Your Processing</h2>
+        <div class="card">
+            <p>Think about a recent decision. Drag these phases into the chronological order you naturally experienced them.</p>
+            
+            <div class="dnd-container">
+                <div>
+                    <h3 style="font-size: 1rem; opacity: 0.8; margin-bottom: 0.5rem;">Available phases</h3>
+                    <div class="dnd-zone" id="timeline-pool">
+                        <!-- Draggables injected here -->
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 1rem; opacity: 0.8; margin-bottom: 0.5rem;">Your Timeline (Top = First)</h3>
+                    <div class="dnd-zone" id="timeline-target">
+                        <!-- Drop here -->
+                    </div>
+                </div>
+            </div>
+            <button class="btn primary" style="margin-top: 2rem;" onclick="finishChapter3()">Reveal Insights</button>
+        </div>
+    </div>
+
+    <!-- Final Screen -->
+    <div id="screen-final" class="screen">
+        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+        <h1>Your Reflection Journal</h1>
+        <div class="card" id="results-content">
+            <!-- Results injected here -->
+        </div>
+        <button class="btn primary" style="margin-top: 1rem;" onclick="location.reload()">Restart Exploration</button>
+    </div>
+</div>
+
+<script>
+    // --- Data & State ---
+    const state = {
+        scores: {
+            analytical: 0,
+            emotional: 0,
+            overthinking: 0,
+            action: 0,
+            balanced: 0
+        },
+        ch1Index: 0
+    };
+
+    const scenarios = [
+        {
+            text: "You receive an unexpected email asking you to lead a new, unfamiliar project.",
+            options: [
+                { text: "Immediately list out what information I need to gather.", trait: "analytical" },
+                { text: "Notice how I feel about it before deciding anything.", trait: "emotional" },
+                { text: "Worry about all the ways it might go wrong or if I'm qualified.", trait: "overthinking" },
+                { text: "Reply 'yes' and figure out the details later.", trait: "action" },
+                { text: "Take a pause, consider my bandwidth, then respond.", trait: "balanced" }
+            ]
+        },
+        {
+            text: "A close friend asks for your advice on a difficult interpersonal situation.",
+            options: [
+                { text: "Help them break down the problem logically into steps.", trait: "analytical" },
+                { text: "Focus entirely on validating their feelings and offering comfort.", trait: "emotional" },
+                { text: "Replay the conversation later, wondering if I gave the right advice.", trait: "overthinking" },
+                { text: "Suggest a direct, actionable solution for them to use right away.", trait: "action" },
+                { text: "Listen fully, then gently explore various perspectives together.", trait: "balanced" }
+            ]
+        },
+        {
+            text: "You have a free afternoon with absolutely nothing scheduled.",
+            options: [
+                { text: "Plan out a structure to use the time efficiently.", trait: "analytical" },
+                { text: "Do whatever feels right in the moment, following my mood.", trait: "emotional" },
+                { text: "Spend half the time trying to decide what the 'best' use of time would be.", trait: "overthinking" },
+                { text: "Immediately start a project or run an errand.", trait: "action" },
+                { text: "Enjoy the rest while gently considering a few relaxing activities.", trait: "balanced" }
+            ]
+        }
+    ];
+
+    const priorityCards = [
+        { id: 'p1', text: 'Having clear data and objective facts', trait: 'analytical' },
+        { id: 'p2', text: 'Ensuring everyone feels heard and valued', trait: 'emotional' },
+        { id: 'p3', text: 'Exploring every possible negative outcome', trait: 'overthinking' },
+        { id: 'p4', text: 'Moving forward quickly to see what happens', trait: 'action' },
+        { id: 'p5', text: 'Finding a sustainable and harmonious pace', trait: 'balanced' }
+    ];
+
+    const timelineCards = [
+        { id: 't1', text: 'Gathering concrete information', trait: 'analytical' },
+        { id: 't2', text: 'Checking my internal intuition', trait: 'emotional' },
+        { id: 't3', text: 'Questioning my initial thoughts repeatedly', trait: 'overthinking' },
+        { id: 't4', text: 'Taking the first actionable step', trait: 'action' },
+        { id: 't5', text: 'Reviewing the whole picture calmly', trait: 'balanced' }
+    ];
+
+    const descriptions = {
+        analytical: "You often navigate the world through logic, structure, and categorization. This suggests a powerful strength in breaking down complex problems and finding clear, objective paths forward.",
+        emotional: "You often tune deeply into the feelings of yourself and others. This suggests a profound well of empathy, allowing you to connect authentically and intuitively understand the human element of any situation.",
+        overthinking: "You tend to explore many layers and potential outcomes of a situation. While this shows deep processing and careful consideration, noticing this pattern can help you recognize when you're experiencing decision fatigue.",
+        action: "You often prefer to learn by doing and experiencing. This suggests a strong drive to move forward, tackle challenges head-on, and maintain momentum rather than getting stuck in preparation.",
+        balanced: "You naturally seek a middle path in your processing. This suggests an ability to pause, integrate different perspectives, and act thoughtfully, balancing logic with intuition."
+    };
+
+    // --- Navigation & Flow ---
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => {
+            s.classList.remove('active');
+            s.style.display = 'none';
+        });
+        const target = document.getElementById(id);
+        target.style.display = 'block';
+        // Trigger reflow for animation
+        void target.offsetWidth; 
+        target.classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function startExperience(mode) {
+        if (mode === 'stress') {
+            document.documentElement.setAttribute('data-theme', 'stress');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        showScreen('screen-ch1');
+        loadScenario();
+    }
+
+    // --- Chapter 1 Logic ---
+    function loadScenario() {
+        if (state.ch1Index >= scenarios.length) {
+            setupChapter2();
+            showScreen('screen-ch2');
+            return;
+        }
+
+        const scenario = scenarios[state.ch1Index];
+        document.getElementById('ch1-scenario').textContent = scenario.text;
+        
+        const optionsContainer = document.getElementById('ch1-options');
+        optionsContainer.innerHTML = '';
+        
+        // Shuffle options so traits aren't always in same order
+        const shuffled = [...scenario.options].sort(() => Math.random() - 0.5);
+        
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = opt.text;
+            btn.onclick = () => selectOption(opt.trait);
+            optionsContainer.appendChild(btn);
+        });
+
+        const totalCh1Steps = scenarios.length;
+        const progressPercent = (state.ch1Index / (totalCh1Steps * 2)) * 100; // Half of total progress is Ch1
+        document.getElementById('ch1-progress').style.width = `${progressPercent}%`;
+    }
+
+    function selectOption(trait) {
+        state.scores[trait] += 3; // Scenarios have high weight
+        state.ch1Index++;
+        loadScenario();
+    }
+
+    // --- Drag and Drop Logic ---
+    let draggedItem = null;
+    let dragPlaceholder = null;
+
+    function initDnD(zoneIds, items, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        // Shuffle initial items
+        const shuffledItems = [...items].sort(() => Math.random() - 0.5);
+        
+        shuffledItems.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'draggable';
+            el.draggable = true;
+            el.textContent = item.text;
+            el.dataset.trait = item.trait;
+            el.id = item.id;
+            
+            el.addEventListener('dragstart', handleDragStart);
+            el.addEventListener('dragend', handleDragEnd);
+            el.addEventListener('dragenter', handleItemDragEnter);
+            el.addEventListener('dragover', handleItemDragOver);
+            el.addEventListener('drop', handleItemDrop);
+            
+            // Touch support
+            el.addEventListener('touchstart', handleTouchStart, {passive: false});
+            el.addEventListener('touchmove', handleTouchMove, {passive: false});
+            el.addEventListener('touchend', handleTouchEnd);
+            
+            container.appendChild(el);
+        });
+
+        zoneIds.forEach(id => {
+            const zone = document.getElementById(id);
+            // Clear existing listeners by cloning if necessary, or just add them
+            zone.addEventListener('dragover', handleZoneDragOver);
+            zone.addEventListener('dragleave', handleZoneDragLeave);
+            zone.addEventListener('drop', handleZoneDrop);
+        });
+    }
+
+    function handleDragStart(e) {
+        draggedItem = this;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', this.id);
+        setTimeout(() => this.classList.add('dragging'), 0);
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        draggedItem = null;
+        document.querySelectorAll('.dnd-zone').forEach(z => z.classList.remove('drag-over'));
+        document.querySelectorAll('.draggable').forEach(d => {
+            d.style.borderTop = '';
+            d.style.borderBottom = '';
+        });
+    }
+
+    function handleItemDragEnter(e) {
+        e.preventDefault();
+    }
+
+    function handleItemDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (this === draggedItem) return;
+        
+        const rect = this.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        
+        // Simple visual feedback for sorting
+        if (e.clientY < midY) {
+            this.style.borderTop = '2px solid var(--accent-color)';
+            this.style.borderBottom = '';
+        } else {
+            this.style.borderBottom = '2px solid var(--accent-color)';
+            this.style.borderTop = '';
+        }
+    }
+
+    function handleItemDrop(e) {
+        e.preventDefault();
+        e.stopPropagation(); // Prevent zone drop from firing
+        
+        this.style.borderTop = '';
+        this.style.borderBottom = '';
+        
+        if (draggedItem && this !== draggedItem) {
+            const rect = this.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            
+            if (e.clientY < midY) {
+                this.parentNode.insertBefore(draggedItem, this);
+            } else {
+                this.parentNode.insertBefore(draggedItem, this.nextSibling);
+            }
+        }
+    }
+
+    function handleZoneDragOver(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    }
+
+    function handleZoneDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function handleZoneDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        if (draggedItem && e.target === this) {
+            this.appendChild(draggedItem);
+        }
+    }
+
+    // Touch Fallback for DnD
+    let touchClone = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+
+    function handleTouchStart(e) {
+        if(e.target.closest('button')) return;
+        draggedItem = this;
+        const touch = e.touches[0];
+        const rect = this.getBoundingClientRect();
+        touchOffsetX = touch.clientX - rect.left;
+        touchOffsetY = touch.clientY - rect.top;
+        
+        this.classList.add('dragging');
+        
+        touchClone = this.cloneNode(true);
+        touchClone.style.position = 'fixed';
+        touchClone.style.width = rect.width + 'px';
+        touchClone.style.opacity = '0.9';
+        touchClone.style.pointerEvents = 'none';
+        touchClone.style.zIndex = '1000';
+        touchClone.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+        document.body.appendChild(touchClone);
+        
+        moveClone(touch.clientX, touch.clientY);
+    }
+
+    function handleTouchMove(e) {
+        if (!touchClone) return;
+        e.preventDefault(); 
+        const touch = e.touches[0];
+        moveClone(touch.clientX, touch.clientY);
+        
+        const elUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        document.querySelectorAll('.dnd-zone').forEach(z => z.classList.remove('drag-over'));
+        document.querySelectorAll('.draggable').forEach(d => {
+            d.style.borderTop = '';
+            d.style.borderBottom = '';
+        });
+
+        if (elUnderTouch) {
+            const zone = elUnderTouch.closest('.dnd-zone');
+            if (zone) zone.classList.add('drag-over');
+            
+            const item = elUnderTouch.closest('.draggable');
+            if (item && item !== draggedItem) {
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                if (touch.clientY < midY) {
+                    item.style.borderTop = '2px solid var(--accent-color)';
+                } else {
+                    item.style.borderBottom = '2px solid var(--accent-color)';
+                }
+            }
+        }
+    }
+
+    function moveClone(x, y) {
+        touchClone.style.left = (x - touchOffsetX) + 'px';
+        touchClone.style.top = (y - touchOffsetY) + 'px';
+    }
+
+    function handleTouchEnd(e) {
+        if (!touchClone) return;
+        
+        const touch = e.changedTouches[0];
+        const elUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        document.querySelectorAll('.draggable').forEach(d => {
+            d.style.borderTop = '';
+            d.style.borderBottom = '';
+        });
+
+        if (elUnderTouch) {
+            const item = elUnderTouch.closest('.draggable');
+            const zone = elUnderTouch.closest('.dnd-zone');
+            
+            if (item && item !== draggedItem) {
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                if (touch.clientY < midY) {
+                    item.parentNode.insertBefore(draggedItem, item);
+                } else {
+                    item.parentNode.insertBefore(draggedItem, item.nextSibling);
+                }
+            } else if (zone) {
+                zone.appendChild(draggedItem);
+            }
+        }
+        
+        touchClone.remove();
+        touchClone = null;
+        draggedItem.classList.remove('dragging');
+        draggedItem = null;
+        document.querySelectorAll('.dnd-zone').forEach(z => z.classList.remove('drag-over'));
+    }
+
+    // --- Chapter 2 & 3 Logic ---
+    function setupChapter2() {
+        initDnD(['priority-pool', 'priority-target'], priorityCards, 'priority-pool');
+    }
+
+    function finishChapter2() {
+        const target = document.getElementById('priority-target');
+        const items = target.querySelectorAll('.draggable');
+        
+        if (items.length < priorityCards.length) {
+            alert("Please drag all cards into your sequence to continue.");
+            return;
+        }
+
+        items.forEach((item, index) => {
+            const trait = item.dataset.trait;
+            const points = Math.max(0, 4 - index); // Top gets 4, then 3, 2, 1, 0
+            state.scores[trait] += points;
+        });
+
+        setupChapter3();
+        showScreen('screen-ch3');
+    }
+
+    function setupChapter3() {
+        initDnD(['timeline-pool', 'timeline-target'], timelineCards, 'timeline-pool');
+    }
+
+    function finishChapter3() {
+        const target = document.getElementById('timeline-target');
+        const items = target.querySelectorAll('.draggable');
+        
+        if (items.length < timelineCards.length) {
+            alert("Please map your full timeline to continue.");
+            return;
+        }
+
+        items.forEach((item, index) => {
+            const trait = item.dataset.trait;
+            const points = Math.max(0, 4 - index);
+            state.scores[trait] += points;
+        });
+
+        generateResults();
+        showScreen('screen-final');
+    }
+
+    // --- Final Results ---
+    function generateResults() {
+        const container = document.getElementById('results-content');
+        
+        let total = Object.values(state.scores).reduce((a, b) => a + b, 0);
+        if (total === 0) total = 1;
+        
+        const sortedTraits = Object.entries(state.scores)
+            .sort((a, b) => b[1] - a[1]);
+            
+        const topTrait = sortedTraits[0][0];
+
+        let html = `
+            <h2>Your Reflection Summary</h2>
+            <p style="font-size: 1.2rem; line-height: 1.8;">${descriptions[topTrait]}</p>
+            <div class="results-section">
+                <h3 style="margin-bottom: 1.5rem;">Your Tendency Breakdown</h3>
+        `;
+
+        sortedTraits.forEach(([trait, score]) => {
+            const percentage = Math.round((score / total) * 100);
+            const label = trait.charAt(0).toUpperCase() + trait.slice(1);
+            
+            html += `
+                <div class="trait-bar-container">
+                    <div class="trait-label">
+                        <span>${label}</span>
+                        <span>${percentage}%</span>
+                    </div>
+                    <div class="trait-bar-bg">
+                        <div class="trait-bar-fill" style="width: 0%" data-target="${percentage}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `
+            </div>
+            <div style="margin-top: 2.5rem; padding: 1.5rem; background-color: var(--progress-bg); border-radius: var(--radius);">
+                <h4 style="margin-bottom: 0.5rem; font-weight: 500;">A Gentle Reminder</h4>
+                <p style="margin-bottom: 0; font-size: 0.95rem; opacity: 0.85;">
+                    These patterns are fluid, not fixed labels. Awareness allows you to lean into your natural strengths while gently practicing different approaches when they might serve you better.
+                </p>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        setTimeout(() => {
+            container.querySelectorAll('.trait-bar-fill').forEach(bar => {
+                bar.style.width = bar.dataset.target;
+            });
+        }, 100);
+    }
+</script>
+</body>
+</html>
