@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Compass</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-gradient: radial-gradient(circle at top right, #1e293b, #0f172a);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .bg-orbs {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      animation: float 20s infinite alternate;
+    }
+
+    .orb-1 {
+      top: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: #3b82f6;
+    }
+
+    .orb-2 {
+      bottom: -10%;
+      right: -10%;
+      width: 40vw;
+      height: 40vw;
+      background: #8b5cf6;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(5%, 10%) scale(1.1);
+      }
+    }
+
+    .glass {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    .progress-container {
+      width: 150px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    main {
+      flex: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .task-card {
+      padding: 2.5rem 2rem;
+      font-size: 1.35rem;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      line-height: 1.5;
+    }
+
+    .task-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .role-card {
+      padding: 0.75rem 1.25rem;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      cursor: grab;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .role-card:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .role-card:active {
+      cursor: grabbing;
+    }
+
+    .dropzone {
+      min-height: 100px;
+      border: 2px dashed var(--card-border);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      flex-wrap: wrap;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .roles-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2.5rem;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      border: 1px solid var(--card-border);
+    }
+
+    .result-panel {
+      margin-top: 2rem;
+      padding: 2.5rem;
+      border-left: 4px solid var(--primary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <header>
+    <div style="font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+      <span style="font-size: 1.5rem;">🧭</span> Task Compass
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span id="progress-text" style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500;"></span>
+      <div class="progress-container" id="progress-container" style="display: none;">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="game-area"></main>
+
+  <script>
+    const roles = {
+      FE: { id: 'FE', name: 'Frontend Dev', color: '#38bdf8', icon: '💻' },
+      BE: { id: 'BE', name: 'Backend Dev', color: '#10b981', icon: '⚙️' },
+      QA: { id: 'QA', name: 'QA Engineer', color: '#f43f5e', icon: '🔍' },
+      PM: { id: 'PM', name: 'Product Manager', color: '#f59e0b', icon: '📊' },
+      UX: { id: 'UX', name: 'UX Designer', color: '#a78bfa', icon: '🎨' },
+      CS: { id: 'CS', name: 'Customer Support', color: '#2dd4bf', icon: '🎧' },
+      EM: { id: 'EM', name: 'Eng Manager', color: '#818cf8', icon: '🛡️' },
+      DO: { id: 'DO', name: 'DevOps', color: '#fb923c', icon: '🚀' }
+    };
+
+    const allScenarios = {
+      1: [
+        { task: "A customer reports that payments fail only on iPhones.", owner: 'FE', why: "Client-side specific issues (like iOS Safari behavior) fall under Frontend. They will investigate the device-specific bug and push a fix.", assist: ['BE', 'QA'] },
+        { task: "The production database is running out of disk space.", owner: 'DO', why: "Infrastructure, scaling, and server capacity are managed by DevOps. They need to provision more space immediately to prevent downtime.", assist: ['BE'] },
+        { task: "Users are confused by the new checkout flow and abandoning their carts.", owner: 'UX', why: "User experience and interface friction is the domain of UX Designers. They need to research the friction points and redesign the user journey.", assist: ['PM', 'FE'] },
+        { task: "We need to prioritize features for the next quarter's roadmap.", owner: 'PM', why: "Product Managers own the roadmap. They align business goals with user needs to decide what gets built next.", assist: ['EM', 'UX'] },
+        { task: "A critical bug is crashing the app on startup for all users.", owner: 'EM', why: "Engineering Managers often act as incident commanders for critical outages, coordinating the right developers and communicating status.", assist: ['FE', 'BE', 'DO'] },
+        { task: "A VIP enterprise client needs a custom API key generated immediately.", owner: 'CS', why: "Customer Support handles direct client requests and account management, escalating to backend if they don't have administrative tools.", assist: ['BE'] },
+        { task: "The new login page design needs to be implemented into code.", owner: 'FE', why: "Frontend Developers turn designs into functional user interfaces.", assist: ['UX', 'QA'] },
+        { task: "We need a suite of automated tests for the critical billing module.", owner: 'QA', why: "QA Engineers own the testing strategy and automated test infrastructure to ensure high quality.", assist: ['BE', 'FE'] }
+      ],
+      2: [
+        { task: "A user reports they can't reset their password.", flow: ['CS', 'QA', 'BE', 'CS'], why: "Support receives the issue and logs it. QA attempts to reproduce the bug. Backend fixes the authentication logic. Support informs the user it's fixed." },
+        { task: "We need to add a new 'Dark Mode' feature.", flow: ['PM', 'UX', 'FE', 'QA'], why: "Product defines the requirements. UX designs the interface. Frontend implements the code. QA verifies it works across devices." },
+        { task: "Incident: Complete server outage during peak hours.", flow: ['DO', 'BE', 'EM', 'CS'], why: "DevOps works to restore the servers. Backend helps debug the root cause. Eng Manager coordinates the fix. Support prepares a public statement." },
+        { task: "Update the privacy policy text on the website.", flow: ['PM', 'FE', 'QA'], why: "Product gets the legal text. Frontend updates the static pages. QA ensures no layout breaks occurred." },
+        { task: "Migrate away from a deprecated third-party API.", flow: ['PM', 'BE', 'QA', 'DO'], why: "Product assesses the impact. Backend writes the new integration. QA tests the data flow. DevOps monitors the deployment." }
+      ],
+      3: [
+        { task: "Customer satisfaction score suddenly drops by 20%.", primary: 'PM', support: ['UX', 'CS', 'EM'], why: "A major metric drop requires investigation. PMs own the overall value metric and lead the task force.", flow: "PM gathers feedback from CS, proposes UX research, and works with EM to execute technical fixes." },
+        { task: "A major feature launch is delayed by two weeks.", primary: 'EM', support: ['PM', 'FE', 'BE'], why: "Engineering Managers own delivery timelines. They must unblock the team, re-scope, and communicate the delay.", flow: "EM assesses the technical blockers with FE and BE, then works with PM to adjust the launch plan." },
+        { task: "Negative reviews appear online about the app being 'too slow'.", primary: 'PM', support: ['DO', 'BE', 'FE'], why: "Performance is a product feature. PM prioritizes the performance work, while the engineering org executes.", flow: "PM creates a performance sprint. DO monitors infrastructure, BE optimizes queries, and FE reduces bundle size." },
+        { task: "Sales increase dramatically, but our servers are struggling to keep up.", primary: 'DO', support: ['BE', 'EM', 'CS'], why: "Sudden scale issues are an infrastructure emergency owned by DevOps.", flow: "DO scales the servers up. BE optimizes bottlenecks. EM coordinates the effort. CS manages customer expectations during slowness." }
+      ]
+    };
+
+    let audioCtx;
+    const state = {
+      stage: 0,
+      questionIndex: 0,
+      scores: { ownership: 0, workflow: 0, collaboration: 0, delegation: 0 }
+    };
+
+    let activeScenarios = { 1: [], 2: [], 3: [] };
+    let viewState = { submitted: false, slots: [] };
+
+    function shuffle(array) {
+      let cur = array.length, ran;
+      while (cur != 0) {
+        ran = Math.floor(Math.random() * cur);
+        cur--;
+        [array[cur], array[ran]] = [array[ran], array[cur]];
+      }
+      return array;
+    }
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'drop') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + 0.1);
+          gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'success') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+          gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.4);
+        }
+      } catch (e) { }
+    }
+
+    function renderMainMenu() {
+      document.getElementById('progress-container').style.display = 'none';
+      document.getElementById('progress-text').textContent = '';
+
+      const container = document.getElementById('game-area');
+      container.innerHTML = `
+    <div class="glass animate-fade-in" style="padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">🏢</div>
+      <h1 style="font-size: 3.5rem; margin: 0 0 1rem 0; font-weight: 800; background: linear-gradient(to right, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Task Compass</h1>
+      <p style="font-size: 1.4rem; color: var(--text-muted); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">Learn how work flows through real tech companies.</p>
+      <button onclick="startGame()" style="font-size: 1.25rem; padding: 1rem 3rem;">Start Simulation</button>
+    </div>
+  `;
+    }
+
+    function startGame() {
+      initAudio();
+      activeScenarios[1] = shuffle([...allScenarios[1]]).slice(0, 3);
+      activeScenarios[2] = shuffle([...allScenarios[2]]).slice(0, 3);
+      activeScenarios[3] = shuffle([...allScenarios[3]]).slice(0, 3);
+      state.stage = 1;
+      state.questionIndex = 0;
+      document.getElementById('progress-container').style.display = 'block';
+      startStage(1, true);
+    }
+
+    function startStage(stage, isNewStage = false) {
+      viewState.submitted = false;
+      viewState.slots = [];
+
+      if (isNewStage) {
+        renderStageIntro(stage);
+      } else {
+        renderGameArea();
+        updateProgress();
+      }
+    }
+
+    function renderStageIntro(stage) {
+      const container = document.getElementById('game-area');
+
+      let title = '', desc = '', icon = '';
+      if (stage === 1) {
+        title = "Stage 1: Who Owns This?";
+        desc = "In a healthy organization, every task has a primary owner. Assign the single most appropriate role to claim ownership of the incoming task.";
+        icon = "🎯";
+      } else if (stage === 2) {
+        title = "Stage 2: Task Routing";
+        desc = "Work rarely happens in isolation. It flows between departments. Build the typical workflow for the given situation by dragging roles in order.";
+        icon = "🛤️";
+      } else if (stage === 3) {
+        title = "Stage 3: Collaboration Challenge";
+        desc = "Complex organizational problems require teamwork. Instead of finding one owner, assign up to 4 roles that must collaborate to resolve the situation.";
+        icon = "🤝";
+      }
+
+      container.innerHTML = `
+    <div class="glass animate-fade-in" style="padding: 4rem 3rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">${icon}</div>
+      <h2 style="font-size: 2.2rem; margin: 0 0 1.5rem 0;">${title}</h2>
+      <p style="font-size: 1.25rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 3rem;">${desc}</p>
+      <button onclick="renderGameArea(); updateProgress();">Begin Stage</button>
+    </div>
+  `;
+      document.getElementById('progress-text').textContent = `Stage ${stage} Introduction`;
+}
+
+function updateProgress() {
+  const total = 9;
+  const current = (state.stage - 1) * 3 + state.questionIndex;
+  const pct = (current / total) * 100;
+  document.getElementById('progress-bar').style.width = `${pct}%`;
+  document.getElementById('progress-text').textContent = `Stage ${state.stage} \u2014 Scenario ${state.questionIndex + 1} of 3`;
+}
+
+function getCurrentScenario() {
+  return activeScenarios[state.stage][state.questionIndex];
+}
+
+function createRoleCard(roleId, inSlot = false, index = 0) {
+  const role = roles[roleId];
+  const el = document.createElement('div');
+  el.className = 'role-card';
+  el.style.borderLeft = `4px solid ${role.color}`;
+  el.innerHTML = `<span style="font-size: 1.25rem">${role.icon}</span> <span>${role.name}</span>`;
+  
+  if (!viewState.submitted && !inSlot) {
+    el.draggable = true;
+    el.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', roleId);
+      el.style.opacity = '0.5';
+    });
+    el.addEventListener('dragend', (e) => el.style.opacity = '1');
+    el.addEventListener('click', () => handleDrop(roleId));
+  }
+
+  if (inSlot && !viewState.submitted) {
+    el.style.cursor = 'pointer';
+    el.title = "Click to remove";
+    el.addEventListener('click', () => {
+      if (state.stage === 1) viewState.slots = [];
+      else viewState.slots.splice(index, 1);
+      playSound('drop');
+      renderGameArea();
+    });
+  }
+  return el;
+}
+
+function handleDrop(roleId) {
+  playSound('drop');
+  if (state.stage === 1) {
+    viewState.slots[0] = roleId;
+  } else if (state.stage === 2) {
+    viewState.slots.push(roleId);
+  } else if (state.stage === 3) {
+    if (!viewState.slots.includes(roleId) && viewState.slots.length < 4) {
+      viewState.slots.push(roleId);
+    }
+  }
+  renderGameArea();
+}
+
+function renderGameArea() {
+  const container = document.getElementById('game-area');
+  container.innerHTML = '';
+  const scenario = getCurrentScenario();
+
+  const taskCard = document.createElement('div');
+  taskCard.className = 'task-card glass animate-fade-in';
+  taskCard.textContent = scenario.task;
+  container.appendChild(taskCard);
+
+  const dropzoneArea = document.createElement('div');
+  dropzoneArea.className = 'animate-fade-in';
+  
+  const dropzone = document.createElement('div');
+  dropzone.className = 'dropzone glass';
+  
+  const label = document.createElement('div');
+  label.style.width = '100%';
+  label.style.textAlign = 'center';
+  label.style.color = 'var(--text-muted)';
+  label.style.marginBottom = '1rem';
+  label.style.fontWeight = '500';
+  
+  if (state.stage === 1) {
+    label.textContent = "Assign the Primary Owner";
+    dropzone.appendChild(label);
+    if (viewState.slots[0]) dropzone.appendChild(createRoleCard(viewState.slots[0], true));
+  } else if (state.stage === 2) {
+    label.textContent = "Build the Workflow Order";
+    dropzone.appendChild(label);
+    viewState.slots.forEach((id, idx) => {
+      dropzone.appendChild(createRoleCard(id, true, idx));
+      if (idx < viewState.slots.length - 1) {
+        const arrow = document.createElement('span');
+        arrow.textContent = '→';
+        arrow.style.color = 'var(--text-muted)';
+        dropzone.appendChild(arrow);
+      }
+    });
+  } else if (state.stage === 3) {
+    label.textContent = `Assign Collaborators (Max 4)`;
+    dropzone.appendChild(label);
+    viewState.slots.forEach((id, idx) => dropzone.appendChild(createRoleCard(id, true, idx)));
+  }
+
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); if (!viewState.submitted) dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    if (viewState.submitted) return;
+    const roleId = e.dataTransfer.getData('text/plain');
+    if (roleId) handleDrop(roleId);
+  });
+
+  dropzoneArea.appendChild(dropzone);
+  container.appendChild(dropzoneArea);
+
+  if (!viewState.submitted) {
+    const pool = document.createElement('div');
+    pool.className = 'roles-pool animate-fade-in';
+    pool.style.animationDelay = '0.1s';
+    Object.keys(roles).forEach(id => pool.appendChild(createRoleCard(id, false)));
+    container.appendChild(pool);
+
+    const btnWrapper = document.createElement('div');
+    btnWrapper.style.textAlign = 'center';
+    btnWrapper.style.marginTop = '2.5rem';
+    
+    const btn = document.createElement('button');
+    btn.textContent = 'Submit Decision';
+    
+    let canSubmit = false;
+    if (state.stage === 1 && viewState.slots.length === 1) canSubmit = true;
+    if (state.stage === 2 && viewState.slots.length >= 2) canSubmit = true;
+    if (state.stage === 3 && viewState.slots.length >= 2) canSubmit = true;
+    
+    btn.disabled = !canSubmit;
+    btn.onclick = handleSubmit;
+    btnWrapper.appendChild(btn);
+    container.appendChild(btnWrapper);
+  } else {
+    renderResultsPanel(container, scenario);
+  }
+}
+
+function handleSubmit() {
+  playSound('success');
+  const scenario = getCurrentScenario();
+  
+  if (state.stage === 1) {
+    const choice = viewState.slots[0];
+    if (choice === scenario.owner) state.scores.ownership += 10;
+    else if (scenario.assist.includes(choice)) {
+      state.scores.ownership += 5;
+      state.scores.delegation -= 2;
+    }
+  } else if (state.stage === 2) {
+    const choice = viewState.slots.join('->');
+    const exp = scenario.flow.join('->');
+    if (choice === exp) state.scores.workflow += 10;
+    else {
+      const correctSteps = viewState.slots.filter((id, idx) => id === scenario.flow[idx]).length;
+      state.scores.workflow += Math.floor((correctSteps / scenario.flow.length) * 10);
+    }
+  } else if (state.stage === 3) {
+    let correct = 0;
+    viewState.slots.forEach(id => {
+      if (id === scenario.primary || scenario.support.includes(id)) correct++;
+    });
+    state.scores.collaboration += (correct * 3);
+    if (viewState.slots.length < 3) state.scores.collaboration -= 2;
+  }
+
+  viewState.submitted = true;
+  renderGameArea();
+}
+
+function renderResultsPanel(container, scenario) {
+  const panel = document.createElement('div');
+  panel.className = 'result-panel glass animate-fade-in';
+  
+  let html = '';
+  if (state.stage === 1) {
+    const isCorrect = viewState.slots[0] === scenario.owner;
+    html += `<h3 style="margin-top:0; color: ${isCorrect ? 'var(--success)' : 'var(--warning)'}">${isCorrect ? 'Spot On!' : "Let's break this down."}</h3>`;
+    html += `<p><strong>Primary Owner:</strong> ${roles[scenario.owner].name}</p>`;
+    html += `<p><strong>Why:</strong> ${scenario.why}</p>`;
+    html += `<p><strong>Assisting Roles:</strong> ${scenario.assist.map(id => roles[id].name).join(', ')}</p>`;
+  } else if (state.stage === 2) {
+    html += `<h3 style="margin-top:0; color: var(--primary);">Workflow Analysis</h3>`;
+    html += `<p><strong>Typical Organization Flow:</strong></p>`;
+    html += `<div id="w-anim" style="display:flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0; align-items: center;">`;
+    scenario.flow.forEach((id, idx) => {
+      html += `<span class="badge w-step" style="background: ${roles[id].color}33; color: ${roles[id].color}; border: 1px solid ${roles[id].color}; opacity: 0.2; transition: all 0.3s;">${roles[id].name}</span>`;
+      if(idx < scenario.flow.length - 1) html += `<span class="w-arrow" style="opacity: 0.2; color: var(--text-muted);">→</span>`;
+    });
+    html += `</div>`;
+    html += `<p><strong>Reasoning:</strong> ${scenario.why}</p>`;
+  } else if (state.stage === 3) {
+    html += `<h3 style="margin-top:0; color: var(--primary);">Collaboration Breakdown</h3>`;
+    html += `<p><strong>Primary Driver:</strong> ${roles[scenario.primary].name}</p>`;
+    html += `<p><strong>Crucial Support Teams:</strong> ${scenario.support.map(id => roles[id].name).join(', ')}</p>`;
+    html += `<p><strong>Strategy:</strong> ${scenario.flow}</p>`;
+    html += `<p><strong>Why:</strong> ${scenario.why}</p>`;
+  }
+
+  panel.innerHTML = html;
+  container.appendChild(panel);
+
+  if (state.stage === 2) {
+    setTimeout(() => {
+      const steps = panel.querySelectorAll('.w-step');
+      const arrows = panel.querySelectorAll('.w-arrow');
+      let i = 0;
+      function animateNext() {
+        if (i < steps.length) {
+          steps[i].style.opacity = '1';
+          steps[i].style.transform = 'scale(1.05)';
+          playSound('drop');
+          setTimeout(() => {
+            steps[i].style.transform = 'scale(1)';
+            if (i < arrows.length) arrows[i].style.opacity = '1';
+            i++;
+            setTimeout(animateNext, 400);
+          }, 200);
+        }
+      }
+      animateNext();
+    }, 400);
+  }
+
+  const btnWrap = document.createElement('div');
+  btnWrap.style.textAlign = 'center';
+  btnWrap.style.marginTop = '2.5rem';
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = 'Continue';
+  nextBtn.onclick = () => {
+    state.questionIndex++;
+    if (state.questionIndex >= 3) {
+      state.stage++;
+      state.questionIndex = 0;
+      if (state.stage > 3) renderOutro();
+      else startStage(state.stage, true);
+    } else {
+      startStage(state.stage, false);
+    }
+  };
+  btnWrap.appendChild(nextBtn);
+  container.appendChild(btnWrap);
+}
+
+function renderOutro() {
+  document.getElementById('progress-bar').style.width = `100%`;
+  document.getElementById('progress-text').textContent = `Simulation Complete`;
+  
+  const container = document.getElementById('game-area');
+  
+  const pOwnership = Math.min(100, Math.round((state.scores.ownership / 30) * 100));
+  const pWorkflow = Math.min(100, Math.round((state.scores.workflow / 30) * 100));
+  const pCollab = Math.min(100, Math.round((state.scores.collaboration / 36) * 100));
+  const pDelegation = Math.min(100, Math.max(20, Math.round((pOwnership + pCollab) / 2) + state.scores.delegation));
+  
+  const scores = {
+    "Task Ownership": pOwnership,
+    "Workflow Thinking": pWorkflow,
+    "Cross-functional Collab": pCollab,
+    "Effective Delegation": pDelegation
+  };
+  
+  const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+  const best = sorted[0][0];
+  const worst = sorted[sorted.length - 1][0];
+  
+  let insight = "Many real workplace problems are solved by teams rather than individuals.";
+  if (worst === "Task Ownership") insight = "When everyone owns a task, no one does. Clear primary ownership is crucial for accountability.";
+  if (worst === "Workflow Thinking") insight = "Smooth transitions between departments reduce friction and increase delivery speed.";
+  if (worst === "Cross-functional Collab") insight = "The hardest problems in tech are rarely solved by one discipline. Collaboration is a superpower.";
+  if (worst === "Effective Delegation") insight = "Proper delegation means handing off tasks to the right specialists rather than centralizing work.";
+  
+  let html = `
+    <div class="glass animate-fade-in" style="padding: 3rem;">
+      <h2 style="text-align: center; margin: 0 0 3rem 0; font-size: 2.5rem; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Management Profile</h2>
+      <div style="display: grid; gap: 1.5rem; margin-bottom: 3.5rem;">
+  `;
+  
+  for (const [key, val] of Object.entries(scores)) {
+    html += `
+      <div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 500;">
+          <span>${key}</span>
+          <span>${val}%</span>
+        </div>
+        <div style="width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden;">
+          <div id="bar-${key.replace(/\\s/g, '')}" style="height: 100%; width: 0%; background: var(--primary); border-radius: 6px; transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);"></div>
+        </div>
+      </div>`;
+  }
+  
+  html += `</div>
+    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+      <h4 style="margin: 0 0 0.5rem 0; color: var(--success); font-size: 1.1rem;">What you understood well</h4>
+      <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">You showed strong instincts in <strong>${best}</strong>, accurately identifying how this aspect drives organizational success.</p>
+    </div>
+    
+    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+      <h4 style="margin: 0 0 0.5rem 0; color: var(--warning); font-size: 1.1rem;">Area for growth</h4>
+      <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">You occasionally struggled with <strong>${worst}</strong>. Remember that modern tech organizations require fluid boundaries.</p>
+    </div>
+    
+    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1.5rem; border-radius: 12px;">
+      <h4 style="margin: 0 0 0.5rem 0; color: var(--primary); font-size: 1.1rem;">Key Insight</h4>
+      <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">${insight}</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 3rem;">
+      <button onclick="location.reload()" style="padding: 1rem 3rem;">Restart Simulation</button>
+    </div>
+  </div>`;
+  
+  container.innerHTML = html;
+  
+  setTimeout(() => {
+    for (const [key, val] of Object.entries(scores)) {
+      const bar = document.getElementById(`bar-${key.replace(/\\s/g, '')}`);
+      if (bar) bar.style.width = `${val}%`;
+    }
+  }, 100);
+}
+
+document.addEventListener('DOMContentLoaded', renderMainMenu);
+  </script>
+</body>
+
+</html>
