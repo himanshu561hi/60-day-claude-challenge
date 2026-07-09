@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Speed Studio | Premium Typing Experience</title>
+<meta name="description" content="A premium General English typing speed test with live analytics, multiple modes, and beautiful design.">
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+
+/* ============================================================
+   THEME TOKENS
+   ============================================================ */
+:root{
+  --bg0:#0d1117;--bg1:#161b27;--bg2:#1c2230;
+  --card:rgba(255,255,255,.05);--card-h:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border-h:rgba(255,255,255,.18);
+  --t1:#e2e8f0;--t2:#94a3b8;--t3:#475569;--t4:#2a3550;
+  --acc:#00d4ff;--acc2:#a855f7;
+  --glow:rgba(0,212,255,.18);--glow2:rgba(168,85,247,.12);
+  --ok:#22c55e;--err:#ef4444;--warn:#f59e0b;
+  --cc:#22c55e;--ci:#ef4444;--cp:#475569;--cu:#00d4ff;
+  --r:12px;--r2:20px;
+  --fs-typing:1.3rem;
+}
+[data-theme="light"]{
+  --bg0:#f0f4f8;--bg1:#fff;--bg2:#f8fafc;
+  --card:rgba(0,0,0,.03);--card-h:rgba(0,0,0,.06);
+  --border:rgba(0,0,0,.1);--border-h:rgba(0,0,0,.2);
+  --t1:#1e293b;--t2:#475569;--t3:#94a3b8;--t4:#e2e8f0;
+  --acc:#0ea5e9;--acc2:#7c3aed;
+  --glow:rgba(14,165,233,.12);--glow2:rgba(124,58,237,.08);
+  --ok:#16a34a;--err:#dc2626;--warn:#d97706;
+  --cc:#16a34a;--ci:#dc2626;--cp:#94a3b8;--cu:#0ea5e9;
+}
+[data-theme="midnight"]{
+  --bg0:#060811;--bg1:#0c1221;--bg2:#111830;
+  --card:rgba(255,255,255,.04);--card-h:rgba(255,255,255,.07);
+  --border:rgba(80,100,200,.15);--border-h:rgba(80,100,200,.3);
+  --t1:#c8d8f0;--t2:#6080b0;--t3:#304060;--t4:#101828;
+  --acc:#4d8aff;--acc2:#8040ff;
+  --glow:rgba(77,138,255,.18);--glow2:rgba(128,64,255,.12);
+  --ok:#22d068;--err:#ff4466;--warn:#ffaa22;
+  --cc:#22d068;--ci:#ff4466;--cp:#304060;--cu:#4d8aff;
+}
+[data-theme="forest"]{
+  --bg0:#080e09;--bg1:#0e1610;--bg2:#141e15;
+  --card:rgba(255,255,255,.04);--card-h:rgba(255,255,255,.07);
+  --border:rgba(80,200,80,.12);--border-h:rgba(80,200,80,.25);
+  --t1:#c0e8c0;--t2:#68a868;--t3:#365836;--t4:#102010;
+  --acc:#44e860;--acc2:#a8d840;
+  --glow:rgba(68,232,96,.15);--glow2:rgba(168,216,64,.1);
+  --ok:#22d050;--err:#e04848;--warn:#e0a820;
+  --cc:#22d050;--ci:#e04848;--cp:#365836;--cu:#44e860;
+}
+[data-theme="ocean"]{
+  --bg0:#040c13;--bg1:#091520;--bg2:#0e1f2d;
+  --card:rgba(255,255,255,.04);--card-h:rgba(255,255,255,.07);
+  --border:rgba(0,160,220,.14);--border-h:rgba(0,160,220,.28);
+  --t1:#b0d8f0;--t2:#4888a8;--t3:#205070;--t4:#081825;
+  --acc:#00b8d8;--acc2:#0050ff;
+  --glow:rgba(0,184,216,.16);--glow2:rgba(0,80,255,.1);
+  --ok:#00cc70;--err:#ff4060;--warn:#ffaa20;
+  --cc:#00cc70;--ci:#ff4060;--cp:#205070;--cu:#00b8d8;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg0);color:var(--t1);min-height:100vh;
+  display:flex;flex-direction:column;overflow-x:hidden;
+  transition:background .3s,color .3s;
+}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit;outline:none}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-h);border-radius:3px}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;background:var(--bg1);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(20px);
+}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;color:var(--t1)}
+.logo-icon{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;font-size:.95rem;
+  box-shadow:0 0 20px var(--glow);
+}
+.logo-txt span{color:var(--acc)}
+.hdr-mid{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center}
+.mode-pill{
+  padding:6px 14px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--t3);font-size:.82rem;font-weight:600;
+  transition:all .2s;white-space:nowrap;
+}
+.mode-pill:hover{border-color:var(--acc);color:var(--acc);background:var(--glow)}
+.mode-pill.active{
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border-color:transparent;color:#fff;
+  box-shadow:0 0 18px var(--glow);
+}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.icon-btn{
+  width:36px;height:36px;border-radius:9px;border:1px solid var(--border);
+  background:var(--card);color:var(--t2);font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.icon-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--glow)}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:28px 20px 40px;max-width:920px;margin:0 auto;width:100%;
+}
+
+/* ============================================================
+   CONFIG PANEL
+   ============================================================ */
+.cfg{
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;margin-bottom:22px;flex-wrap:wrap;min-height:36px;
+}
+.cfg-sep{width:1px;height:18px;background:var(--border);margin:0 6px}
+.cfg-btn{
+  padding:5px 13px;border-radius:8px;border:none;
+  background:transparent;color:var(--t3);font-size:.82rem;font-weight:600;
+  transition:all .2s;
+}
+.cfg-btn:hover{color:var(--t2);background:var(--card)}
+.cfg-btn.active{color:var(--acc);background:var(--glow);border:1px solid var(--acc)}
+.cfg-label{font-size:.82rem;color:var(--t3);padding:5px 10px}
+
+/* ============================================================
+   LIVE STATS BAR
+   ============================================================ */
+.stats-bar{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;margin-bottom:18px;width:100%;
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 24px;flex-wrap:wrap;row-gap:10px;
+}
+.stat-item{display:flex;flex-direction:column;align-items:center;padding:0 18px}
+.stat-v{
+  font-size:1.5rem;font-weight:800;color:var(--t1);
+  font-variant-numeric:tabular-nums;line-height:1;
+  transition:color .2s;
+}
+.stat-l{font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px}
+.stat-item.prime .stat-v{color:var(--acc);font-size:1.8rem}
+.stat-div{width:1px;height:36px;background:var(--border);flex-shrink:0}
+.timer-warn{color:var(--warn)!important;animation:pulse .7s ease infinite}
+.timer-crit{color:var(--err)!important;animation:pulse .4s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ============================================================
+   TYPING CARD
+   ============================================================ */
+.t-wrap{width:100%;position:relative;margin-bottom:14px}
+.t-card{
+  background:var(--bg1);border:1.5px solid var(--border);
+  border-radius:var(--r2);padding:32px 36px 24px;
+  position:relative;
+  transition:border-color .3s,box-shadow .3s;
+}
+.t-card.active{border-color:var(--acc);box-shadow:0 0 40px var(--glow),inset 0 0 40px var(--glow)}
+.t-card.err-flash{animation:errFlash .18s ease}
+@keyframes errFlash{0%,100%{box-shadow:none}50%{box-shadow:0 0 30px rgba(239,68,68,.4)}}
+
+/* Live WPM badge */
+.live-wpm{
+  position:absolute;top:14px;right:18px;
+  font-size:.78rem;font-weight:700;color:var(--acc);
+  background:var(--glow);border:1px solid var(--acc);
+  padding:3px 10px;border-radius:10px;
+  opacity:0;transition:opacity .4s;pointer-events:none;
+}
+.live-wpm.vis{opacity:1}
+
+/* Typing text area */
+.t-text{
+  font-family:'Courier New',Courier,monospace;
+  font-size:var(--fs-typing);line-height:2;letter-spacing:.02em;
+  user-select:none;position:relative;
+  word-break:break-word;overflow-wrap:break-word;
+}
+/* Focus mode: clip to 2 lines only */
+.t-text.focus-mode{max-height:calc(var(--fs-typing) * 2 * 2);overflow:hidden;}
+.t-inner{transition:transform .18s ease;}
+
+/* Characters */
+.ch{display:inline;position:relative;transition:color .04s}
+.ch.ok{color:var(--cc)}
+.ch.bad{color:var(--ci);background:rgba(239,68,68,.1);border-radius:2px}
+.ch.pend{color:var(--cp)}
+.ch.extra{color:var(--ci);text-decoration:underline wavy var(--ci)}
+
+/* Caret - line style */
+.ch.cur::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--cu);animation:blink 1.1s step-end infinite;
+  border-radius:1px;
+}
+/* Caret - block style */
+.ch.cur.blk{background:var(--cu);color:var(--bg0);border-radius:2px}
+.ch.cur.blk::before{display:none}
+/* Caret - underline style */
+.ch.cur.uline::before{
+  top:auto;bottom:-2px;width:100%;height:2px;left:0;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Overlay */
+.t-overlay{
+  position:absolute;inset:0;border-radius:calc(var(--r2) - 1px);
+  background:rgba(13,17,23,.88);backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:10px;cursor:pointer;
+  transition:opacity .25s;z-index:10;
+}
+.t-overlay.hidden{display:none}
+.ov-icon{font-size:2.2rem}
+.ov-txt{font-size:1rem;font-weight:600;color:var(--t2)}
+.ov-hint{font-size:.78rem;color:var(--t3);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+kbd{
+  display:inline-block;padding:2px 7px;border-radius:5px;
+  border:1px solid var(--border-h);background:var(--card);
+  font-family:monospace;font-size:.72rem;color:var(--t2);
+}
+
+/* Hidden input */
+.t-input{
+  position:absolute;width:1px;height:1px;opacity:0;
+  top:50%;left:50%;pointer-events:none;
+}
+
+/* Progress bar */
+.prog-wrap{height:4px;background:var(--t4);border-radius:2px;margin-top:14px;overflow:hidden}
+.prog-fill{
+  height:100%;width:0%;border-radius:2px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  transition:width .3s ease;position:relative;
+}
+.prog-fill::after{
+  content:'';position:absolute;right:0;top:0;bottom:0;
+  width:24px;background:white;opacity:.3;filter:blur(6px);
+}
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+.ctrls{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;margin-top:18px;flex-wrap:wrap;
+}
+.ctrl-btn{
+  padding:8px 20px;border-radius:9px;border:1px solid var(--border);
+  background:var(--card);color:var(--t2);font-size:.84rem;font-weight:600;
+  display:flex;align-items:center;gap:6px;transition:all .2s;
+}
+.ctrl-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--glow)}
+.ctrl-btn.pri{
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border-color:transparent;color:#fff;
+  box-shadow:0 2px 12px var(--glow);
+}
+.ctrl-btn.pri:hover{opacity:.88;color:#fff}
+.sc-hints{
+  display:flex;gap:18px;flex-wrap:wrap;justify-content:center;
+  margin-top:10px;font-size:.73rem;color:var(--t3);
+}
+.sc-item{display:flex;align-items:center;gap:4px}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.m-ovl{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(12px);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.m-ovl.vis{opacity:1;pointer-events:all}
+.m-box{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--r2);padding:32px;
+  max-width:870px;width:100%;max-height:90vh;
+  overflow-y:auto;position:relative;
+  transform:translateY(20px) scale(.97);transition:transform .3s;
+}
+.m-ovl.vis .m-box{transform:translateY(0) scale(1)}
+.m-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.m-title{font-size:1.35rem;font-weight:800}
+.m-close{
+  width:32px;height:32px;border-radius:8px;
+  border:1px solid var(--border);background:var(--card);
+  color:var(--t3);display:flex;align-items:center;justify-content:center;
+  font-size:1rem;transition:all .2s;
+}
+.m-close:hover{border-color:var(--err);color:var(--err)}
+
+/* Results hero */
+.res-hero{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:12px;margin-bottom:24px;
+}
+.rsc{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 14px;text-align:center;
+  transition:all .2s;
+}
+.rsc:hover{border-color:var(--border-h);background:var(--card-h)}
+.rsc.hl{border-color:var(--acc);background:var(--glow)}
+.rsc-v{font-size:1.9rem;font-weight:800;color:var(--t1);font-variant-numeric:tabular-nums;line-height:1}
+.rsc.hl .rsc-v{color:var(--acc)}
+.rsc-u{font-size:.75rem;color:var(--t3);font-weight:400}
+.rsc-l{font-size:.72rem;color:var(--t2);margin-top:5px;display:flex;align-items:center;justify-content:center;gap:6px}
+.pb-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 8px;border-radius:8px;font-size:.65rem;font-weight:800;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1) .3s both;
+}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* Charts grid */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.chart-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px;
+}
+.chart-ttl{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:12px}
+.chart-svg{width:100%;display:block}
+
+/* Char analysis */
+.char-ana{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.ca-card{
+  text-align:center;padding:16px 8px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+}
+.ca-v{font-size:1.5rem;font-weight:800}
+.ca-l{font-size:.68rem;color:var(--t3);text-transform:uppercase;margin-top:4px}
+.ca-ok{color:var(--ok)}.ca-bad{color:var(--err)}.ca-ex{color:var(--warn)}.ca-ms{color:var(--t3)}
+
+/* Heatmap */
+.hm-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:24px}
+.kb{display:flex;flex-direction:column;gap:4px;align-items:center;margin-top:12px}
+.kb-row{display:flex;gap:4px}
+.key{
+  min-width:28px;height:28px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;border:1px solid var(--border);
+  background:var(--bg2);color:var(--t3);padding:0 4px;
+  transition:all .2s;position:relative;
+}
+.key.hot{border-color:var(--err);color:#fff}
+.key-space{width:140px}
+
+/* Percentile section */
+.pct-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:24px}
+.pct-bar{height:8px;background:var(--t4);border-radius:4px;position:relative;margin:10px 0}
+.pct-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.pct-dot{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:18px;height:18px;border-radius:50%;
+  background:var(--acc);border:3px solid var(--bg1);
+}
+.pct-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--t3)}
+
+/* Achievements */
+.ach-section{margin-bottom:24px}
+.ach-ttl{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:10px}
+.ach-list{display:flex;gap:10px;flex-wrap:wrap}
+.ach-badge{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:20px;
+  border:1px solid var(--border);background:var(--card);
+  font-size:.82rem;font-weight:600;color:var(--t2);
+}
+.ach-badge.earned{
+  border-color:var(--acc);background:var(--glow);color:var(--acc);
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* Performance summary */
+.perf-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:24px}
+.perf-ttl{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:14px}
+.perf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:11px;font-size:.88rem;color:var(--t2)}
+.perf-item:last-child{margin-bottom:0}
+.perf-ico{flex-shrink:0;margin-top:1px}
+
+/* History list */
+.hist-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 15px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);font-size:.84rem;margin-bottom:7px;transition:all .2s;
+}
+.hist-item:hover{border-color:var(--border-h);background:var(--card-h)}
+.hist-l{display:flex;flex-direction:column;gap:2px}
+.hist-mode{color:var(--t3);font-size:.72rem}
+.hist-r{display:flex;align-items:center;gap:14px}
+.hist-wpm{font-size:1.1rem;font-weight:800;color:var(--acc)}
+.hist-acc{color:var(--t2);font-size:.82rem}
+.hist-date{color:var(--t3);font-size:.72rem}
+
+/* ============================================================
+   SIDE PANELS
+   ============================================================ */
+.panel{
+  position:fixed;top:0;right:0;width:310px;height:100vh;
+  background:var(--bg1);border-left:1px solid var(--border);
+  z-index:300;padding:24px;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+}
+.panel.open{transform:translateX(0)}
+.p-ovl{position:fixed;inset:0;z-index:299;display:none;background:rgba(0,0,0,.3);backdrop-filter:blur(3px)}
+.p-ovl.open{display:block}
+.p-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.p-title{font-size:1rem;font-weight:800}
+
+/* Settings */
+.sg{margin-bottom:22px}
+.sg-l{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:9px}
+.sg-opts{display:flex;gap:6px;flex-wrap:wrap}
+.s-opt{
+  padding:5px 13px;border-radius:8px;border:1px solid var(--border);
+  background:var(--card);color:var(--t2);font-size:.8rem;font-weight:600;
+  transition:all .2s;
+}
+.s-opt:hover{border-color:var(--acc);color:var(--acc)}
+.s-opt.active{background:var(--glow);border-color:var(--acc);color:var(--acc)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tog-lbl{font-size:.88rem;color:var(--t2)}
+.tog{
+  width:40px;height:22px;background:var(--border-h);border-radius:11px;
+  position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;
+}
+.tog.on{background:var(--acc)}
+.tog::after{
+  content:'';position:absolute;width:16px;height:16px;
+  background:#fff;border-radius:50%;top:3px;left:3px;
+  transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.tog.on::after{transform:translateX(18px)}
+
+/* Theme previews */
+.theme-opts{display:flex;gap:10px;flex-wrap:wrap}
+.th-opt{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.th-prev{width:50px;height:34px;border-radius:7px;border:2px solid var(--border);overflow:hidden;transition:border-color .2s}
+.th-opt.active .th-prev{border-color:var(--acc)}
+.th-name{font-size:.68rem;color:var(--t3)}
+.danger-btn{
+  width:100%;padding:9px;border-radius:9px;
+  border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.07);
+  color:var(--err);font-size:.84rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s;
+}
+.danger-btn:hover{background:rgba(239,68,68,.15);border-color:var(--err)}
+
+/* ============================================================
+   CUSTOM TEXT MODAL
+   ============================================================ */
+.custom-ta{
+  width:100%;min-height:120px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:14px;color:var(--t1);font-family:inherit;
+  font-size:.9rem;resize:vertical;outline:none;transition:border-color .2s;
+}
+.custom-ta:focus{border-color:var(--acc)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--bg2);border:1px solid var(--border-h);
+  border-radius:10px;padding:11px 20px;
+  font-size:.84rem;color:var(--t1);z-index:500;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;
+  pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ============================================================
+   ZEN MODE
+   ============================================================ */
+body.zen .hdr{opacity:0;pointer-events:none}
+body.zen .cfg{opacity:0;pointer-events:none}
+body.zen .stats-bar{opacity:.25;transition:opacity .3s}
+body.zen .stats-bar:hover{opacity:1}
+body.zen .ctrls{opacity:.2;transition:opacity .3s}
+body.zen .ctrls:hover{opacity:1}
+body.zen .sc-hints{opacity:0}
+body.zen .t-card{border-color:transparent;background:transparent;box-shadow:none}
+
+/* Focus mode blur */
+.ch.fblur{opacity:.12;transition:opacity .15s}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:680px){
+  .hdr{padding:11px 14px}
+  .hdr-mid{display:none}
+  .main{padding:16px 12px 32px}
+  .t-card{padding:20px 16px 16px}
+  .t-text{font-size:1.05rem}
+  .stats-bar{padding:12px 10px}
+  .stat-item{padding:0 10px}
+  .stat-v{font-size:1.2rem}
+  .stat-item.prime .stat-v{font-size:1.4rem}
+  .charts-grid{grid-template-columns:1fr}
+  .char-ana{grid-template-columns:repeat(2,1fr)}
+  .res-hero{grid-template-columns:repeat(3,1fr)}
+  .panel{width:100%}
+  .m-box{padding:20px}
+}
+@media(max-width:400px){
+  .res-hero{grid-template-columns:repeat(2,1fr)}
+  .char-ana{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================== HEADER ============================== -->
+<header class="hdr" id="hdr">
+  <div class="logo">
+    <div class="logo-icon">⌨️</div>
+    <div class="logo-txt">Typing Speed <span>Studio</span></div>
+  </div>
+  <nav class="hdr-mid" id="modePills" aria-label="Typing modes"></nav>
+  <div class="hdr-right">
+    <button class="icon-btn" id="histBtn" title="History (H)" aria-label="View history">📊</button>
+    <button class="icon-btn" id="settBtn" title="Settings (Esc)" aria-label="Open settings">⚙️</button>
+    <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<!-- ============================== MAIN ============================== -->
+<main class="main" id="mainArea">
+
+  <!-- Config panel -->
+  <div class="cfg" id="cfg" role="toolbar" aria-label="Mode configuration"></div>
+
+  <!-- Live stats -->
+  <div class="stats-bar" id="statsBar" aria-live="polite" aria-atomic="true">
+    <div class="stat-item prime">
+      <div class="stat-v" id="sWpm">0</div>
+      <div class="stat-l">WPM</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-v" id="sRaw">0</div>
+      <div class="stat-l">Raw</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-v" id="sCpm">0</div>
+      <div class="stat-l" id="sCpmL">CPM</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-v" id="sAcc">100%</div>
+      <div class="stat-l">Acc</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-v" id="sStreak">0</div>
+      <div class="stat-l">Streak</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-v" id="sMist">0</div>
+      <div class="stat-l">Errors</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item prime">
+      <div class="stat-v" id="sClock">60</div>
+      <div class="stat-l" id="sClockL">Time</div>
+    </div>
+  </div>
+
+  <!-- Typing area -->
+  <div class="t-wrap" id="tWrap">
+    <div class="t-card" id="tCard" tabindex="0" role="application" aria-label="Typing area">
+      <div class="live-wpm" id="liveWpm">0 WPM</div>
+      <div class="t-text" id="tText" aria-hidden="true">
+        <div class="t-inner" id="tInner"></div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-fill" id="prog"></div>
+      </div>
+      <!-- Overlay -->
+      <div class="t-overlay" id="tOverlay">
+        <div class="ov-icon">⌨️</div>
+        <div class="ov-txt">Start typing to begin</div>
+        <div class="ov-hint">
+          <kbd>Tab</kbd> restart
+          <kbd>Ctrl+P</kbd> pause
+          <kbd>Esc</kbd> settings
+        </div>
+      </div>
+      <!-- Hidden real input -->
+      <textarea id="tInput" class="t-input" autocomplete="off"
+        autocorrect="off" autocapitalize="off" spellcheck="false"
+        aria-label="Type here" tabindex="-1"></textarea>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="ctrls">
+    <button class="ctrl-btn" id="restartBtn" aria-label="Restart (Tab)">↺ Restart</button>
+    <button class="ctrl-btn" id="pauseBtn" style="display:none" aria-label="Pause (Ctrl+P)">⏸ Pause</button>
+    <button class="ctrl-btn" id="nextBtn" aria-label="Next text">→ Next Text</button>
+  </div>
+  <div class="sc-hints">
+    <span class="sc-item"><kbd>Tab</kbd> Restart</span>
+    <span class="sc-item"><kbd>Ctrl+P</kbd> Pause</span>
+    <span class="sc-item"><kbd>Esc</kbd> Settings</span>
+    <span class="sc-item"><kbd>H</kbd> History</span>
+    <span class="sc-item"><kbd>N</kbd> Next text</span>
+  </div>
+</main>
+
+<!-- ============================== CUSTOM TEXT MODAL ============================== -->
+<div class="m-ovl" id="customModal" role="dialog" aria-modal="true" aria-label="Custom text">
+  <div class="m-box" style="max-width:520px">
+    <div class="m-hdr">
+      <div class="m-title">✏️ Custom Text</div>
+      <button class="m-close" id="customClose" aria-label="Close">✕</button>
+    </div>
+    <p style="color:var(--t2);font-size:.9rem;margin-bottom:14px">Paste or type any text you want to practice with.</p>
+    <textarea class="custom-ta" id="customTa" placeholder="Enter your custom text here… (minimum 20 characters)"></textarea>
+    <div class="modal-actions">
+      <button class="ctrl-btn" id="customCancel">Cancel</button>
+      <button class="ctrl-btn pri" id="customStart">▶ Start Practice</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== RESULTS MODAL ============================== -->
+<div class="m-ovl" id="resModal" role="dialog" aria-modal="true" aria-label="Session results">
+  <div class="m-box">
+    <div class="m-hdr">
+      <div class="m-title">🏆 Session Results</div>
+      <button class="m-close" id="resClose" aria-label="Close">✕</button>
+    </div>
+    <div class="res-hero" id="resHero"></div>
+    <div class="charts-grid" id="chartsGrid">
+      <div class="chart-card">
+        <div class="chart-ttl">⚡ WPM Over Time</div>
+        <svg class="chart-svg" id="wpmSvg" viewBox="0 0 400 110" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-card">
+        <div class="chart-ttl">🎯 Accuracy Over Time</div>
+        <svg class="chart-svg" id="accSvg" viewBox="0 0 400 110" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+    <div class="char-ana" id="charAna"></div>
+    <div class="hm-card">
+      <div class="chart-ttl">🔥 Error Heatmap</div>
+      <div class="kb" id="kbHeat"></div>
+    </div>
+    <div class="pct-card" id="pctCard"></div>
+    <div class="ach-section" id="achSec"></div>
+    <div class="perf-card">
+      <div class="perf-ttl">📝 Performance Summary</div>
+      <div id="perfBody"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="ctrl-btn pri" id="retryBtn">↺ Retry Same Text</button>
+      <button class="ctrl-btn" id="newBtn">→ New Test</button>
+      <button class="ctrl-btn" id="histFromResBtn">📊 History</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== HISTORY PANEL ============================== -->
+<div class="p-ovl" id="histOvl"></div>
+<div class="panel" id="histPanel" role="complementary" aria-label="History">
+  <div class="p-hdr">
+    <div class="p-title">📊 Session History</div>
+    <button class="m-close" id="histClose" aria-label="Close history">✕</button>
+  </div>
+  <div id="histBody"></div>
+</div>
+
+<!-- ============================== SETTINGS PANEL ============================== -->
+<div class="p-ovl" id="settOvl"></div>
+<div class="panel" id="settPanel" role="complementary" aria-label="Settings">
+  <div class="p-hdr">
+    <div class="p-title">⚙️ Settings</div>
+    <button class="m-close" id="settClose" aria-label="Close settings">✕</button>
+  </div>
+
+  <div class="sg">
+    <div class="sg-l">Theme</div>
+    <div class="theme-opts" id="themeOpts"></div>
+  </div>
+
+  <div class="sg">
+    <div class="sg-l">Font Size</div>
+    <div class="sg-opts" id="fsOpts">
+      <button class="s-opt" data-fs="small">Small</button>
+      <button class="s-opt active" data-fs="medium">Medium</button>
+      <button class="s-opt" data-fs="large">Large</button>
+      <button class="s-opt" data-fs="xl">XL</button>
+    </div>
+  </div>
+
+  <div class="sg">
+    <div class="sg-l">Caret Style</div>
+    <div class="sg-opts" id="caretOpts">
+      <button class="s-opt active" data-caret="line">Line</button>
+      <button class="s-opt" data-caret="block">Block</button>
+      <button class="s-opt" data-caret="underline">Underline</button>
+    </div>
+  </div>
+
+  <div class="sg">
+    <div class="sg-l">Options</div>
+    <div class="toggle-row">
+      <span class="tog-lbl">🔊 Sound Effects</span>
+      <div class="tog on" id="togSound"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="tog-lbl">💨 Smooth Scroll</span>
+      <div class="tog on" id="togScroll"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="tog-lbl">⚡ Show CPM</span>
+      <div class="tog on" id="togCpm"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="tog-lbl">🔢 Live WPM Badge</span>
+      <div class="tog on" id="togLiveWpm"></div>
+    </div>
+  </div>
+
+  <div class="sg">
+    <div class="sg-l">Danger Zone</div>
+    <button class="danger-btn" id="clearHistBtn">🗑️ Clear All History</button>
+  </div>
+</div>
+
+<!-- ============================== TOAST ============================== -->
+<div class="toast" id="toast" aria-live="polite"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+"use strict";
+
+/* ============================================================
+   PASSAGE POOLS – General English
+   ============================================================ */
+const POOL = {
+easy:[
+`The sun rises every morning without fail. Birds begin to sing as the sky turns pink and gold. A new day brings fresh chances to do something wonderful. Take a deep breath and enjoy the simple beauty around you. Life is full of small moments that deserve our full attention and care. A walk in the park, a cup of warm tea, or a kind word from a friend can make any day feel special.`,
+
+`Reading books opens doors to worlds we might never visit in real life. Each page turns like a new road waiting to be walked. The best stories stay with us long after we close the cover and put them on the shelf. They shape the way we see the world and help us understand other people. Pick up a book today and let your imagination take flight into the sky.`,
+
+`Water is the source of all life on our planet. Rivers carry it from tall mountains down to the wide sea. Rain fills the lakes and feeds the trees and grass. Every living creature depends on clean water to grow and survive each day. We must take care of this precious gift and protect it for the children who will come after us.`,
+
+`Coffee shops are places where people come to think, talk, and rest. Students sit at corner tables with their books and laptops. Old friends catch up over warm cups and quiet laughter. Workers take a short break from their busy day to breathe and recharge. The smell of fresh coffee in the air makes almost any morning feel a little better and brighter.`,
+
+`The night sky above us is full of millions of stars waiting to be seen. On a clear evening far from city lights, the band of the Milky Way stretches across the dark like a river of light. Ancient peoples used the stars to find their way and to tell grand stories about heroes and gods. Today we still look up and wonder what lies out there in the vast dark.`,
+
+`Music has the power to change how we feel in a single moment. A bright and happy song can lift a heavy heart. A slow and gentle melody brings comfort during sad times. People all around the world use music to celebrate, to grieve, to worship, and simply to enjoy being alive. It crosses every border of language and culture with ease and grace.`,
+
+`Gardens are places of quiet beauty and great patience. Growing things teaches us that the best results take time. Seeds planted in the ground today may not bloom for weeks or even months. Regular care, water, and sunlight are all that plants need to thrive. There is a deep sense of joy in watching something you have tended grow strong and full of color.`,
+
+`A good night of sleep can change everything about the next day. When we rest properly our minds become sharp and our bodies feel strong. Problems that seemed huge the night before often look much smaller in the morning light. Doctors say that most adults need about eight hours of rest each night to stay well. Sleep is not a luxury but a basic need for a healthy life.`,
+
+`Cooking a meal from scratch is one of the most satisfying things a person can do. The smell of onions cooking in butter, the sizzle of meat in a hot pan, and the color of fresh herbs all come together to create something that nourishes both the body and the soul. Sharing a home-cooked meal with someone you care about is one of the simplest pleasures in life.`,
+
+`Walking in nature is good for both the body and the mind. The sound of wind in the trees and the sight of open fields help us slow down and breathe. Many people find that a simple walk clears their head and helps them think more clearly. Nature has a way of putting things in perspective and reminding us of what truly matters in this world.`,
+],
+
+medium:[
+`Every great journey begins with a single step, but what truly defines the journey is the willingness to take the next one, and the one after that, through rain and shine, doubt and clarity. The path of mastery is rarely a straight line. It curves and doubles back on itself, offers unexpected detours and dead ends that seem to lead nowhere. Yet each of these apparent setbacks contains a lesson, if only we are patient enough and humble enough to look for it carefully.`,
+
+`The morning light filtered through the curtains, casting long golden stripes across the wooden floor. She stretched slowly, listening to the familiar sounds of the neighborhood waking up around her. A dog barked somewhere down the street. A garbage truck rumbled and clanked as it made its way past. The smell of fresh coffee drifted up from the kitchen below. These ordinary moments, she had come to understand, were the ones worth savoring the most of all.`,
+
+`Language is the most powerful tool human beings have ever created. With words we share knowledge across many generations, build great civilizations, express both love and grief, and debate the deepest nature of existence itself. The words we choose shape the very thoughts we are capable of thinking. A person who reads widely develops a richer inner world, a broader capacity for empathy, and a more nuanced understanding of the human condition in all its complexity.`,
+
+`Scientists have long been fascinated by the extraordinary behavior of ants. These tiny creatures, each one seemingly simple and almost automatic in its actions, work together in ways that accomplish remarkable feats of engineering, farming, and collective defense. A colony of ants has no central leader giving orders, yet it operates with remarkable efficiency and adaptability. This emergent intelligence, arising from countless individual interactions, tells us something genuinely profound about the nature of complexity itself.`,
+
+`The ocean covers more than seventy percent of our planet's surface, yet we have explored less of its dark depths than we have explored the surface of the moon above us. Entire mountain ranges lie hidden beneath the waves, unseen by human eyes. Species undiscovered by science still drift through the cold dark water far below the reach of sunlight. Every expedition into the deep returns with new wonders and reminds us how much remains entirely unknown to science and to human knowledge.`,
+
+`Creativity is not a gift reserved only for artists and musicians. It is a fundamental human capacity, the ability to see existing ideas in new ways, to find connections others have missed, to ask better questions and imagine better answers to the problems we face. Every challenge, no matter how technical or how ordinary it seems, can benefit enormously from a creative approach. The key is to resist the comfort of the obvious solution and to keep looking a little longer and harder.`,
+
+`Urban parks are the lungs of a living city. They provide clean air to breathe, cooling shade on hot summer days, and a refuge from the constant noise and relentless pace of urban life. Studies consistently show that access to green open space improves mental health in measurable ways, reduces stress, and encourages physical activity among people of all ages. A well-designed park invites everyone regardless of background to share the same ground, to rest, play, and simply exist together in peace.`,
+
+`The art of cooking is older than written history itself. Long before there were books, cities, or laws, our ancestors gathered around fires to transform raw ingredients into nourishing and satisfying meals. This act of transformation, using heat, skill, and imagination to create something greater than the sum of its parts, remains one of the most rewarding expressions of human creativity. A meal prepared with care is simultaneously both science and art, nourishment and gift, sustenance and love.`,
+
+`Memory is not a simple recording that replays exactly what happened. Every time we recall an event, we actually reconstruct it from scattered fragments, and that reconstruction is shaped by our current mood, our present beliefs, and the last time we thought about it. This means our most treasured memories are also our most heavily edited ones. Neuroscientists have confirmed that the very act of remembering changes the memory itself each time. We are, in a very real sense, the ongoing stories we tell about ourselves and our lives.`,
+
+`The invention of the printing press in the fifteenth century fundamentally transformed the relationship between information and power in European society. Before Gutenberg, books were extraordinarily rare and expensive objects, and the ability to read was largely confined to priests and nobility. Within just a few decades of the press's invention, books became accessible to the growing middle class, ideas spread faster than any authority could contain them, and the conditions for both the Renaissance and the Reformation were firmly set in place.`,
+
+`Habit is the invisible architecture of daily life. We perform dozens of actions each morning without conscious thought, from the way we make coffee to the route we walk to work. These automatic behaviors free up our mental energy for more demanding tasks, which is why habits are so valuable. But they also mean we can sleepwalk through large portions of our lives without really noticing what we are doing or why. Building good habits and gently releasing bad ones is one of the highest forms of self-mastery available to any person.`,
+
+`The telescope changed our understanding of the universe forever. Before Galileo pointed his crude device at the night sky, most people believed Earth sat at the center of everything and that the stars were fixed and perfect. What he saw shattered those certainties. Mountains on the moon, moons around Jupiter, and phases of Venus all pointed unmistakably toward a cosmos far stranger and more wonderful than anyone had imagined. Every great scientific instrument since has deepened that sense of wonder and expanded our sense of where and what we are.`,
+],
+
+hard:[
+`The epistemological implications of quantum mechanics remain among the most contentious and philosophically significant questions in contemporary science. The Copenhagen interpretation, with its insistence on the centrality of the observer and the fundamental indeterminacy of unmeasured quantities, challenged the classical assumption that physical reality exists independently of observation entirely. Alternative interpretations, including the many-worlds hypothesis and pilot wave theory, attempt to restore a more realist picture of nature, each at the cost of introducing their own profound philosophical complications that resist any simple resolution.`,
+
+`Neuroplasticity, the brain's remarkable capacity to reorganize its synaptic connections in response to experience, learning, and injury, has revolutionized our understanding of cognition and rehabilitation over the past several decades. Where earlier neuroscientists believed the adult brain was essentially static and fixed in its organization, contemporary research reveals a far more dynamic picture of continual adaptation. Persistent deliberate practice modifies cortical representations, trauma can alter neural architectures in enduring ways, and even the vivid imagination of a movement activates the same motor pathways as physically executing it in the world.`,
+
+`The thermodynamic arrow of time presents one of the deepest puzzles in fundamental physics. Physical processes overwhelmingly proceed from states of lower entropy to states of higher entropy, yet the underlying equations of both classical and quantum mechanics are perfectly time-symmetric, meaning the microscopic laws of physics cannot in themselves account for the manifest asymmetry we observe at the macroscopic level around us. The resolution of this apparent contradiction most likely involves the extraordinarily improbable low-entropy initial conditions of our universe in the moments immediately following the Big Bang.`,
+
+`The paradox of tolerance, articulated by the philosopher Karl Popper in the aftermath of catastrophic totalitarianism, presents a fundamental and still unresolved challenge to liberal political philosophy. Popper argued that unlimited tolerance must eventually lead to the disappearance of tolerance itself from society. If we extend tolerance even to those whose explicit goal is the destruction of a tolerant society, and if we are not prepared to defend tolerance against its most determined enemies, then tolerance will eventually be destroyed by those who exploit it most ruthlessly and without scruple.`,
+
+`Evolutionary theory has demonstrated with overwhelming and converging evidence that the astonishing complexity of living organisms arises through the cumulative action of natural selection operating across millions of generations. The emergence of sophisticated biological adaptations, from the vertebrate eye to the intricate biochemistry of cellular metabolism, can be fully accounted for by gradual incremental improvements each conferring some marginal reproductive advantage on the organisms that possessed them over their competitors. The depth of geological time, so difficult for human intuition to grasp intuitively, provides the essential substrate for this extraordinary process to unfold.`,
+
+`Consciousness remains perhaps the most profound and intractable mystery confronting modern science and philosophy alike. We can describe in remarkable detail the neural correlates of various mental states, the electrochemical mechanisms by which neurons communicate, and the brain regions associated with particular cognitive functions. Yet the explanatory gap between these physical descriptions and the subjective, first-person experience of being conscious persists stubbornly. Why does any physical process give rise to experience at all? Why is there something it is like to see red, feel pain, or hear music? These questions have resisted every attempted reduction.`,
+]
+};
+
+const QUOTES=[
+{t:"The only way to do great work is to love what you do.",a:"Steve Jobs"},
+{t:"In the middle of difficulty lies opportunity.",a:"Albert Einstein"},
+{t:"It does not matter how slowly you go as long as you do not stop.",a:"Confucius"},
+{t:"Life is what happens to you while you're busy making other plans.",a:"John Lennon"},
+{t:"The future belongs to those who believe in the beauty of their dreams.",a:"Eleanor Roosevelt"},
+{t:"It is during our darkest moments that we must focus to see the light.",a:"Aristotle"},
+{t:"Spread love everywhere you go. Let no one ever come to you without leaving happier.",a:"Mother Teresa"},
+{t:"When you reach the end of your rope, tie a knot in it and hang on.",a:"Franklin D. Roosevelt"},
+{t:"Always remember that you are absolutely unique. Just like everyone else.",a:"Margaret Mead"},
+{t:"Do not go where the path may lead, go instead where there is no path and leave a trail.",a:"Ralph Waldo Emerson"},
+{t:"You will face many defeats in life, but never let yourself be defeated.",a:"Maya Angelou"},
+{t:"The greatest glory in living lies not in never falling, but in rising every time we fall.",a:"Nelson Mandela"},
+{t:"In the end, it's not the years in your life that count. It's the life in your years.",a:"Abraham Lincoln"},
+{t:"Life is either a daring adventure or nothing at all.",a:"Helen Keller"},
+{t:"Many of life's failures are people who did not realize how close they were to success when they gave up.",a:"Thomas A. Edison"},
+{t:"The only impossible journey is the one you never begin.",a:"Tony Robbins"},
+{t:"You miss one hundred percent of the shots you don't take.",a:"Wayne Gretzky"},
+{t:"Whether you think you can or think you can't, you're right.",a:"Henry Ford"},
+{t:"The secret of getting ahead is getting started.",a:"Mark Twain"},
+{t:"A person who never made a mistake never tried anything new.",a:"Albert Einstein"},
+{t:"Strive not to be a success, but rather to be of value.",a:"Albert Einstein"},
+{t:"Two roads diverged in a wood, and I took the one less traveled by, and that has made all the difference.",a:"Robert Frost"},
+{t:"You only live once, but if you do it right, once is enough.",a:"Mae West"},
+{t:"In three words I can sum up everything I've learned about life: it goes on.",a:"Robert Frost"},
+];
+
+const WORDS=["the","be","to","of","and","a","in","that","have","it","for","not","on","with","he","as","you","do","at","this","but","his","by","from","they","we","say","her","she","or","an","will","my","one","all","would","there","their","what","so","up","out","if","about","who","get","which","go","me","when","make","can","like","time","no","just","know","take","people","year","your","good","some","them","see","other","than","now","look","only","come","over","think","new","want","because","any","these","give","day","most","us","great","work","way","even","two","how","first","well","also","back","use","after","thing","go","right","man","through","much","before","old","tell","too","try","call","again","come","here","off","want","show","every","big","need","large","often","hand","high","place","hold","sure","open","seem","together","young","ready","real","already","full","face","fact","both","start","might","story","since","side","once","near","part","point","ask","play","small","number","off","always","next","food","keep","set","put","end","turn","why","does","far","look","head","yet","government","system","each","learn","plant","cover","food","sun","four","thought","let","keep","eye","never","last","door","between","city","tree","cross","since","hard","start","might","example","paper","group","always","music","those","mark","book","until","mile","river","car","feet","care","second","enough","plain","girl","usual","move","north","open","seem","light","voice","power","town","fine","drive","lead","watch","color","note","rain","fine","grow","fact","river"];
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+const S = {
+  mode:'time', timeLimit:60, wordLimit:50,
+  status:'idle', // idle|running|paused|finished
+  startTime:null, pauseStart:null, totalPausedMs:0,
+  target:'', typed:'',
+  correct:0, incorrect:0, extra:0, mistakes:0,
+  streak:0, maxStreak:0,
+  wpmSamples:[], // [{t,wpm,raw,acc}]
+  errMap:{},
+  timerTick:null, sampleTick:null,
+  lastPassage:null, lastQuote:null,
+  settings:{
+    theme:'dark', fs:'medium', caret:'line',
+    sound:true, scroll:true, cpm:true, liveWpm:true,
+  },
+  history:[],
+  diff:'medium',
+};
+
+const FS_MAP={small:'1rem',medium:'1.3rem',large:'1.6rem',xl:'2rem'};
+
+/* ============================================================
+   LOCAL STORAGE
+   ============================================================ */
+const DB = {
+  KEY:'tss_v2',
+  load(){
+    try{
+      const d=JSON.parse(localStorage.getItem(this.KEY)||'{}');
+      if(d.settings)Object.assign(S.settings,d.settings);
+      if(d.history)S.history=d.history;
+      if(d.diff)S.diff=d.diff;
+    }catch(e){}
+  },
+  save(){
+    try{
+      localStorage.setItem(this.KEY,JSON.stringify({
+        settings:S.settings,history:S.history.slice(0,100),diff:S.diff
+      }));
+    }catch(e){}
+  },
+  pb(mode,limit){
+    const key=`${mode}_${limit}`;
+    const m=S.history.filter(h=>h.mk===key);
+    return m.length?m.reduce((b,h)=>h.wpm>b.wpm?h:b):null;
+  },
+  push(sess){S.history.unshift(sess);this.save();},
+  clear(){S.history=[];this.save();}
+};
+
+/* ============================================================
+   SOUND ENGINE  (Web Audio API)
+   ============================================================ */
+const SFX={
+  ctx:null,
+  init(){
+    try{this.ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  },
+  play(type){
+    if(!S.settings.sound||!this.ctx)return;
+    if(this.ctx.state==='suspended')this.ctx.resume();
+    const now=this.ctx.currentTime;
+    const o=this.ctx.createOscillator();
+    const g=this.ctx.createGain();
+    o.connect(g);g.connect(this.ctx.destination);
+    if(type==='ok'){
+      o.frequency.value=520+Math.random()*160;o.type='sine';
+      g.gain.setValueAtTime(.03,now);
+      g.gain.exponentialRampToValueAtTime(.001,now+.06);
+      o.start(now);o.stop(now+.06);
+    }else if(type==='err'){
+      o.frequency.value=180;o.type='sawtooth';
+      g.gain.setValueAtTime(.06,now);
+      g.gain.exponentialRampToValueAtTime(.001,now+.12);
+      o.start(now);o.stop(now+.12);
+    }else if(type==='done'){
+      [523,659,784,1047].forEach((f,i)=>{
+        const oo=this.ctx.createOscillator();
+        const gg=this.ctx.createGain();
+        oo.connect(gg);gg.connect(this.ctx.destination);
+        oo.frequency.value=f;oo.type='sine';
+        gg.gain.setValueAtTime(.14,now+i*.1);
+        gg.gain.exponentialRampToValueAtTime(.001,now+i*.1+.35);
+        oo.start(now+i*.1);oo.stop(now+i*.1+.35);
+      });
+    }
+  }
+};
+
+/* ============================================================
+   PASSAGE GENERATOR
+   ============================================================ */
+const Gen={
+  text(){
+    const pool=POOL[S.diff]||POOL.medium;
+    let p;
+    do{p=pool[Math.floor(Math.random()*pool.length)];}
+    while(p===S.lastPassage&&pool.length>1);
+    // For long time modes ensure enough text
+    if(S.mode==='time'&&S.timeLimit>=60){
+      // Concatenate until >= 600 chars
+      let txt=p;
+      while(txt.length<700){
+        let extra;
+        do{extra=pool[Math.floor(Math.random()*pool.length)];}while(extra===txt.slice(-extra.length));
+        txt+=' '+extra;
+      }
+      S.lastPassage=p;
+      return txt;
+    }
+    S.lastPassage=p;
+    return p;
+  },
+  words(n){
+    const w=[];
+    for(let i=0;i<n;i++)w.push(WORDS[Math.floor(Math.random()*WORDS.length)]);
+    return w.join(' ');
+  },
+  quote(){
+    let q;
+    do{q=QUOTES[Math.floor(Math.random()*QUOTES.length)];}
+    while(q===S.lastQuote&&QUOTES.length>1);
+    S.lastQuote=q;
+    return q.t;
+  },
+  forMode(){
+    switch(S.mode){
+      case'words':return this.words(S.wordLimit);
+      case'quote':return this.quote();
+      case'custom':return S.target; // already set
+      default:return this.text();
+    }
+  }
+};
+
+/* ============================================================
+   STATS CALCULATOR
+   ============================================================ */
+const Calc={
+  elapsedMs(){
+    if(!S.startTime)return 0;
+    const now=S.status==='paused'?S.pauseStart:Date.now();
+    return now-S.startTime-S.totalPausedMs;
+  },
+  elapsedMin(){return Math.max(this.elapsedMs()/60000,.0001);},
+  wpm(){return Math.min(250,Math.round(S.correct/5/this.elapsedMin()));},
+  raw(){return Math.min(300,Math.round(S.typed.length/5/this.elapsedMin()));},
+  acc(){
+    const tot=S.typed.length;
+    return tot?Math.max(0,Math.min(100,Math.round(S.correct/tot*100))):100;
+  },
+  cpm(){return Math.min(1500,Math.round(S.correct/this.elapsedMin()));},
+  consistency(samples){
+    const wpms=samples.map(p=>p.wpm).filter(w=>w>0);
+    if(wpms.length<2)return 100;
+    const mean=wpms.reduce((a,b)=>a+b,0)/wpms.length;
+    if(!mean)return 100;
+    const sd=Math.sqrt(wpms.reduce((a,b)=>a+(b-mean)**2,0)/wpms.length);
+    return Math.max(0,Math.min(100,Math.round(100-sd/mean*100*0.5)));
+  },
+  percentile(wpm){
+    const pts=[[10,5],[20,15],[30,25],[40,35],[50,45],[60,55],[70,63],[80,72],[90,82],[95,90],[98,100],[99,120],[99.5,150]];
+    for(const[pct,threshold]of pts.slice().reverse())if(wpm>=threshold)return Math.round(pct);
+    return 5;
+  },
+  rhythm(samples){
+    if(samples.length<3)return 'Not enough data';
+    const wpms=samples.map(p=>p.wpm);
+    const diffs=wpms.slice(1).map((w,i)=>Math.abs(w-wpms[i]));
+    const avg=diffs.reduce((a,b)=>a+b,0)/diffs.length;
+    if(avg<5)return'Very Steady 🎹';
+    if(avg<12)return'Steady 🎵';
+    if(avg<22)return'Moderate 🎶';
+    if(avg<35)return'Variable 📈';
+    return'Erratic ⚡';
+  },
+  wordsLeft(){
+    const tw=S.target.split(' ');
+    const typed=S.typed;
+    let pos=0,done=0;
+    for(let i=0;i<tw.length;i++){
+      const w=tw[i];
+      if(typed.substring(pos,pos+w.length)===w){
+        if(i<tw.length-1){
+          if(typed[pos+w.length]===' '){done++;pos+=w.length+1;}
+          else break;
+        }else{done++;}
+      }else break;
+    }
+    return Math.max(0,tw.length-done);
+  }
+};
+
+/* ============================================================
+   TYPING ENGINE
+   ============================================================ */
+const Engine={
+  init(){
+    clearInterval(S.timerTick);clearInterval(S.sampleTick);
+    const txt=Gen.forMode();
+    S.target=txt;S.typed='';
+    S.correct=0;S.incorrect=0;S.extra=0;S.mistakes=0;
+    S.streak=0;S.maxStreak=0;S.wpmSamples=[];S.errMap={};
+    S.startTime=null;S.pauseStart=null;S.totalPausedMs=0;
+    S.status='idle';
+    const inp=document.getElementById('tInput');
+    inp.value='';
+    UI.render();UI.resetStats();UI.showOverlay('start');UI.hidePause();
+    this._setClockDisplay();
+  },
+  _setClockDisplay(){
+    const el=document.getElementById('sClock');
+    const lb=document.getElementById('sClockL');
+    el.className='stat-v';
+    if(S.mode==='time'||S.mode==='focus'){
+      el.textContent=S.timeLimit;lb.textContent='Time';
+    }else if(S.mode==='words'){
+      el.textContent=S.wordLimit;lb.textContent='Left';
+    }else if(S.mode==='zen'){
+      el.textContent='∞';lb.textContent='Zen';
+    }else{
+      el.textContent='0s';lb.textContent='Time';
+    }
+  },
+  start(){
+    if(S.status==='running')return;
+    S.status='running';
+    if(!S.startTime)S.startTime=Date.now();
+    UI.hideOverlay();UI.showPause();
+    document.getElementById('tCard').classList.add('active');
+    // Timer tick
+    if(S.mode==='time'||S.mode==='focus'){
+      S.timerTick=setInterval(()=>{
+        if(S.status!=='running')return;
+        const rem=Math.max(0,S.timeLimit-Math.floor(Calc.elapsedMs()/1000));
+        const el=document.getElementById('sClock');
+        el.textContent=rem;
+        el.className=rem<=5?'stat-v timer-crit':rem<=15?'stat-v timer-warn':'stat-v';
+        if(rem===0)this.finish();
+      },120);
+    }else{
+      S.timerTick=setInterval(()=>{
+        if(S.status!=='running')return;
+        const sec=Math.floor(Calc.elapsedMs()/1000);
+        if(S.mode!=='words')document.getElementById('sClock').textContent=sec+'s';
+      },300);
+    }
+    // WPM sample every second
+    S.sampleTick=setInterval(()=>{
+      if(S.status!=='running'||!S.startTime||S.typed.length<2)return;
+      S.wpmSamples.push({
+        t:parseFloat((Calc.elapsedMs()/1000).toFixed(1)),
+        wpm:Calc.wpm(),raw:Calc.raw(),acc:Calc.acc()
+      });
+    },1000);
+  },
+  pause(){
+    if(S.status!=='running')return;
+    S.status='paused';S.pauseStart=Date.now();
+    clearInterval(S.timerTick);clearInterval(S.sampleTick);
+    UI.showOverlay('pause');
+    const pb=document.getElementById('pauseBtn');
+    pb.innerHTML='▶ Resume';
+    Toast.show('Paused — press Ctrl+P or click to resume');
+  },
+  resume(){
+    if(S.status!=='paused')return;
+    S.totalPausedMs+=Date.now()-S.pauseStart;
+    S.pauseStart=null;
+    S.status='idle'; // reset so start() re-initializes
+    S.startTime=Date.now()-Calc.elapsedMs()+S.totalPausedMs; // keep elapsed
+    // Actually let's just re-set startTime
+    const alreadyElapsed=S.totalPausedMs; // we'll subtract
+    this.start();
+    document.getElementById('pauseBtn').innerHTML='⏸ Pause';
+    UI.hideOverlay();
+    document.getElementById('tInput').focus();
+  },
+  handleInput(val){
+    if(S.status==='finished')return;
+    if(S.status==='idle')this.start();
+    if(S.status==='paused')return;
+    // Cap extra chars
+    if(val.length>S.target.length+20){
+      document.getElementById('tInput').value=val.substring(0,S.target.length+20);
+      return;
+    }
+    const prev=S.typed;
+    S.typed=val;
+    // Recalc correct/incorrect/extra
+    S.correct=0;S.incorrect=0;S.extra=0;
+    for(let i=0;i<val.length;i++){
+      if(i<S.target.length){
+        if(val[i]===S.target[i])S.correct++;
+        else{
+          S.incorrect++;
+          S.errMap[S.target[i]]=(S.errMap[S.target[i]]||0)+1;
+        }
+      }else S.extra++;
+    }
+    // New char added?
+    if(val.length>prev.length){
+      const i=val.length-1;
+      if(i<S.target.length&&val[i]===S.target[i]){
+        S.streak++;S.maxStreak=Math.max(S.maxStreak,S.streak);
+        SFX.play('ok');
+      }else{
+        S.mistakes++;S.streak=0;
+        SFX.play('err');UI.flashErr();
+      }
+    }else{
+      // Backspace — reset streak
+      S.streak=Math.max(0,S.streak-1);
+    }
+    UI.render();UI.updateStats();UI.updateProgress();
+    if(S.settings.liveWpm&&S.wpmSamples.length>0){
+      const lw=document.getElementById('liveWpm');
+      lw.textContent=S.wpmSamples[S.wpmSamples.length-1].wpm+' WPM';
+      lw.classList.add('vis');
+    }
+    if(S.settings.scroll)UI.scroll();
+    // Check done (for word/quote/custom/zen)
+    if(['words','quote','custom','zen'].includes(S.mode)){
+      if(val.length===S.target.length){
+        // Check all correct
+        let allOk=true;
+        for(let i=0;i<val.length;i++)if(val[i]!==S.target[i]){allOk=false;break;}
+        if(allOk)this.finish();
+      }
+    }
+    // Words mode counter
+    if(S.mode==='words')document.getElementById('sClock').textContent=Calc.wordsLeft();
+  },
+  finish(){
+    if(S.status==='finished')return;
+    S.status='finished';
+    clearInterval(S.timerTick);clearInterval(S.sampleTick);
+    document.getElementById('tCard').classList.remove('active');
+    document.getElementById('pauseBtn').style.display='none';
+    document.getElementById('liveWpm').classList.remove('vis');
+    // Final sample
+    if(S.typed.length>0){
+      S.wpmSamples.push({
+        t:parseFloat((Calc.elapsedMs()/1000).toFixed(1)),
+        wpm:Calc.wpm(),raw:Calc.raw(),acc:Calc.acc()
+      });
+    }
+    SFX.play('done');
+    const sess=this.buildSession();
+    DB.push(sess);
+    setTimeout(()=>Results.show(sess),500);
+  },
+  buildSession(){
+    const elapsed=Calc.elapsedMs();
+    const wpm=Calc.wpm(),raw=Calc.raw(),acc=Calc.acc();
+    const reached=Math.min(S.typed.length,S.target.length);
+    const missed=Math.max(0,S.target.length-reached);
+    const completion=Math.round(reached/S.target.length*100);
+    const mk=S.mode==='time'?`time_${S.timeLimit}`:
+              S.mode==='words'?`words_${S.wordLimit}`:S.mode;
+    return{
+      id:Date.now(),mode:S.mode,mk,
+      timeLimit:S.timeLimit,wordLimit:S.wordLimit,
+      wpm,raw,acc,
+      consistency:Calc.consistency(S.wpmSamples),
+      completion,mistakes:S.mistakes,
+      correct:S.correct,incorrect:S.incorrect,
+      extra:S.extra,missed,
+      elapsed,maxStreak:S.maxStreak,
+      samples:[...S.wpmSamples],
+      errMap:{...S.errMap},
+      diff:S.diff,ts:Date.now(),
+      target:S.target,
+    };
+  },
+  restart(){
+    clearInterval(S.timerTick);clearInterval(S.sampleTick);
+    document.getElementById('tInput').value='';
+    this.init();
+    document.getElementById('tInput').focus();
+  },
+  nextText(){
+    if(S.mode==='custom'){S.mode='time';}
+    clearInterval(S.timerTick);clearInterval(S.sampleTick);
+    document.getElementById('tInput').value='';
+    this.init();
+    document.getElementById('tInput').focus();
+  }
+};
+
+/* ============================================================
+   UI RENDERER
+   ============================================================ */
+const UI={
+  render(){
+    const target=S.target,typed=S.typed;
+    const caret=S.settings.caret;
+    let html='';
+    for(let i=0;i<target.length;i++){
+      let cls='ch';
+      if(i<typed.length){
+        cls+=typed[i]===target[i]?' ok':' bad';
+      }else cls+=' pend';
+      if(i===typed.length)cls+=` cur${caret==='block'?' blk':caret==='underline'?' uline':''}`;
+      const ch=target[i]===' '?'&nbsp;':
+                target[i]==='<'?'&lt;':
+                target[i]==='>'?'&gt;':
+                target[i]==='&'?'&amp;':target[i];
+      html+=`<span class="${cls}">${ch}</span>`;
+    }
+    // Extra chars
+    for(let i=target.length;i<typed.length;i++){
+      const isCur=i===typed.length-1;
+      html+=`<span class="ch extra${isCur?` cur${caret==='block'?' blk':caret==='underline'?' uline':''}`:''}">
+        ${typed[i]===' '?'&nbsp;':typed[i]}</span>`;
+    }
+    // Focus mode
+    if(S.mode==='focus'){
+      document.getElementById('tText').classList.add('focus-mode');
+    }else{
+      document.getElementById('tText').classList.remove('focus-mode');
+    }
+    document.getElementById('tInner').innerHTML=html;
+    // Focus mode dimming
+    if(S.mode==='focus')this._focusDim();
+  },
+  _focusDim(){
+    const cur=document.querySelector('.ch.cur');
+    if(!cur)return;
+    const tEl=document.getElementById('tText');
+    const lh=parseFloat(getComputedStyle(tEl).lineHeight)||42;
+    const tTop=tEl.getBoundingClientRect().top;
+    const curLine=Math.round((cur.getBoundingClientRect().top-tTop)/lh);
+    document.querySelectorAll('.ch').forEach(c=>{
+      const cl=Math.round((c.getBoundingClientRect().top-tTop)/lh);
+      c.classList.toggle('fblur',Math.abs(cl-curLine)>0);
+    });
+  },
+  scroll(){
+    const cur=document.querySelector('.ch.cur');
+    if(!cur)return;
+    const inner=document.getElementById('tInner');
+    if(S.mode==='focus'){
+      // Focus mode: scroll text so only current line shows
+      const lh=parseFloat(getComputedStyle(document.getElementById('tText')).lineHeight)||42;
+      const off=Math.max(0,cur.offsetTop-lh*0.5);
+      inner.style.transform=`translateY(-${off}px)`;
+    }else{
+      // All other modes: no transform — full text stays visible
+      inner.style.transform='translateY(0)';
+      // Gently nudge cursor into view if it's below the viewport
+      cur.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  },
+  resetStats(){
+    ['sWpm','sRaw','sCpm','sAcc','sStreak','sMist'].forEach(id=>{
+      document.getElementById(id).textContent=id==='sAcc'?'100%':'0';
+    });
+    document.getElementById('prog').style.width='0%';
+    document.getElementById('tInner').style.transform='translateY(0)'; // always reset scroll
+    document.getElementById('liveWpm').classList.remove('vis');
+  },
+  updateStats(){
+    if(S.status==='idle')return;
+    document.getElementById('sWpm').textContent=Math.min(250,Calc.wpm());
+    document.getElementById('sRaw').textContent=Math.min(300,Calc.raw());
+    document.getElementById('sCpm').textContent=Math.min(1500,Calc.cpm());
+    document.getElementById('sAcc').textContent=Calc.acc()+'%';
+    document.getElementById('sStreak').textContent=S.streak;
+    document.getElementById('sMist').textContent=S.mistakes;
+  },
+  updateProgress(){
+    const pct=Math.min(100,S.typed.length/S.target.length*100);
+    document.getElementById('prog').style.width=pct+'%';
+  },
+  showOverlay(type){
+    const ov=document.getElementById('tOverlay');
+    if(type==='pause'){
+      ov.innerHTML=`<div class="ov-icon">⏸</div>
+        <div class="ov-txt">Test Paused</div>
+        <div class="ov-hint"><kbd>Ctrl+P</kbd> to resume • click anywhere here</div>`;
+    }else{
+      ov.innerHTML=`<div class="ov-icon">⌨️</div>
+        <div class="ov-txt">Start typing to begin</div>
+        <div class="ov-hint"><kbd>Tab</kbd> restart&nbsp;&nbsp;<kbd>Ctrl+P</kbd> pause&nbsp;&nbsp;<kbd>Esc</kbd> settings</div>`;
+    }
+    ov.classList.remove('hidden');
+  },
+  hideOverlay(){document.getElementById('tOverlay').classList.add('hidden');},
+  showPause(){document.getElementById('pauseBtn').style.display='flex';},
+  hidePause(){
+    const pb=document.getElementById('pauseBtn');
+    pb.style.display='none';pb.innerHTML='⏸ Pause';
+  },
+  flashErr(){
+    const c=document.getElementById('tCard');
+    c.classList.add('err-flash');
+    setTimeout(()=>c.classList.remove('err-flash'),220);
+  },
+  setupCfg(){
+    const cfg=document.getElementById('cfg');
+    cfg.innerHTML='';
+    if(S.mode==='time'||S.mode==='focus'){
+      [15,30,60,120].forEach(t=>{
+        const b=document.createElement('button');
+        b.className='cfg-btn'+(S.timeLimit===t?' active':'');
+        b.textContent=t+'s';
+        b.onclick=()=>{S.timeLimit=t;cfg.querySelectorAll('.cfg-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');Engine.init();document.getElementById('tInput').focus();};
+        cfg.appendChild(b);
+      });
+    }else if(S.mode==='words'){
+      [25,50,100,250].forEach(w=>{
+        const b=document.createElement('button');
+        b.className='cfg-btn'+(S.wordLimit===w?' active':'');
+        b.textContent=w+' words';
+        b.onclick=()=>{S.wordLimit=w;cfg.querySelectorAll('.cfg-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');Engine.init();document.getElementById('tInput').focus();};
+        cfg.appendChild(b);
+      });
+    }else if(S.mode==='zen'){
+      const l=document.createElement('span');
+      l.className='cfg-label';l.textContent='🧘 Distraction-free practice — no timer, no pressure';
+      cfg.appendChild(l);
+    }else if(S.mode==='quote'){
+      const l=document.createElement('span');l.className='cfg-label';
+      l.textContent='💬 Type the quote — press → Next Text for a new one';cfg.appendChild(l);
+    }else if(S.mode==='custom'){
+      const l=document.createElement('span');l.className='cfg-label';
+      l.textContent='✏️ Custom text — your own practice material';cfg.appendChild(l);
+    }
+    if(['time','words','focus','zen'].includes(S.mode)){
+      const sep=document.createElement('div');sep.className='cfg-sep';cfg.appendChild(sep);
+      ['easy','medium','hard'].forEach(d=>{
+        const b=document.createElement('button');
+        b.className='cfg-btn'+(S.diff===d?' active':'');
+        b.textContent=d[0].toUpperCase()+d.slice(1);
+        b.onclick=()=>{
+          S.diff=d;DB.save();
+          cfg.querySelectorAll(`[data-diff]`).forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');Engine.nextText();
+        };
+        b.dataset.diff=d;cfg.appendChild(b);
+      });
+    }
+  }
+};
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+const Results={
+  show(s){
+    this._hero(s);
+    this._charts(s);
+    this._chars(s);
+    this._heatmap(s);
+    this._percentile(s);
+    this._achievements(s);
+    this._summary(s);
+    document.getElementById('resModal').classList.add('vis');
+  },
+  _hero(s){
+    const pb=DB.pb(s.mode,s.mode==='time'?s.timeLimit:s.wordLimit);
+    const isNewPB=!pb||s.wpm>=pb.wpm;
+    const modeLabel={time:`⏱ ${s.timeLimit}s`,words:`📝 ${s.wordLimit}w`,quote:'💬 Quote',custom:'✏️ Custom',focus:'🔍 Focus',zen:'🧘 Zen'}[s.mode]||s.mode;
+    document.getElementById('resHero').innerHTML=`
+      <div class="rsc hl">
+        <div class="rsc-v">${s.wpm}<span class="rsc-u"> wpm</span></div>
+        <div class="rsc-l">Net WPM ${isNewPB?'<span class="pb-badge">🏆 PB</span>':''}</div>
+      </div>
+      <div class="rsc">
+        <div class="rsc-v">${s.raw}<span class="rsc-u"> wpm</span></div>
+        <div class="rsc-l">Raw WPM</div>
+      </div>
+      <div class="rsc">
+        <div class="rsc-v">${s.acc}<span class="rsc-u">%</span></div>
+        <div class="rsc-l">Accuracy</div>
+      </div>
+      <div class="rsc">
+        <div class="rsc-v">${s.consistency}<span class="rsc-u">%</span></div>
+        <div class="rsc-l">Consistency</div>
+      </div>
+      <div class="rsc">
+        <div class="rsc-v">${s.completion}<span class="rsc-u">%</span></div>
+        <div class="rsc-l">Completion</div>
+      </div>
+      <div class="rsc">
+        <div class="rsc-v">${Math.round(s.elapsed/1000)}<span class="rsc-u">s</span></div>
+        <div class="rsc-l">${modeLabel}</div>
+      </div>`;
+  },
+  _charts(s){
+    this._drawChart('wpmSvg',s.samples.map(p=>({x:p.t,y:p.wpm})),'var(--acc)');
+    this._drawChart('accSvg',s.samples.map(p=>({x:p.t,y:p.acc})),'var(--ok)');
+  },
+  _drawChart(id,data,color){
+    const svg=document.getElementById(id);
+    const W=400,H=110;
+    const pad={t:10,r:10,b:24,l:36};
+    const w=W-pad.l-pad.r,h=H-pad.t-pad.b;
+    if(!data.length){
+      svg.innerHTML=`<text x="200" y="55" text-anchor="middle" fill="var(--t3)" font-size="11">Not enough data</text>`;
+      return;
+    }
+    const xs=data.map(p=>p.x),ys=data.map(p=>p.y);
+    const minX=Math.min(...xs),maxX=Math.max(...xs)||1;
+    const maxY=Math.max(...ys,1)*1.15;
+    const px=x=>pad.l+(maxX===minX?w/2:(x-minX)/(maxX-minX)*w);
+    const py=y=>pad.t+h-(y/maxY*h);
+    const pts=data.map(p=>[px(p.x),py(p.y)]);
+    // Smooth bezier path
+    let d=`M${pts[0][0]},${pts[0][1]}`;
+    for(let i=1;i<pts.length;i++){
+      const cpx=(pts[i-1][0]+pts[i][0])/2;
+      d+=` C${cpx},${pts[i-1][1]},${cpx},${pts[i][1]},${pts[i][0]},${pts[i][1]}`;
+    }
+    const fillD=d+` L${pts[pts.length-1][0]},${pad.t+h} L${pts[0][0]},${pad.t+h} Z`;
+    // Grid
+    let grid='';
+    for(let i=0;i<=4;i++){
+      const val=Math.round(maxY/4*i);
+      const y=py(val);
+      grid+=`<line x1="${pad.l}" y1="${y}" x2="${pad.l+w}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
+      grid+=`<text x="${pad.l-4}" y="${y+4}" text-anchor="end" fill="var(--t3)" font-size="9">${val}</text>`;
+    }
+    // X labels
+    let xl='';
+    if(xs.length>1){
+      [0,Math.floor(xs.length/2),xs.length-1].forEach(i=>{
+        xl+=`<text x="${px(xs[i])}" y="${pad.t+h+16}" text-anchor="middle" fill="var(--t3)" font-size="9">${Math.round(xs[i])}s</text>`;
+      });
+    }
+    const gId=id+'G';
+    svg.innerHTML=`
+      <defs><linearGradient id="${gId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity=".3"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient></defs>
+      ${grid}${xl}
+      <path d="${fillD}" fill="url(#${gId})"/>
+      <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+      ${pts.map((_,i)=>i===pts.length-1?`<circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="3.5" fill="${color}"/>`:'').join('')}
+    `;
+  },
+  _chars(s){
+    document.getElementById('charAna').innerHTML=`
+      <div class="ca-card"><div class="ca-v ca-ok">${s.correct}</div><div class="ca-l">✅ Correct</div></div>
+      <div class="ca-card"><div class="ca-v ca-bad">${s.incorrect}</div><div class="ca-l">❌ Incorrect</div></div>
+      <div class="ca-card"><div class="ca-v ca-ex">${s.extra}</div><div class="ca-l">➕ Extra</div></div>
+      <div class="ca-card"><div class="ca-v ca-ms">${s.missed}</div><div class="ca-l">💨 Missed</div></div>`;
+  },
+  _heatmap(s){
+    const em=s.errMap||{};
+    const maxE=Math.max(...Object.values(em),1);
+    const rows=[
+      ['`','1','2','3','4','5','6','7','8','9','0','-','='],
+      ['q','w','e','r','t','y','u','i','o','p','[',']','\\'],
+      ['a','s','d','f','g','h','j','k','l',";'"],
+      ['z','x','c','v','b','n','m',',','.','/'],
+      [' ']
+    ];
+    const kb=document.getElementById('kbHeat');kb.innerHTML='';
+    rows.forEach(row=>{
+      const rowEl=document.createElement('div');rowEl.className='kb-row';
+      row.forEach(k=>{
+        const ke=document.createElement('div');ke.className='key';
+        if(k===' '){ke.classList.add('key-space');ke.textContent='SPACE';}
+        else ke.textContent=k.toUpperCase();
+        const errs=em[k]||0;
+        if(errs>0){
+          const intensity=Math.min(.85,errs/maxE*.7+.15);
+          ke.classList.add('hot');
+          ke.style.background=`rgba(239,68,68,${intensity})`;
+          ke.title=`${errs} error${errs>1?'s':''}`;
+        }
+        rowEl.appendChild(ke);
+      });
+      kb.appendChild(rowEl);
+    });
+  },
+  _percentile(s){
+    const pct=Calc.percentile(s.wpm);
+    document.getElementById('pctCard').innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:.85rem;font-weight:700">Speed Percentile</span>
+        <span style="font-size:1.15rem;font-weight:800;color:var(--acc)">Top ${100-pct}%</span>
+      </div>
+      <div class="pct-bar">
+        <div class="pct-fill" style="width:${pct}%"></div>
+        <div class="pct-dot" style="left:${pct}%"></div>
+      </div>
+      <div class="pct-labels"><span>Beginner</span><span>${pct}th percentile</span><span>Expert</span></div>`;
+  },
+  _achievements(s){
+    const earned=[];
+    if(s.wpm>=150)earned.push({ico:'⚡',n:'Lightning Fingers'});
+    else if(s.wpm>=100)earned.push({ico:'🚀',n:'Speed Demon'});
+    else if(s.wpm>=80)earned.push({ico:'🔥',n:'On Fire'});
+    else if(s.wpm>=60)earned.push({ico:'✈️',n:'Taking Off'});
+    else if(s.wpm>=40)earned.push({ico:'🐎',n:'Galloping'});
+    if(s.acc===100)earned.push({ico:'💎',n:'Diamond Accuracy'});
+    else if(s.acc>=98)earned.push({ico:'🎯',n:'Sharpshooter'});
+    else if(s.acc>=95)earned.push({ico:'✅',n:'Precise'});
+    if(s.consistency>=95)earned.push({ico:'🎹',n:'Metronome'});
+    else if(s.consistency>=85)earned.push({ico:'📐',n:'Steady Hands'});
+    if(s.mistakes===0)earned.push({ico:'🏅',n:'Zero Mistakes'});
+    if(s.maxStreak>=100)earned.push({ico:'🔱',n:'Streak Legend'});
+    else if(s.maxStreak>=50)earned.push({ico:'⛓️',n:'Chain Typer'});
+    const pb=DB.pb(s.mode,s.mode==='time'?s.timeLimit:s.wordLimit);
+    if(!pb||s.wpm>=pb.wpm)earned.push({ico:'🏆',n:'Personal Best'});
+    if(s.mode==='zen')earned.push({ico:'🧘',n:'Zen Practitioner'});
+    if(s.mode==='focus')earned.push({ico:'🔍',n:'Focused Mind'});
+    const el=document.getElementById('achSec');
+    if(!earned.length){el.innerHTML='';return;}
+    el.innerHTML=`<div class="ach-ttl">🏆 Achievements Earned</div>
+      <div class="ach-list">${earned.map((a,i)=>`
+        <div class="ach-badge earned" style="animation-delay:${i*.08}s">${a.ico} ${a.n}</div>`).join('')}
+      </div>`;
+  },
+  _summary(s){
+    const items=[];
+    // Strengths
+    if(s.acc>=95)items.push({i:'💪',t:`Strong accuracy at ${s.acc}% — keep that discipline`});
+    if(s.wpm>=70)items.push({i:'⚡',t:`${s.wpm} WPM places you well above the average typist`});
+    if(s.consistency>=85)items.push({i:'🎵',t:`Great rhythm consistency — your pace stays stable throughout`});
+    if(s.mistakes===0)items.push({i:'🌟',t:'Flawless session — zero mistakes!'});
+    if(s.maxStreak>=30)items.push({i:'⛓️',t:`Impressive ${s.maxStreak}-character streak with no errors`});
+    // Weaknesses
+    if(s.acc<88)items.push({i:'🎯',t:`Accuracy at ${s.acc}% — slow down slightly to reduce mistakes`});
+    if(s.wpm<35)items.push({i:'🐢',t:'Speed is below average — consistent daily practice will help most'});
+    if(s.consistency<65)items.push({i:'📊',t:'Inconsistent speed detected — try to find and keep a steady rhythm'});
+    if(s.mistakes>12)items.push({i:'🔧',t:`${s.mistakes} errors noted — prioritize accuracy before chasing speed`});
+    // Top error keys
+    const topErr=Object.entries(s.errMap||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    if(topErr.length)items.push({i:'🔑',t:`Most mistyped: ${topErr.map(([k,v])=>`'${k===' '?'Space':k}' ×${v}`).join(', ')}`});
+    // Rhythm
+    items.push({i:'🎼',t:`Typing rhythm: ${Calc.rhythm(s.samples)}`});
+    // Suggestion
+    if(s.wpm<50)items.push({i:'💡',t:'Tip: Practice 10 min daily on Easy mode. Accuracy first, speed follows.'});
+    else if(s.wpm<80)items.push({i:'💡',t:'Tip: Try Medium or Hard passages to push vocabulary and speed together.'});
+    else items.push({i:'💡',t:'Tip: You\'re fast — now aim for near-perfect accuracy on Hard difficulty.'});
+    document.getElementById('perfBody').innerHTML=items.map(item=>
+      `<div class="perf-item"><span class="perf-ico">${item.i}</span><span>${item.t}</span></div>`).join('');
+  }
+};
+
+/* ============================================================
+   HISTORY PANEL
+   ============================================================ */
+const Hist={
+  render(){
+    const h=S.history;
+    const el=document.getElementById('histBody');
+    if(!h.length){
+      el.innerHTML='<p style="color:var(--t3);text-align:center;padding:40px 0;font-size:.88rem">No sessions yet.<br>Complete a typing test to see your history here.</p>';
+      return;
+    }
+    el.innerHTML=h.slice(0,40).map(s=>{
+      const d=new Date(s.ts);
+      const ds=d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const ml={time:`⏱ ${s.timeLimit}s`,words:`📝 ${s.wordLimit}w`,quote:'💬 Quote',custom:'✏️ Custom',focus:'🔍 Focus',zen:'🧘 Zen'}[s.mode]||s.mode;
+      return`<div class="hist-item">
+        <div class="hist-l">
+          <span>${ml} · ${(s.diff||'medium')[0].toUpperCase()+(s.diff||'medium').slice(1)}</span>
+          <span class="hist-mode">${ds}</span>
+        </div>
+        <div class="hist-r">
+          <span class="hist-wpm">${s.wpm} WPM</span>
+          <span class="hist-acc">${s.acc}%</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+};
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+const Toast={
+  _t:null,
+  show(msg,dur=2600){
+    const el=document.getElementById('toast');
+    el.textContent=msg;el.classList.add('show');
+    clearTimeout(this._t);
+    this._t=setTimeout(()=>el.classList.remove('show'),dur);
+  }
+};
+
+/* ============================================================
+   THEME MANAGER
+   ============================================================ */
+const Themes={
+  list:[
+    {id:'dark',name:'Dark',c:['#0d1117','#1c2230','#00d4ff']},
+    {id:'light',name:'Light',c:['#f0f4f8','#ffffff','#0ea5e9']},
+    {id:'midnight',name:'Midnight',c:['#060811','#111830','#4d8aff']},
+    {id:'forest',name:'Forest',c:['#080e09','#141e15','#44e860']},
+    {id:'ocean',name:'Ocean',c:['#040c13','#0e1f2d','#00b8d8']},
+  ],
+  set(id){
+    document.documentElement.setAttribute('data-theme',id);
+    S.settings.theme=id;DB.save();
+    document.getElementById('themeBtn').textContent=id==='light'?'🌙':'☀️';
+    this._updateOpts();
+  },
+  toggle(){this.set(S.settings.theme==='light'?'dark':'light');},
+  _updateOpts(){
+    document.querySelectorAll('.th-opt').forEach(o=>o.classList.toggle('active',o.dataset.t===S.settings.theme));
+  },
+  renderOpts(){
+    const c=document.getElementById('themeOpts');
+    c.innerHTML=this.list.map(t=>`
+      <div class="th-opt${t.id===S.settings.theme?' active':''}" data-t="${t.id}" onclick="Themes.set('${t.id}')">
+        <div class="th-prev" style="background:linear-gradient(135deg,${t.c[0]} 45%,${t.c[2]} 100%);border-color:${t.id===S.settings.theme?'var(--acc)':'var(--border)'}"></div>
+        <span class="th-name">${t.name}</span>
+      </div>`).join('');
+  }
+};
+
+/* ============================================================
+   MODE SETUP
+   ============================================================ */
+function setupModePills(){
+  const modes=[
+    {id:'time',l:'⏱ Time'},
+    {id:'words',l:'📝 Words'},
+    {id:'quote',l:'💬 Quote'},
+    {id:'custom',l:'✏️ Custom'},
+    {id:'focus',l:'🔍 Focus'},
+    {id:'zen',l:'🧘 Zen'},
+  ];
+  const c=document.getElementById('modePills');
+  c.innerHTML=modes.map(m=>`<button class="mode-pill${S.mode===m.id?' active':''}" data-m="${m.id}" aria-pressed="${S.mode===m.id}">${m.l}</button>`).join('');
+  c.querySelectorAll('.mode-pill').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const m=b.dataset.m;
+      if(m==='custom'){document.getElementById('customModal').classList.add('vis');return;}
+      setMode(m);
+    });
+  });
+}
+
+function setMode(m){
+  S.mode=m;
+  document.querySelectorAll('.mode-pill').forEach(b=>{
+    const on=b.dataset.m===m;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-pressed',String(on));
+  });
+  document.body.classList.toggle('zen',m==='zen');
+  UI.setupCfg();
+  Engine.init();
+  document.getElementById('tInput').focus();
+}
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+function bindEvents(){
+  const inp=document.getElementById('tInput');
+
+  // Typing
+  inp.addEventListener('input',e=>Engine.handleInput(e.target.value));
+  inp.addEventListener('paste',e=>e.preventDefault());
+
+  // Click card to focus
+  document.getElementById('tCard').addEventListener('click',e=>{
+    if(e.target.closest('button'))return;
+    if(S.status==='paused'){Engine.resume();return;}
+    UI.hideOverlay();inp.focus();
+  });
+  document.getElementById('tOverlay').addEventListener('click',()=>{
+    if(S.status==='paused'){Engine.resume();}
+    else{UI.hideOverlay();inp.focus();}
+  });
+  document.getElementById('mainArea').addEventListener('click',e=>{
+    if(!e.target.closest('button')&&!e.target.closest('.cfg')&&S.status!=='finished'){
+      inp.focus();
+    }
+  });
+
+  // Controls
+  document.getElementById('restartBtn').addEventListener('click',()=>Engine.restart());
+  document.getElementById('pauseBtn').addEventListener('click',()=>{
+    if(S.status==='running')Engine.pause();
+    else if(S.status==='paused')Engine.resume();
+  });
+  document.getElementById('nextBtn').addEventListener('click',()=>Engine.nextText());
+
+  // Header
+  document.getElementById('histBtn').addEventListener('click',()=>{Hist.render();openPanel('hist');});
+  document.getElementById('settBtn').addEventListener('click',()=>{Themes.renderOpts();openPanel('sett');});
+  document.getElementById('themeBtn').addEventListener('click',()=>Themes.toggle());
+
+  // Panel close
+  ['hist','sett'].forEach(p=>{
+    document.getElementById(p+'Close').addEventListener('click',()=>closePanel(p));
+    document.getElementById(p+'Ovl').addEventListener('click',()=>closePanel(p));
+  });
+
+  // Results modal
+  document.getElementById('resClose').addEventListener('click',()=>document.getElementById('resModal').classList.remove('vis'));
+  document.getElementById('retryBtn').addEventListener('click',()=>{
+    const saved=S.target;
+    document.getElementById('resModal').classList.remove('vis');
+    Engine.restart();
+    S.target=saved;UI.render();inp.focus();
+  });
+  document.getElementById('newBtn').addEventListener('click',()=>{document.getElementById('resModal').classList.remove('vis');Engine.nextText();});
+  document.getElementById('histFromResBtn').addEventListener('click',()=>{
+    document.getElementById('resModal').classList.remove('vis');
+    Hist.render();openPanel('hist');
+  });
+
+  // Custom modal
+  document.getElementById('customClose').addEventListener('click',()=>document.getElementById('customModal').classList.remove('vis'));
+  document.getElementById('customCancel').addEventListener('click',()=>document.getElementById('customModal').classList.remove('vis'));
+  document.getElementById('customStart').addEventListener('click',()=>{
+    const txt=document.getElementById('customTa').value.trim();
+    if(txt.length<20){Toast.show('Please enter at least 20 characters');return;}
+    S.target=txt;
+    document.getElementById('customModal').classList.remove('vis');
+    S.mode='custom';
+    document.querySelectorAll('.mode-pill').forEach(b=>b.classList.toggle('active',b.dataset.m==='custom'));
+    document.body.classList.remove('zen');
+    UI.setupCfg();Engine.init();inp.focus();
+  });
+
+  // Font size
+  document.getElementById('fsOpts').querySelectorAll('[data-fs]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('[data-fs]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      S.settings.fs=b.dataset.fs;
+      document.documentElement.style.setProperty('--fs-typing',FS_MAP[b.dataset.fs]||'1.3rem');
+      DB.save();
+    });
+  });
+
+  // Caret
+  document.getElementById('caretOpts').querySelectorAll('[data-caret]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('[data-caret]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');S.settings.caret=b.dataset.caret;DB.save();UI.render();
+    });
+  });
+
+  // Toggles
+  function bindToggle(id,key,cb){
+    const el=document.getElementById(id);
+    el.addEventListener('click',()=>{
+      S.settings[key]=!S.settings[key];
+      el.classList.toggle('on',S.settings[key]);
+      DB.save();if(cb)cb();
+    });
+  }
+  bindToggle('togSound','sound');
+  bindToggle('togScroll','scroll');
+  bindToggle('togCpm','cpm',()=>{
+    document.getElementById('sCpm').parentElement.style.display=S.settings.cpm?'':'none';
+  });
+  bindToggle('togLiveWpm','liveWpm',()=>{
+    if(!S.settings.liveWpm)document.getElementById('liveWpm').classList.remove('vis');
+  });
+
+  // Clear history
+  document.getElementById('clearHistBtn').addEventListener('click',()=>{
+    if(confirm('Clear all history? This cannot be undone.'))
+    {DB.clear();Hist.render();Toast.show('History cleared');}
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown',e=>{
+    // Tab = restart
+    if(e.key==='Tab'){e.preventDefault();Engine.restart();return;}
+    // Ctrl+P = pause/resume
+    if(e.key.toLowerCase()==='p'&&(e.ctrlKey||e.metaKey)){
+      e.preventDefault();
+      if(S.status==='running')Engine.pause();
+      else if(S.status==='paused')Engine.resume();
+      return;
+    }
+    // Escape
+    if(e.key==='Escape'){
+      const anyOpen=
+        document.getElementById('settPanel').classList.contains('open')||
+        document.getElementById('histPanel').classList.contains('open')||
+        document.getElementById('resModal').classList.contains('vis')||
+        document.getElementById('customModal').classList.contains('vis');
+      if(anyOpen){
+        closePanel('sett');closePanel('hist');
+        document.getElementById('resModal').classList.remove('vis');
+        document.getElementById('customModal').classList.remove('vis');
+      }else{Themes.renderOpts();openPanel('sett');}
+      return;
+    }
+    // H = history (when not actively typing)
+    if(e.key.toLowerCase()==='h'&&S.status!=='running'&&e.target!==inp){
+      Hist.render();openPanel('hist');return;
+    }
+    // N = next text (when idle)
+    if(e.key.toLowerCase()==='n'&&S.status==='idle'&&e.target!==inp){
+      Engine.nextText();return;
+    }
+  });
+}
+
+function openPanel(name){
+  document.getElementById(name+'Panel').classList.add('open');
+  document.getElementById(name+'Ovl').classList.add('open');
+}
+function closePanel(name){
+  document.getElementById(name+'Panel').classList.remove('open');
+  document.getElementById(name+'Ovl').classList.remove('open');
+}
+
+/* ============================================================
+   APPLY SAVED SETTINGS
+   ============================================================ */
+function applySavedSettings(){
+  const s=S.settings;
+  document.documentElement.setAttribute('data-theme',s.theme);
+  document.getElementById('themeBtn').textContent=s.theme==='light'?'🌙':'☀️';
+  document.documentElement.style.setProperty('--fs-typing',FS_MAP[s.fs]||'1.3rem');
+  // Font size button
+  document.querySelectorAll('[data-fs]').forEach(b=>b.classList.toggle('active',b.dataset.fs===s.fs));
+  // Caret button
+  document.querySelectorAll('[data-caret]').forEach(b=>b.classList.toggle('active',b.dataset.caret===s.caret));
+  // Toggles
+  document.getElementById('togSound').classList.toggle('on',s.sound);
+  document.getElementById('togScroll').classList.toggle('on',s.scroll);
+  document.getElementById('togCpm').classList.toggle('on',s.cpm);
+  document.getElementById('togLiveWpm').classList.toggle('on',s.liveWpm);
+  // CPM visibility
+  if(!s.cpm)document.getElementById('sCpm').parentElement.style.display='none';
+  // Zen body class
+  if(S.mode==='zen')document.body.classList.add('zen');
+}
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+(function init(){
+  DB.load();
+  applySavedSettings();
+  SFX.init();
+  setupModePills();
+  UI.setupCfg();
+  Engine.init();
+  bindEvents();
+  // Auto-focus input
+  setTimeout(()=>document.getElementById('tInput').focus(),100);
+})();
+</script>
+</body>
+</html>
