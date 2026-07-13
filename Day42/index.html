@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Financial Command Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #111827;
+            --bg-surface-elevated: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --border-color: #374151;
+            --font-main: 'Inter', sans-serif;
+            --transition-speed: 0.3s;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            transition: transform var(--transition-speed);
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--bg-surface-elevated);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            box-shadow: inset 3px 0 0 var(--accent-primary);
+        }
+
+        .profile-badge {
+            margin-top: auto;
+            padding: 16px;
+            background-color: var(--bg-surface-elevated);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 32px 40px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-titles h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-titles p {
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-primary-hover);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        .card {
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Specific Cards */
+        .metrics-row {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(180deg, var(--bg-surface-elevated) 0%, var(--bg-surface) 100%);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: var(--accent-primary);
+        }
+        
+        .metric-card:nth-child(2)::before { background: var(--accent-danger); }
+        .metric-card:nth-child(3)::before { background: var(--accent-success); }
+        .metric-card:nth-child(4)::before { background: var(--accent-warning); }
+
+        .metric-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.875rem;
+            margin-top: 8px;
+        }
+
+        .trend-up { color: var(--accent-success); }
+        .trend-down { color: var(--accent-danger); }
+
+        .chart-card {
+            grid-column: span 8;
+            min-height: 350px;
+        }
+        
+        .health-card {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .health-score-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 16px;
+        }
+
+        .health-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-success) var(--score-deg, 0deg), var(--bg-surface-elevated) 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .health-circle::after {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background-color: var(--bg-surface);
+            border-radius: 50%;
+        }
+
+        .health-score {
+            position: relative;
+            z-index: 10;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .simulator-card {
+            grid-column: span 6;
+        }
+
+        .ai-tips-card {
+            grid-column: span 6;
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        /* Custom Chart UI */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            height: 250px;
+            gap: 16px;
+            padding-top: 20px;
+            margin-top: auto;
+        }
+
+        .chart-bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            gap: 8px;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 100%;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .bar {
+            width: 16px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease-out;
+            position: relative;
+        }
+        
+        .bar:hover::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-surface-elevated);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 10;
+            border: 1px solid var(--border-color);
+        }
+
+        .bar-income { background-color: var(--accent-primary); }
+        .bar-expense { background-color: var(--accent-danger); }
+        
+        .chart-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Controls */
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-primary);
+        }
+        
+        .range-value {
+            float: right;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        /* AI Tips */
+        .tip-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .tip-item {
+            display: flex;
+            gap: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 16px;
+            border-radius: var(--radius-lg);
+        }
+        
+        .tip-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Forms / Inputs */
+        .input-text {
+            width: 100%;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: var(--font-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-text:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            .chart-card, .simulator-card, .ai-tips-card, .health-card {
+                grid-column: span 8;
+            }
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 16px;
+                flex: none;
+            }
+            .brand {
+                margin-bottom: 16px;
+            }
+            .nav-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 8px;
+            }
+            .nav-item {
+                white-space: nowrap;
+                padding: 8px 12px;
+            }
+            .profile-badge {
+                display: none;
+            }
+            .main-content {
+                padding: 20px;
+                overflow-y: visible;
+                flex: none;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+            .dashboard-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+            }
+            .metrics-row {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .chart-container {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            .chart-bar-group {
+                min-width: 60px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .header-actions, .simulator-card {
+                display: none !important;
+            }
+            .main-content {
+                padding: 0;
+            }
+            body {
+                background: white;
+                color: black;
+                height: auto;
+                overflow: visible;
+            }
+            .card {
+                background: white;
+                border: 1px solid #ccc;
+                box-shadow: none;
+                color: black;
+                page-break-inside: avoid;
+            }
+            .metric-card, .ai-tips-card {
+                background: white;
+                border: 1px solid #ccc;
+            }
+            * {
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">FC</div>
+            Command Center
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Overview Dashboard
+            </li>
+            <li class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Cash Flow
+            </li>
+            <li class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Invoices & Tax
+            </li>
+            <li class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                Planning & AI
+            </li>
+            <li class="nav-item" style="margin-top: 24px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Settings
+            </li>
+        </ul>
+        <div class="profile-badge">
+            <div class="profile-avatar">FR</div>
+            <div>
+                <div style="font-weight: 600; font-size: 0.875rem;">Freelancer Pro</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">Variable Income</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="header-titles">
+                <h1>Dashboard</h1>
+                <p>Welcome back! Here's your financial pulse for this month.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="window.print()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print Report
+                </button>
+                <button class="btn btn-primary" onclick="resetData()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    Reset Data
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <!-- Key Metrics -->
+            <div class="metrics-row fade-in" style="animation-delay: 0.1s;">
+                <div class="metric-card">
+                    <div class="metric-title">Projected Monthly Income</div>
+                    <div class="metric-value" id="val-income">$0</div>
+                    <div class="metric-trend trend-up">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        +12% vs last mo
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Operating Expenses</div>
+                    <div class="metric-value" id="val-expense">$0</div>
+                    <div class="metric-trend trend-down">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+                        -5% vs last mo
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Net Cash Flow</div>
+                    <div class="metric-value" id="val-net">$0</div>
+                    <div class="metric-trend trend-up">Stable</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Estimated Tax (30%)</div>
+                    <div class="metric-value" id="val-tax">$0</div>
+                    <div class="metric-trend trend-warning" style="color: var(--accent-warning);">Action Required: Move to savings</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card chart-card fade-in" style="animation-delay: 0.2s;">
+                <div class="card-header">
+                    <div class="card-title">6-Month Cash Flow Trend</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                        <span style="display:inline-block; width:10px; height:10px; background:var(--accent-primary); border-radius:2px; margin-right:4px;"></span> Income
+                        <span style="display:inline-block; width:10px; height:10px; background:var(--accent-danger); border-radius:2px; margin-right:4px; margin-left:12px;"></span> Expenses
+                    </div>
+                </div>
+                <div class="chart-container" id="cashflow-chart">
+                    <!-- Chart bars generated by JS -->
+                </div>
+            </div>
+
+            <!-- Health Score -->
+            <div class="card health-card fade-in" style="animation-delay: 0.3s;">
+                <div class="card-title" style="margin-bottom: 24px;">Financial Health Score</div>
+                <div class="health-score-container" id="health-circle">
+                    <div class="health-circle">
+                        <span class="health-score" id="val-score">0</span>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 16px;">Based on your buffer, tax readiness, and cash flow consistency.</p>
+                <div style="width: 100%; text-align: left; padding: 12px; background: var(--bg-surface-elevated); border-radius: 8px;">
+                    <strong style="display: block; margin-bottom: 4px; font-size: 0.875rem;">Status: <span id="val-status-text" style="color: var(--accent-success);">Good</span></strong>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">You have a solid runway for the next 3 months even with variable income.</span>
+                </div>
+            </div>
+
+            <!-- What-if Simulator -->
+            <div class="card simulator-card fade-in" style="animation-delay: 0.4s;">
+                <div class="card-header">
+                    <div class="card-title">"What-If" Stress Test Simulator</div>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 20px;">Adjust variables below to see how a bad month or an amazing month affects your cash flow and tax burden.</p>
+                
+                <div class="control-group">
+                    <label>Simulate Income Change <span class="range-value" id="sim-income-val">0%</span></label>
+                    <input type="range" id="sim-income" min="-50" max="100" value="0" step="5">
+                </div>
+                
+                <div class="control-group">
+                    <label>Simulate Expense Change <span class="range-value" id="sim-expense-val">0%</span></label>
+                    <input type="range" id="sim-expense" min="-30" max="50" value="0" step="5">
+                </div>
+
+                <div style="margin-top: 24px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: var(--text-secondary);">Simulated Net Income</span>
+                        <strong id="sim-net-result">$0</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-secondary);">New Tax Liability</span>
+                        <strong id="sim-tax-result">$0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Tips & Insights -->
+            <div class="card ai-tips-card fade-in" style="animation-delay: 0.5s;">
+                <div class="card-header">
+                    <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #a78bfa;"><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg>
+                        AI Insights for Freelancers
+                    </div>
+                </div>
+                <div class="tip-list">
+                    <div class="tip-item">
+                        <div class="tip-icon">💡</div>
+                        <div>
+                            <h4 style="font-size: 0.875rem; margin-bottom: 4px;">Variable Income Strategy</h4>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Your income fluctuates by about 15% month-to-month. Build a "Hill & Valley" fund: save excess in high months to pay yourself a steady salary in low months.</p>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon">🧾</div>
+                        <div>
+                            <h4 style="font-size: 0.875rem; margin-bottom: 4px;">Tax Optimization</h4>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary);">You're projected to owe around $1,500 in quarterly taxes next month. Consider purchasing that new equipment now to increase deductions.</p>
+                        </div>
+                    </div>
+                    <div class="tip-item" style="background: rgba(29, 78, 216, 0.2); border: 1px dashed var(--accent-primary);">
+                        <div class="tip-icon">🤖</div>
+                        <div>
+                            <h4 style="font-size: 0.875rem; margin-bottom: 4px;">Ask your AI Planner:</h4>
+                            <p style="font-size: 0.75rem; color: var(--accent-primary); cursor: pointer;">"How do I structure a Solo 401(k) based on my current net?" →</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // State Management with LocalStorage
+        const defaultState = {
+            baseIncome: 8500,
+            baseExpense: 3200,
+            taxRate: 0.30,
+            simIncomeMod: 0,
+            simExpenseMod: 0,
+            history: [
+                { month: 'Jan', inc: 7200, exp: 3100 },
+                { month: 'Feb', inc: 6500, exp: 3050 },
+                { month: 'Mar', inc: 9100, exp: 3400 },
+                { month: 'Apr', inc: 8400, exp: 3100 },
+                { month: 'May', inc: 10200, exp: 3800 },
+                { month: 'Jun', inc: 8500, exp: 3200 },
+            ]
+        };
+
+        let state = JSON.parse(localStorage.getItem('financeApp_state')) || JSON.parse(JSON.stringify(defaultState));
+
+        const formatCurr = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+
+        function render() {
+            // Calculations
+            const simIncome = state.baseIncome * (1 + (state.simIncomeMod / 100));
+            const simExpense = state.baseExpense * (1 + (state.simExpenseMod / 100));
+            const simNet = simIncome - simExpense;
+            const simTax = simIncome * state.taxRate;
+
+            const baseNet = state.baseIncome - state.baseExpense;
+            const baseTax = state.baseIncome * state.taxRate;
+
+            // Health Score Logic (0-100)
+            // Good score = expenses < 50% income, stable income history
+            const expenseRatio = state.baseExpense / state.baseIncome;
+            let score = 100;
+            if (expenseRatio > 0.8) score -= 40;
+            else if (expenseRatio > 0.5) score -= 20;
+            
+            // Adjust for simulation
+            if (simNet < 0) score -= 50;
+            else if (simNet < baseNet) score -= 10;
+            
+            score = Math.max(0, Math.min(100, Math.round(score)));
+
+            // Update DOM Elements
+            document.getElementById('val-income').textContent = formatCurr(state.baseIncome);
+            document.getElementById('val-expense').textContent = formatCurr(state.baseExpense);
+            document.getElementById('val-net').textContent = formatCurr(baseNet);
+            document.getElementById('val-tax').textContent = formatCurr(baseTax);
+
+            // Simulation DOM
+            document.getElementById('sim-income-val').textContent = (state.simIncomeMod > 0 ? '+' : '') + state.simIncomeMod + '%';
+            document.getElementById('sim-expense-val').textContent = (state.simExpenseMod > 0 ? '+' : '') + state.simExpenseMod + '%';
+            document.getElementById('sim-net-result').textContent = formatCurr(simNet);
+            document.getElementById('sim-tax-result').textContent = formatCurr(simTax);
+            
+            // Update color based on simulation result
+            const simNetEl = document.getElementById('sim-net-result');
+            simNetEl.style.color = simNet < 0 ? 'var(--accent-danger)' : 'var(--accent-success)';
+
+            // Health Score DOM
+            document.getElementById('val-score').textContent = score;
+            const scoreDeg = (score / 100) * 360;
+            document.getElementById('health-circle').style.setProperty('--score-deg', `${scoreDeg}deg`);
+            
+            const statusTextEl = document.getElementById('val-status-text');
+            if (score >= 80) {
+                statusTextEl.textContent = 'Excellent';
+                statusTextEl.style.color = 'var(--accent-success)';
+                document.querySelector('.health-circle').style.background = `conic-gradient(var(--accent-success) var(--score-deg, 0deg), var(--bg-surface-elevated) 0deg)`;
+            } else if (score >= 50) {
+                statusTextEl.textContent = 'Fair';
+                statusTextEl.style.color = 'var(--accent-warning)';
+                document.querySelector('.health-circle').style.background = `conic-gradient(var(--accent-warning) var(--score-deg, 0deg), var(--bg-surface-elevated) 0deg)`;
+            } else {
+                statusTextEl.textContent = 'Vulnerable';
+                statusTextEl.style.color = 'var(--accent-danger)';
+                document.querySelector('.health-circle').style.background = `conic-gradient(var(--accent-danger) var(--score-deg, 0deg), var(--bg-surface-elevated) 0deg)`;
+            }
+
+            // Render Chart
+            renderChart(simIncome, simExpense);
+
+            // Save to LocalStorage
+            localStorage.setItem('financeApp_state', JSON.stringify(state));
+        }
+
+        function renderChart(currentSimInc, currentSimExp) {
+            const chartEl = document.getElementById('cashflow-chart');
+            chartEl.innerHTML = '';
+            
+            // Generate max value for scaling
+            const maxVal = Math.max(...state.history.map(d => Math.max(d.inc, d.exp)), currentSimInc, currentSimExp);
+            
+            const renderBarGroup = (label, inc, exp, isSimulation = false) => {
+                const incHeight = (inc / maxVal) * 100;
+                const expHeight = (exp / maxVal) * 100;
+                
+                const group = document.createElement('div');
+                group.className = 'chart-bar-group';
+                if (isSimulation) group.style.opacity = '0.7';
+                
+                group.innerHTML = `
+                    <div class="bar-wrapper">
+                        <div class="bar bar-income" style="height: ${Math.max(incHeight, 5)}%" data-value="${formatCurr(inc)}"></div>
+                        <div class="bar bar-expense" style="height: ${Math.max(expHeight, 5)}%" data-value="${formatCurr(exp)}"></div>
+                    </div>
+                    <div class="chart-label">${label}</div>
+                `;
+                return group;
+            };
+
+            // Historical Data
+            state.history.forEach(data => {
+                chartEl.appendChild(renderBarGroup(data.month, data.inc, data.exp));
+            });
+            
+            // Simulation Data (Next month projection)
+            chartEl.appendChild(renderBarGroup('Projected', currentSimInc, currentSimExp, true));
+        }
+
+        // Event Listeners
+        document.getElementById('sim-income').addEventListener('input', (e) => {
+            state.simIncomeMod = parseInt(e.target.value, 10);
+            render();
+        });
+
+        document.getElementById('sim-expense').addEventListener('input', (e) => {
+            state.simExpenseMod = parseInt(e.target.value, 10);
+            render();
+        });
+
+        function resetData() {
+            if(confirm("Are you sure you want to reset all simulations and data to default?")) {
+                state = JSON.parse(JSON.stringify(defaultState));
+                document.getElementById('sim-income').value = 0;
+                document.getElementById('sim-expense').value = 0;
+                render();
+            }
+        }
+
+        // Initial render
+        render();
+
+    </script>
+</body>
+</html>
