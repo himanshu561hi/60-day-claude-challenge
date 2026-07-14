@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workflow Architect | Client Onboarding</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #6366F1;
+            --primary-dark: #3730A3;
+            --secondary: #10B981;
+            --bg: #F3F4F6;
+            --surface: #FFFFFF;
+            --text: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+            --sidebar-width: 280px;
+        }
+
+        .dark-theme {
+            --primary: #6366F1;
+            --primary-light: #818CF8;
+            --primary-dark: #4F46E5;
+            --secondary: #34D399;
+            --bg: #111827;
+            --surface: #1F2937;
+            --text: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border: #374151;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: var(--transition);
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .progress-container {
+            margin-top: 2rem;
+            background-color: var(--bg);
+            padding: 1rem;
+            border-radius: var(--radius);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .sidebar-actions {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--border);
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 3rem;
+            width: calc(100% - var(--sidebar-width));
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 800px;
+        }
+
+        /* Flowchart */
+        .flowchart {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            overflow-x: auto;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.5rem;
+            position: relative;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .flow-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .flow-step::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: var(--border);
+            z-index: 1;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        .flow-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Stage Cards */
+        .stage-card {
+            background-color: var(--surface);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            border-top: 4px solid var(--primary);
+            position: relative;
+        }
+        
+        .bookmark-badge {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            background: var(--secondary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .stage-card.bookmarked .bookmark-badge {
+            display: block;
+        }
+
+        .stage-title {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .stage-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        ul {
+            list-style-position: inside;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tasks */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: var(--bg);
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .task-item:hover {
+            background-color: var(--border);
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .task-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .task-item.completed label {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        /* AI Tools Card */
+        .tool-card {
+            background: linear-gradient(to right, rgba(79,70,229,0.05), rgba(16,185,129,0.05));
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-badge {
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        
+        .tool-alt {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            border-top: 1px dashed var(--border);
+            padding-top: 0.5rem;
+        }
+
+        /* Prompts */
+        .prompt-box {
+            background-color: #1E1E1E;
+            color: #D4D4D4;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            position: relative;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .prompt-box::before {
+            content: 'PROMPT TEMPLATE';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255,255,255,0.1);
+            padding: 3px 10px;
+            font-size: 0.7rem;
+            border-bottom-left-radius: 8px;
+        }
+
+        /* Details / Accordion */
+        details {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .dark-theme summary {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .details-content {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .mistakes-list li {
+            color: var(--danger, #EF4444);
+        }
+
+        /* Notes Area */
+        .notes-area {
+            margin-top: 2rem;
+            border-top: 1px dashed var(--border);
+            padding-top: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 1rem;
+            border-radius: 8px;
+            min-height: 100px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .stage-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Conclusion Grid */
+        .conclusion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .conclusion-card {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tag {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 0; }
+            .stage-card { break-inside: avoid; border-top: 2px solid #000; box-shadow: none; border: 1px solid #ccc; }
+            body { background: #fff; color: #000; }
+            .tool-card, details, .notes-area { border: 1px solid #eee; }
+            .prompt-box { background: #f5f5f5; color: #333; border: 1px solid #ddd; }
+            .btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">AI Workflow Architect</div>
+        <nav class="nav-links">
+            <a href="#diagram" class="nav-link">Overview</a>
+            <a href="#stage1" class="nav-link">1. Lead Capture</a>
+            <a href="#stage2" class="nav-link">2. Discovery & Proposal</a>
+            <a href="#stage3" class="nav-link">3. Contracting</a>
+            <a href="#stage4" class="nav-link">4. Project Kickoff</a>
+            <a href="#stage5" class="nav-link">5. Setup & Integration</a>
+            <a href="#conclusion" class="nav-link">Conclusion</a>
+        </nav>
+
+        <div class="progress-container">
+            <div class="progress-header">
+                <span>Workflow Progress</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="overall-progress"></div>
+            </div>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn btn-outline" id="theme-toggle">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                Toggle Dark Mode
+            </button>
+            <button class="btn" id="print-btn">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Print Workflow Guide
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <h1>Freelance/Agency Client Onboarding</h1>
+            <p>A comprehensive end-to-end AI-powered automation strategy designed to transform prospects into active, aligned clients with zero friction and maximum professional impact.</p>
+        </header>
+
+        <!-- Interactive Diagram -->
+        <section id="diagram">
+            <div class="flowchart">
+                <div class="flow-step">
+                    <div class="flow-icon">1</div>
+                    <div class="flow-label">Lead Capture</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">2</div>
+                    <div class="flow-label">Discovery & Proposal</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">3</div>
+                    <div class="flow-label">Contracting</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">4</div>
+                    <div class="flow-label">Project Kickoff</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">5</div>
+                    <div class="flow-label">Integration</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAGE 1 -->
+        <section id="stage1" class="stage-card">
+            <div class="bookmark-badge">Bookmarked</div>
+            <div class="stage-title">
+                <h2>Stage 1: Lead Capture & Qualification</h2>
+                <span style="font-size: 1rem; color: var(--text-muted);">Est. Time: 15 mins (Automated)</span>
+            </div>
+            
+            <div class="stage-grid">
+                <div class="col">
+                    <h3 class="section-title">Objectives</h3>
+                    <ul>
+                        <li>Capture prospective client data automatically.</li>
+                        <li>Filter out low-budget or out-of-scope inquiries.</li>
+                        <li>Set a highly professional first impression.</li>
+                    </ul>
+
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="task-list" id="tasks-s1">
+                        <div class="task-item">
+                            <input type="checkbox" id="t1-1" class="task-check">
+                            <label for="t1-1">Set up automated inquiry form on website.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t1-2" class="task-check">
+                            <label for="t1-2">Configure Zapier to push leads to CRM.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t1-3" class="task-check">
+                            <label for="t1-3">Create automated AI response for qualified leads (Calendly link).</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t1-4" class="task-check">
+                            <label for="t1-4">Create polite rejection template for unqualified leads.</label>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">Expected Outputs</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">A filtered list of high-intent, budget-approved leads booked on your calendar without manual emailing.</p>
+                </div>
+                
+                <div class="col">
+                    <h3 class="section-title">AI Tools & Recommendations</h3>
+                    <div class="tool-card">
+                        <div class="tool-title">Typeform + Zapier + ChatGPT <span class="tool-badge">Primary</span></div>
+                        <p><strong>Why:</strong> Typeform offers a conversational UI. Zapier connects it to your CRM. ChatGPT can evaluate the responses to classify the lead's quality.</p>
+                        <div class="tool-alt"><strong>Alternatives:</strong> Tally Forms, Make.com, Claude 3 API</div>
+                    </div>
+
+                    <h3 class="section-title">AI Prompt Example</h3>
+                    <div class="prompt-box">
+You are an expert sales assistant. Review the following client inquiry form submission:
+[Insert Form Data]
+
+Task:
+1. Determine if the budget aligns with our minimum of $5,000.
+2. Determine if the requested timeline (X weeks) is feasible.
+3. Draft a professional, enthusiastic email response. If qualified, include my booking link [Link]. If unqualified, decline politely and recommend they check out my DIY resources at [Link].
+                    </div>
+                </div>
+            </div>
+
+            <details>
+                <summary>Best Practices & Common Mistakes</summary>
+                <div class="details-content stage-grid">
+                    <div>
+                        <strong>Best Practices:</strong>
+                        <ul>
+                            <li>Always ask for budget ranges upfront.</li>
+                            <li>Keep the initial form under 7 questions to reduce friction.</li>
+                            <li>Use conditional logic to hide/show questions based on previous answers.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>Common Mistakes:</strong>
+                        <ul class="mistakes-list">
+                            <li>Asking for too much detail before a discovery call.</li>
+                            <li>Failing to send an immediate auto-responder acknowledging receipt.</li>
+                            <li>Not syncing the form directly to a CRM, causing data silos.</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+
+            <div class="notes-area">
+                <textarea id="note-s1" placeholder="Add your notes, specific links, or customized prompts for this stage..."></textarea>
+                <div class="stage-actions">
+                    <button class="btn btn-outline toggle-bookmark" data-target="stage1">Toggle Bookmark</button>
+                    <button class="btn save-notes" data-target="note-s1">Save Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAGE 2 -->
+        <section id="stage2" class="stage-card">
+            <div class="bookmark-badge">Bookmarked</div>
+            <div class="stage-title">
+                <h2>Stage 2: Discovery & Proposal Generation</h2>
+                <span style="font-size: 1rem; color: var(--text-muted);">Est. Time: 45 mins</span>
+            </div>
+            
+            <div class="stage-grid">
+                <div class="col">
+                    <h3 class="section-title">Objectives</h3>
+                    <ul>
+                        <li>Understand client pain points deeply during the call.</li>
+                        <li>Instantly translate call transcripts into a compelling proposal.</li>
+                        <li>Deliver a tailored strategy that justifies premium pricing.</li>
+                    </ul>
+
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="task-list" id="tasks-s2">
+                        <div class="task-item">
+                            <input type="checkbox" id="t2-1" class="task-check">
+                            <label for="t2-1">Run discovery call using an AI meeting assistant.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t2-2" class="task-check">
+                            <label for="t2-2">Extract key deliverables, timeline, and goals from transcript.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t2-3" class="task-check">
+                            <label for="t2-3">Generate customized proposal draft using LLM.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t2-4" class="task-check">
+                            <label for="t2-4">Format in proposal software and send to client.</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col">
+                    <h3 class="section-title">AI Tools & Recommendations</h3>
+                    <div class="tool-card">
+                        <div class="tool-title">Otter.ai / Fireflies + Claude 3.5 Sonnet <span class="tool-badge">Primary</span></div>
+                        <p><strong>Why:</strong> Fireflies records and transcribes the call. Claude 3.5 Sonnet is currently the best at natural language generation for business writing, turning raw transcripts into structured proposals perfectly.</p>
+                        <div class="tool-alt"><strong>Alternatives:</strong> Fathom, Proposify, PandaDoc</div>
+                    </div>
+
+                    <h3 class="section-title">AI Prompt Example</h3>
+                    <div class="prompt-box">
+Here is the transcript from a discovery call with a new client:
+[Insert Transcript]
+
+Act as a senior agency copywriter. Extract the client's main pain points, desired outcomes, and required deliverables. 
+Draft a 3-page proposal layout including:
+1. Executive Summary
+2. Proposed Solution (3 phases)
+3. Timeline & Investment
+Use persuasive, confident, and professional language.
+                    </div>
+                </div>
+            </div>
+            
+            <details>
+                <summary>Efficiency Tip</summary>
+                <div class="details-content">
+                    <p>Create a master Template in PandaDoc or Notion. Use AI only to generate the <strong>custom text blocks</strong> (Executive summary, specific deliverables). Copy-paste the AI output into your beautiful template rather than having AI try to format the whole document.</p>
+                </div>
+            </details>
+
+            <div class="notes-area">
+                <textarea id="note-s2" placeholder="Add your notes..."></textarea>
+                <div class="stage-actions">
+                    <button class="btn btn-outline toggle-bookmark" data-target="stage2">Toggle Bookmark</button>
+                    <button class="btn save-notes" data-target="note-s2">Save Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAGE 3 -->
+        <section id="stage3" class="stage-card">
+            <div class="bookmark-badge">Bookmarked</div>
+            <div class="stage-title">
+                <h2>Stage 3: Contracting & Invoicing</h2>
+                <span style="font-size: 1rem; color: var(--text-muted);">Est. Time: 10 mins</span>
+            </div>
+            
+            <div class="stage-grid">
+                <div class="col">
+                    <h3 class="section-title">Objectives</h3>
+                    <ul>
+                        <li>Secure legally binding signatures.</li>
+                        <li>Collect initial deposit automatically.</li>
+                        <li>Transition client from "prospect" to "active client".</li>
+                    </ul>
+
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="task-list" id="tasks-s3">
+                        <div class="task-item">
+                            <input type="checkbox" id="t3-1" class="task-check">
+                            <label for="t3-1">Convert approved proposal into MSA/SOW.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t3-2" class="task-check">
+                            <label for="t3-2">Generate and send first invoice (e.g., 50% deposit).</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t3-3" class="task-check">
+                            <label for="t3-3">Set up automated follow-ups for unpaid invoices.</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col">
+                    <h3 class="section-title">AI Tools & Recommendations</h3>
+                    <div class="tool-card">
+                        <div class="tool-title">Stripe / Bonsai + DocuSign <span class="tool-badge">Primary</span></div>
+                        <p><strong>Why:</strong> Bonsai handles contracts and invoicing in one flow. Stripe enables immediate payment capture via credit card/ACH upon signature.</p>
+                        <div class="tool-alt"><strong>Alternatives:</strong> HoneyBook, Dubsado, QuickBooks</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-area">
+                <textarea id="note-s3" placeholder="Add your notes..."></textarea>
+                <div class="stage-actions">
+                    <button class="btn btn-outline toggle-bookmark" data-target="stage3">Toggle Bookmark</button>
+                    <button class="btn save-notes" data-target="note-s3">Save Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAGE 4 -->
+        <section id="stage4" class="stage-card">
+            <div class="bookmark-badge">Bookmarked</div>
+            <div class="stage-title">
+                <h2>Stage 4: Project Kickoff & Info Gathering</h2>
+                <span style="font-size: 1rem; color: var(--text-muted);">Est. Time: 30 mins (Async)</span>
+            </div>
+            
+            <div class="stage-grid">
+                <div class="col">
+                    <h3 class="section-title">Objectives</h3>
+                    <ul>
+                        <li>Collect brand assets, logins, and intake questionnaires without endless email threads.</li>
+                        <li>Set clear boundaries and communication guidelines.</li>
+                    </ul>
+
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="task-list" id="tasks-s4">
+                        <div class="task-item">
+                            <input type="checkbox" id="t4-1" class="task-check">
+                            <label for="t4-1">Send dynamic intake form triggered by invoice payment.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t4-2" class="task-check">
+                            <label for="t4-2">Generate shared Google Drive / Dropbox folder structure.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t4-3" class="task-check">
+                            <label for="t4-3">Welcome email with project roadmap and boundaries.</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col">
+                    <h3 class="section-title">AI Tools & Recommendations</h3>
+                    <div class="tool-card">
+                        <div class="tool-title">Content Snare / Google Workspace <span class="tool-badge">Primary</span></div>
+                        <p><strong>Why:</strong> Content Snare is designed specifically to extract info/files from clients with automated reminders, saving hours of chasing assets.</p>
+                        <div class="tool-alt"><strong>Alternatives:</strong> Notion portals, Airtable forms</div>
+                    </div>
+                    
+                    <h3 class="section-title">AI Prompt Example</h3>
+                    <div class="prompt-box">
+Draft a warm, exciting "Welcome & Next Steps" email for a new client who just paid their deposit for a [Service] project. 
+Include:
+- Gratitude for choosing us.
+- Link to the intake form [Link].
+- Link to the shared Drive folder [Link].
+- Our working hours (Mon-Fri, 9am-5pm EST) and expected response times (24 hrs).
+Keep the tone highly professional but approachable.
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-area">
+                <textarea id="note-s4" placeholder="Add your notes..."></textarea>
+                <div class="stage-actions">
+                    <button class="btn btn-outline toggle-bookmark" data-target="stage4">Toggle Bookmark</button>
+                    <button class="btn save-notes" data-target="note-s4">Save Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAGE 5 -->
+        <section id="stage5" class="stage-card">
+            <div class="bookmark-badge">Bookmarked</div>
+            <div class="stage-title">
+                <h2>Stage 5: Integration & Client Portal Setup</h2>
+                <span style="font-size: 1rem; color: var(--text-muted);">Est. Time: 20 mins</span>
+            </div>
+            
+            <div class="stage-grid">
+                <div class="col">
+                    <h3 class="section-title">Objectives</h3>
+                    <ul>
+                        <li>Give the client a single source of truth for the project.</li>
+                        <li>Automate task creation internally.</li>
+                    </ul>
+
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="task-list" id="tasks-s5">
+                        <div class="task-item">
+                            <input type="checkbox" id="t5-1" class="task-check">
+                            <label for="t5-1">Duplicate Client Portal template in Notion/ClickUp.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t5-2" class="task-check">
+                            <label for="t5-2">Populate portal with contract, invoice, and timeline.</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" id="t5-3" class="task-check">
+                            <label for="t5-3">Invite client to portal / Slack channel.</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col">
+                    <h3 class="section-title">AI Tools & Recommendations</h3>
+                    <div class="tool-card">
+                        <div class="tool-title">Notion / ClickUp + Make.com <span class="tool-badge">Primary</span></div>
+                        <p><strong>Why:</strong> Make.com can watch for an executed contract and automatically duplicate a Notion template, rename it to the client's name, and share it with their email.</p>
+                        <div class="tool-alt"><strong>Alternatives:</strong> Basecamp, Asana, Monday.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-area">
+                <textarea id="note-s5" placeholder="Add your notes..."></textarea>
+                <div class="stage-actions">
+                    <button class="btn btn-outline toggle-bookmark" data-target="stage5">Toggle Bookmark</button>
+                    <button class="btn save-notes" data-target="note-s5">Save Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section id="conclusion" class="stage-card" style="border-top-color: var(--secondary);">
+            <div class="stage-title">
+                <h2>Workflow Summary & Resources</h2>
+            </div>
+            
+            <div class="conclusion-grid">
+                <div class="conclusion-card">
+                    <h3 class="section-title">Workflow Summary</h3>
+                    <p>By implementing this workflow, you eliminate manual data entry, reduce client drop-off rates, look like an enterprise-level agency, and save approximately <strong>3-5 hours per new client</strong>.</p>
+                </div>
+                
+                <div class="conclusion-card">
+                    <h3 class="section-title">Recommended AI Stack</h3>
+                    <div class="tag-list">
+                        <span class="tag">ChatGPT / Claude</span>
+                        <span class="tag">Zapier / Make.com</span>
+                        <span class="tag">Otter / Fireflies</span>
+                        <span class="tag">Typeform</span>
+                        <span class="tag">Notion</span>
+                        <span class="tag">Stripe</span>
+                    </div>
+                </div>
+                
+                <div class="conclusion-card">
+                    <h3 class="section-title">Future Automation Opportunities</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li>AI Chatbot on website for pre-qualification.</li>
+                        <li>Automated weekly progress reports generated by AI based on Jira/ClickUp data.</li>
+                        <li>AI-driven automated testimonial collection post-project.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const printBtn = document.getElementById('print-btn');
+        const taskChecks = document.querySelectorAll('.task-check');
+        const progressBar = document.getElementById('overall-progress');
+        const progressText = document.getElementById('progress-text');
+        const textareas = document.querySelectorAll('textarea');
+        const saveBtns = document.querySelectorAll('.save-notes');
+        const bookmarkBtns = document.querySelectorAll('.toggle-bookmark');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        // Initialize state from local storage
+        function init() {
+            // Theme
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+
+            // Tasks
+            let completedCount = 0;
+            taskChecks.forEach(check => {
+                const isChecked = localStorage.getItem(check.id) === 'true';
+                check.checked = isChecked;
+                if (isChecked) {
+                    check.closest('.task-item').classList.add('completed');
+                    completedCount++;
+                }
+                
+                check.addEventListener('change', (e) => {
+                    localStorage.setItem(e.target.id, e.target.checked);
+                    if (e.target.checked) {
+                        e.target.closest('.task-item').classList.add('completed');
+                    } else {
+                        e.target.closest('.task-item').classList.remove('completed');
+                    }
+                    updateProgress();
+                });
+            });
+            updateProgress(completedCount, taskChecks.length);
+
+            // Notes
+            textareas.forEach(ta => {
+                const savedVal = localStorage.getItem(ta.id);
+                if (savedVal) ta.value = savedVal;
+            });
+
+            // Bookmarks
+            bookmarkBtns.forEach(btn => {
+                const targetId = btn.getAttribute('data-target');
+                const isBookmarked = localStorage.getItem(`bookmark-${targetId}`) === 'true';
+                if (isBookmarked) {
+                    document.getElementById(targetId).classList.add('bookmarked');
+                    btn.textContent = 'Remove Bookmark';
+                }
+            });
+        }
+
+        // Update Progress Bar
+        function updateProgress() {
+            const total = taskChecks.length;
+            const completed = document.querySelectorAll('.task-check:checked').length;
+            const percentage = Math.round((completed / total) * 100) || 0;
+            
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}%`;
+        }
+
+        // Event Listeners
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        printBtn.addEventListener('click', () => {
+            window.print();
+        });
+
+        saveBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.target.getAttribute('data-target');
+                const ta = document.getElementById(targetId);
+                localStorage.setItem(targetId, ta.value);
+                
+                const originalText = e.target.textContent;
+                e.target.textContent = 'Saved!';
+                e.target.style.backgroundColor = 'var(--secondary)';
+                
+                setTimeout(() => {
+                    e.target.textContent = originalText;
+                    e.target.style.backgroundColor = '';
+                }, 2000);
+            });
+        });
+
+        bookmarkBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.target.getAttribute('data-target');
+                const section = document.getElementById(targetId);
+                const isBookmarked = section.classList.toggle('bookmarked');
+                
+                localStorage.setItem(`bookmark-${targetId}`, isBookmarked);
+                e.target.textContent = isBookmarked ? 'Remove Bookmark' : 'Toggle Bookmark';
+            });
+        });
+
+        // Smooth Scrolling & Active Nav Highlight
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Run init
+        init();
+    </script>
+</body>
+</html>

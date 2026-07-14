@@ -404,7 +404,7 @@ socket.send(JSON.stringify(payload));</code></pre>
         
         quizzes[modId].forEach((q, i) => {
             html += `
-                <div class="question" id="q-${modId}-${i}" ${i === 0 ? 'class="question active" style="display:block"' : ''}>
+                <div class="question ${i === 0 ? 'active' : ''}" id="q-${modId}-${i}">
                     <p style="font-size: 1.2rem; font-weight: 600;">Question ${i + 1} of 4</p>
                     <p>${q.q}</p>
                     <div class="options">
@@ -463,9 +463,8 @@ socket.send(JSON.stringify(payload));</code></pre>
         const summary = document.getElementById(`summary-${modId}`);
         summary.style.display = 'block';
         
-        document.getElementById(`mod-${modId}`).classList.replace('active', 'completed');
-
         if (score >= 3) {
+            document.getElementById(`mod-${modId}`).classList.replace('active', 'completed');
             summary.innerHTML = `<h3 style="color: var(--secondary)">Module Passed! (${score}/4)</h3>
                                  <p>Great job. You've unlocked the next section.</p>`;
             
@@ -521,7 +520,10 @@ socket.send(JSON.stringify(payload));</code></pre>
         });
     }
 
+    let isPolling = false;
     async function demoPolling() {
+        if(isPolling) return;
+        isPolling = true;
         const log = document.getElementById('demo-1-log');
         log.innerText = 'Polling started... (Interval: 1.5s)';
         for(let i=0; i<3; i++) {
@@ -531,9 +533,13 @@ socket.send(JSON.stringify(payload));</code></pre>
             log.innerText = `Res ${i+1}: Server says "No new data"`;
             await new Promise(r => setTimeout(r, 500));
         }
+        isPolling = false;
     }
 
+    let isWSDemo = false;
     async function demoWS() {
+        if(isWSDemo) return;
+        isWSDemo = true;
         const log = document.getElementById('demo-1-log');
         log.innerText = 'WS Connecting... (Handshake)';
         await createPacket('demo-1-canvas', '80px', 'calc(100% - 90px)', 'var(--accent)', 0);
@@ -557,12 +563,13 @@ socket.send(JSON.stringify(payload));</code></pre>
             await createPacket('demo-1-canvas', 'calc(100% - 90px)', '80px', 'var(--secondary)', 0);
             await createPacket('demo-1-canvas', 'calc(100% - 90px)', '80px', 'var(--secondary)', 500);
             log.innerText = 'Push complete. Connection remains open.';
-            setTimeout(() => line.remove(), 2000);
+            setTimeout(() => { line.remove(); isWSDemo = false; }, 2000);
         }, 1000);
     }
 
     // Demo 2: Echo
     let demo2State = false;
+    let demo2Connecting = false;
     function logDemo2(msg, color='var(--text-main)') {
         const log = document.getElementById('demo2-log');
         log.innerHTML += `<br><span style="color:${color}">${msg}</span>`;
@@ -570,10 +577,12 @@ socket.send(JSON.stringify(payload));</code></pre>
     }
 
     function demo2Connect() {
-        if(demo2State) return;
+        if(demo2State || demo2Connecting) return;
+        demo2Connecting = true;
         logDemo2('⏳ new WebSocket("wss://echo.server")...', 'var(--text-muted)');
         setTimeout(() => {
             demo2State = true;
+            demo2Connecting = false;
             logDemo2('✅ onopen: Connected to server!', 'var(--secondary)');
             document.getElementById('btn-send-demo2').disabled = false;
             document.getElementById('btn-connect-demo2').disabled = true;
@@ -589,7 +598,10 @@ socket.send(JSON.stringify(payload));</code></pre>
     }
 
     // Demo 4: PubSub
+    let pubSubRunning = false;
     async function demoPubSub() {
+        if (pubSubRunning) return;
+        pubSubRunning = true;
         const log = document.getElementById('pubsub-log');
         log.innerText = 'Alice sends message to Server A...';
         
@@ -639,6 +651,7 @@ socket.send(JSON.stringify(payload));</code></pre>
                     setTimeout(() => {
                         pB.remove(); pC.remove();
                         log.innerText = 'Delivery complete. Real-time scale achieved.';
+                        pubSubRunning = false;
                     }, 1000);
 
                 }, 1000);
