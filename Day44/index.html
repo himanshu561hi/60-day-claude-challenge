@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Roast & Rebuild Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Color Palette */
+            --bg-dark: #09090b;
+            --bg-card: rgba(24, 24, 27, 0.7);
+            --bg-card-hover: rgba(39, 39, 42, 0.9);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --secondary: #8b5cf6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            
+            /* Typography */
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-heading);
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn.active {
+            color: white;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        .nav-btn.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .user-profile {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-weight: 700;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1200px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Cards & Containers */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 1rem;
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Score Badge */
+        .score-badge {
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .score-bad { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .score-good { color: var(--accent); border-color: rgba(16, 185, 129, 0.3); }
+
+        /* Roast Elements */
+        .roast-item { margin-bottom: 1.25rem; }
+        .roast-label { font-weight: 600; color: white; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+        .roast-text { color: var(--text-muted); margin-left: 1.75rem; }
+
+        /* Rebuild Elements */
+        .rebuild-option {
+            background: rgba(255,255,255,0.03);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .rebuild-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .rebuild-content {
+            font-size: 1.1rem;
+            color: white;
+            line-height: 1.7;
+        }
+
+        .code-block {
+            background: #0f111a;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: monospace;
+            color: #a6accd;
+            margin: 1rem 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            white-space: pre-wrap;
+        }
+
+        /* Scorecard */
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .score-card {
+            background: linear-gradient(145deg, rgba(30,30,35,0.9), rgba(15,15,20,0.9));
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(135deg, transparent, rgba(59, 130, 246, 0.05));
+            pointer-events: none;
+        }
+
+        .sc-title {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .sc-values {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .sc-before { color: var(--danger); text-decoration: line-through; opacity: 0.7; }
+        .sc-after { color: var(--accent); }
+        .sc-diff { font-size: 1rem; background: rgba(16, 185, 129, 0.1); color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 1rem; }
+
+        .overall-score {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .overall-score .sc-values {
+            justify-content: center;
+            gap: 2rem;
+            font-size: 3rem;
+        }
+
+        /* Timeline / Action Plan */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2.35rem;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .timeline-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .timeline-content h3 {
+            color: white;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-heading);
+        }
+
+        /* Summary Card */
+        .share-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .share-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .share-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .share-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .share-stat-box p { color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; }
+        .share-stat-box h4 { font-size: 2rem; font-family: var(--font-heading); }
+        
+        .share-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .share-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .share-list li i { color: var(--danger); }
+
+        .share-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--accent);
+            color: white;
+        }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-toggle { display: block; }
+            .sidebar {
+                transform: translateX(-100%);
+                width: 100%;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main-content {
+                margin-left: 0;
+                padding: 4rem 1.5rem 2rem 1.5rem;
+            }
+            .overall-score .sc-values { font-size: 2rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <i data-lucide="flame" style="color: var(--danger);"></i>
+            ProfileRoast
+        </div>
+
+        <div class="nav-items">
+            <button class="nav-btn active" onclick="switchTab('roast', this)">
+                <i data-lucide="alert-triangle"></i> Part 1: The Roast
+            </button>
+            <button class="nav-btn" onclick="switchTab('rebuild', this)">
+                <i data-lucide="hammer"></i> Part 2: The Rebuild
+            </button>
+            <button class="nav-btn" onclick="switchTab('scorecard', this)">
+                <i data-lucide="bar-chart-2"></i> Part 3: Scorecard
+            </button>
+            <button class="nav-btn" onclick="switchTab('plan', this)">
+                <i data-lucide="calendar"></i> Part 4: 7-Day Plan
+            </button>
+            <button class="nav-btn" onclick="switchTab('summary', this)">
+                <i data-lucide="share-2"></i> Part 5: Summary
+            </button>
+        </div>
+
+        <div class="user-profile">
+            <div class="avatar">HG</div>
+            <div>
+                <div style="font-weight: 600; font-family: var(--font-heading); color: white;">Himanshu Gupta</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Full-Stack Developer</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <!-- SECTION: THE ROAST -->
+        <section id="roast" class="section active">
+            <div class="section-header">
+                <h1 class="section-title">The Brutal Roast 🔥</h1>
+                <p class="section-subtitle">What recruiters ACTUALLY think when they see your profile in 3 seconds.</p>
+            </div>
+
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="type" style="color: var(--primary);"></i> Headline
+                    </div>
+                    <div class="score-badge score-bad">6 / 10</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label"><i data-lucide="message-square" size="18"></i> Recruiter Reaction:</div>
+                    <div class="roast-text">"Generic start. 'MERN Stack' is good for search. 'Building AI' is cool but vague. 'Paper winner' is academic, I want to know if you can ship production code."</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label" style="color: var(--danger);"><i data-lucide="x-circle" size="18"></i> The Problem:</div>
+                    <div class="roast-text">Too generic. You blend in with millions of other devs. It says <em>what</em> you are, not <em>who</em> you help or the business value you drive.</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label" style="color: var(--secondary);"><i data-lucide="eye-off" size="18"></i> Invisible Cost:</div>
+                    <div class="roast-text">You lose the "wow" factor before they even click your profile. You're just another search result.</div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="align-left" style="color: var(--primary);"></i> About Section (First 2 Lines)
+                    </div>
+                    <div class="score-badge score-bad">4 / 10</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label"><i data-lucide="message-square" size="18"></i> Recruiter Reaction:</div>
+                    <div class="roast-text">"Yawn. Another student introducing themselves like it's a cover letter. I already know your name from the top."</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label" style="color: var(--danger);"><i data-lucide="x-circle" size="18"></i> The Problem:</div>
+                    <div class="roast-text">"🚀 Full-Stack Developer... Hi, I'm Himanshu... a student". Wasting the precious real estate before the "see more" button instantly frames you as junior.</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label" style="color: var(--secondary);"><i data-lucide="eye-off" size="18"></i> Invisible Cost:</div>
+                    <div class="roast-text">90% of people will never click "see more" because the hook didn't grab them.</div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i data-lucide="briefcase" style="color: var(--primary);"></i> Experience (Top Entry)
+                    </div>
+                    <div class="score-badge score-bad">3 / 10</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label"><i data-lucide="message-square" size="18"></i> Recruiter Reaction:</div>
+                    <div class="roast-text">"This tells me nothing. What projects? What was the impact? 'Working on' means nothing to me."</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label" style="color: var(--danger);"><i data-lucide="x-circle" size="18"></i> The Problem:</div>
+                    <div class="roast-text">It reads like a job description or learning syllabus, not an achievement list. Companies hire for value, not to subsidize learning.</div>
+                </div>
+                <div class="roast-item">
+                    <div class="roast-label" style="color: var(--secondary);"><i data-lucide="eye-off" size="18"></i> Invisible Cost:</div>
+                    <div class="roast-text">Recruiters skip to the next profile that says "Built an AI tool that saved X hours" because it shows concrete ROI.</div>
+                </div>
+            </div>
+            
+            <div class="overall-score" style="border-radius: 1rem; margin-top: 2rem;">
+                <h3 style="color: white; font-family: var(--font-heading); margin-bottom: 0.5rem;">Current Profile Strength</h3>
+                <div style="font-size: 3.5rem; font-weight: 800; color: var(--danger); font-family: var(--font-heading);">52 <span style="font-size: 1.5rem; color: var(--text-muted)">/ 100</span></div>
+            </div>
+        </section>
+
+        <!-- SECTION: THE REBUILD -->
+        <section id="rebuild" class="section">
+            <div class="section-header">
+                <h1 class="section-title">The Rebuild 🛠️</h1>
+                <p class="section-subtitle">Optimized for search visibility, authority, and conversion.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Headline Options</div>
+                </div>
+                
+                <div class="rebuild-option">
+                    <div class="rebuild-label">Option 1: Keyword-Optimized (Recommended for Job Search)</div>
+                    <div class="rebuild-content">Full-Stack Software Engineer (MERN) | Building Scalable AI Web Apps | React.js, Node.js | Actively Seeking Full-Time IT Roles</div>
+                </div>
+
+                <div class="rebuild-option" style="border-color: var(--secondary);">
+                    <div class="rebuild-label" style="color: var(--secondary);">Option 2: Value-Proposition (Client Attraction)</div>
+                    <div class="rebuild-content">Full-Stack Developer | I architect scalable MERN applications & AI-powered tools | 1st Place National Tech Winner 🏆</div>
+                </div>
+                
+                <div class="rebuild-option" style="border-color: var(--accent);">
+                    <div class="rebuild-label" style="color: var(--accent);">Option 3: Authority Style (Thought Leadership)</div>
+                    <div class="rebuild-content">Software Engineer | Specializing in AI-Integrated Platforms & MERN Stack | Hackathon Winner & Technical Writer</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">About Section Complete Rewrite</div>
+                </div>
+                <div class="code-block"><b>[The Hook - Visible before 'see more']</b>
+Building AI-powered platforms isn't just about writing code—it's about solving real-world problems.
+
+<b>[The Story]</b>
+As a Full-Stack Software Engineer specializing in the MERN stack, I transform complex ideas into scalable, user-centric web applications. Over the past year, I haven't just been studying theory; I've been shipping products. I engineer robust backend architectures and pair them with dynamic frontends to create seamless digital experiences.
+
+<b>[The Proof]</b>
+From developing an AI Career Coach with 12+ integrated backend APIs, to building a real-time AI Interview platform leveraging Gemini and Vapi AI, I thrive at the intersection of software engineering and artificial intelligence. My ability to execute under pressure recently earned my team 1st Place at a National-Level Technical Paper competition and a Top 75 spot out of 10,000+ at Hacknovate 7.0.
+
+<b>[The CTA]</b>
+I am currently seeking full-time Full-Stack Developer roles where I can contribute to an innovative engineering team. 
+📩 Send me a DM or connect with me—let's build something impactful together.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Experience Bullet Rewrite (Mirai School)</div>
+                </div>
+                <p style="color: var(--danger); text-decoration: line-through; margin-bottom: 1rem; opacity: 0.7;">
+                    Selected for an 8-week AI Summer Internship at Mirai School of Technology. Working on real-world AI and Machine Learning projects while gaining hands-on experience...
+                </p>
+                <div class="rebuild-option" style="border-color: var(--accent);">
+                    <div class="rebuild-label" style="color: var(--accent);">The After (Achievement based):</div>
+                    <div class="rebuild-content">
+                        • Engineered and deployed [Feature/Project Name], integrating Natural Language Processing (NLP) and Computer Vision to [State the problem it solved].<br><br>
+                        • Optimized AI workflows and implemented advanced Prompt Engineering techniques, improving [efficiency/accuracy metric by X%].<br><br>
+                        • Collaborated with a team of developers and mentors to architect practical Machine Learning solutions from concept to deployment.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Skills Strategy</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--accent); margin-bottom: 0.5rem;"><i data-lucide="plus-circle" size="16"></i> Top Skills to ADD:</h4>
+                        <ul style="color: var(--text-muted); margin-left: 1.5rem; line-height: 1.8;">
+                            <li>Next.js & RESTful WebServices</li>
+                            <li>System Architecture</li>
+                            <li>Prompt Engineering & OpenAI API</li>
+                            <li>Vercel & Tailwind CSS</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--danger); margin-bottom: 0.5rem;"><i data-lucide="minus-circle" size="16"></i> Skills to REMOVE:</h4>
+                        <p style="color: var(--text-muted);">HTML, CSS, HTML5, CSS3. (If you know React, these are implied. Leaving them makes you look like a beginner).</p>
+                        
+                        <h4 style="color: var(--primary); margin-top: 1.5rem; margin-bottom: 0.5rem;"><i data-lucide="pin" size="16"></i> Top 3 to PIN:</h4>
+                        <p style="color: white; font-weight: 600;">1. React.js | 2. Node.js | 3. Artificial Intelligence (AI)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: SCORECARD -->
+        <section id="scorecard" class="section">
+            <div class="section-header">
+                <h1 class="section-title">Before vs After Scorecard 📈</h1>
+                <p class="section-subtitle">See the quantifiable difference in your profile's impact.</p>
+            </div>
+
+            <div class="scorecard-grid">
+                <div class="score-card">
+                    <div class="sc-title">Headline</div>
+                    <div class="sc-values">
+                        <span class="sc-before">6/10</span>
+                        <i data-lucide="arrow-right" style="color: var(--text-muted);"></i>
+                        <span class="sc-after">9/10</span>
+                        <span class="sc-diff">+3</span>
+                    </div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="sc-title">About (Hook)</div>
+                    <div class="sc-values">
+                        <span class="sc-before">4/10</span>
+                        <i data-lucide="arrow-right" style="color: var(--text-muted);"></i>
+                        <span class="sc-after">9.5/10</span>
+                        <span class="sc-diff">+5.5</span>
+                    </div>
+                </div>
+
+                <div class="score-card">
+                    <div class="sc-title">About (Full)</div>
+                    <div class="sc-values">
+                        <span class="sc-before">6/10</span>
+                        <i data-lucide="arrow-right" style="color: var(--text-muted);"></i>
+                        <span class="sc-after">9/10</span>
+                        <span class="sc-diff">+3</span>
+                    </div>
+                </div>
+
+                <div class="score-card">
+                    <div class="sc-title">Experience</div>
+                    <div class="sc-values">
+                        <span class="sc-before">3/10</span>
+                        <i data-lucide="arrow-right" style="color: var(--text-muted);"></i>
+                        <span class="sc-after">8.5/10</span>
+                        <span class="sc-diff">+5.5</span>
+                    </div>
+                </div>
+
+                <div class="overall-score">
+                    <div class="sc-title" style="color: white; font-size: 1.2rem;">OVERALL PROFILE STRENGTH</div>
+                    <div class="sc-values">
+                        <span class="sc-before">52/100</span>
+                        <i data-lucide="arrow-right" style="color: var(--text-muted);"></i>
+                        <span class="sc-after">90/100</span>
+                        <span class="sc-diff" style="background: var(--accent); color: white; padding: 0.5rem 1rem;">+38 Points</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: 7 DAY PLAN -->
+        <section id="plan" class="section">
+            <div class="section-header">
+                <h1 class="section-title">7-Day Activation Plan 🚀</h1>
+                <p class="section-subtitle">Don't just let your profile sit there. Put it to work.</p>
+            </div>
+
+            <div class="card" style="padding: 3rem;">
+                <div class="timeline">
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker">1</div>
+                        <div class="timeline-content">
+                            <h3>Day 1: The Rebuild</h3>
+                            <p style="color: var(--text-muted);">Update your Headline, About section, Experience bullets, and pin your Top 3 skills. Delete HTML/CSS from skills.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">2</div>
+                        <div class="timeline-content">
+                            <h3>Day 2: "Build in Public" Post</h3>
+                            <div class="code-block" style="margin-top: 0.5rem; font-size: 0.95rem;">"I just completely tore down and rebuilt my LinkedIn profile. 🛠️
+
+As a Full-Stack MERN developer, I spend all my time optimizing code, but realized I wasn't optimizing my own personal brand. 
+
+Big shifts I made:
+1️⃣ Stopped calling myself a 'student' in the first line and started highlighting the actual products I've shipped (like my AI Career Coach).
+2️⃣ Rewrote my experience to focus on achievements, not just a list of technologies.
+3️⃣ Pinned the skills that actually matter for the roles I want.
+
+If you're an engineer, when was the last time you refactored your LinkedIn profile? Let me know what you think of the new look! 👇"</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">3</div>
+                        <div class="timeline-content">
+                            <h3>Day 3: Strategic Outreach</h3>
+                            <p style="color: var(--text-muted);">Send 10 connection requests to Tech Recruiters or Engineering Managers. Use this template:</p>
+                            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; margin-top: 0.5rem; font-style: italic; color: white;">
+                                "Hi [Name], I loved your recent post on [Topic/Hiring]. I'm a Full-Stack MERN Developer actively looking for full-time roles. Would love to connect and follow your team's work!"
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">4</div>
+                        <div class="timeline-content">
+                            <h3>Day 4: Value Commenting</h3>
+                            <p style="color: var(--text-muted);">Find 5 posts from engineering leaders. Use the formula: <strong>Agree + Add 1 Insight from your projects + Ask a Question.</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">5</div>
+                        <div class="timeline-content">
+                            <h3>Day 5: The Hot-Take Post</h3>
+                            <div class="code-block" style="margin-top: 0.5rem; font-size: 0.95rem;">"Building an AI-powered app sounds glamorous until you have to manage 12+ backend APIs. 😅
+
+While building my AI Career Coach platform, the biggest technical hurdle wasn't the AI—it was [insert technical challenge]. 
+
+Here's how I solved it using [React/Node]:
+1. [Step 1]
+2. [Step 2]
+
+What's the hardest technical bug you've squashed this week?"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker">6</div>
+                        <div class="timeline-content">
+                            <h3>Day 6 & 7: Engage & Review</h3>
+                            <p style="color: var(--text-muted);">Reply to every comment. Send 5 more requests. On Day 7, check analytics. Are views up? Is acceptance rate > 30%?</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: SUMMARY -->
+        <section id="summary" class="section">
+            <div class="section-header">
+                <h1 class="section-title">Share Your Wins 📸</h1>
+                <p class="section-subtitle">Screenshot this card and post it to show you take your career seriously.</p>
+            </div>
+
+            <div class="share-card">
+                <h2 class="share-title">I let AI roast my LinkedIn profile today. Here's what changed:</h2>
+                
+                <div class="share-stats">
+                    <div class="share-stat-box">
+                        <p>Before</p>
+                        <h4 style="color: var(--danger); text-decoration: line-through;">52/100</h4>
+                    </div>
+                    <div class="share-stat-box">
+                        <p>After</p>
+                        <h4 style="color: var(--accent);">90/100</h4>
+                    </div>
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Top 3 mistakes I was making:</p>
+                <ul class="share-list">
+                    <li>
+                        <i data-lucide="x-circle"></i>
+                        <span style="color: #e2e8f0;">Wasting my About section hook by calling myself a 'student' instead of an engineer who ships products.</span>
+                    </li>
+                    <li>
+                        <i data-lucide="x-circle"></i>
+                        <span style="color: #e2e8f0;">Writing my experience like a job description copy-paste instead of highlighting actual achievements.</span>
+                    </li>
+                    <li>
+                        <i data-lucide="x-circle"></i>
+                        <span style="color: #e2e8f0;">Keeping a generic headline that didn't scream exactly what value I bring to a company.</span>
+                    </li>
+                </ul>
+
+                <div class="share-highlight">
+                    <strong>The #1 thing that made the biggest difference:</strong><br>
+                    Framing myself as a problem-solver who builds real-world applications, not just someone looking for a job.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Tab Switching Logic
+        function switchTab(tabId, btnElement) {
+            // Remove active class from all sections and buttons
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to target section and button
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+
+            // Close sidebar on mobile after click
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
