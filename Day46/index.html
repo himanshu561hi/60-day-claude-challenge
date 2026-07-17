@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autonomous Agent Studio</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel-bg: #1a1d24;
+    --accent: #6366f1;
+    --accent-glow: rgba(99, 102, 241, 0.5);
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --success: #10b981;
+    --error: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header {
+    background: #111827;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    z-index: 10;
+  }
+  h1 { font-size: 1.2rem; font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.5rem; }
+  h1::before { content: ''; display: inline-block; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
+  
+  .container {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .panel-header {
+    padding: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+  .panel-content {
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  /* SVG Workflow */
+  .svg-container {
+    width: 100%;
+    height: 250px;
+    background: #111827;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+  }
+  .node circle {
+    transition: all 0.3s ease;
+  }
+  
+  /* Form */
+  textarea {
+    width: 100%;
+    height: 100px;
+    background: #000;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-family: inherit;
+    resize: none;
+    margin-bottom: 1rem;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  button:hover { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 4px 12px var(--accent-glow); }
+  button:disabled { background: var(--border); cursor: not-allowed; transform: none; box-shadow: none; color: var(--text-muted); }
+  
+  /* Feed */
+  #outputs-container { display: flex; flex-direction: column; gap: 1rem; }
+  .agent-card {
+    background: #111827;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .agent-card-header {
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .agent-badge {
+    background: rgba(99, 102, 241, 0.2);
+    color: #818cf8;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .round-badge {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .agent-card-body {
+    padding: 1rem;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .highlight-score {
+    color: var(--success);
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(16,185,129,0.3);
+    padding: 0.2rem 0.5rem;
+    background: rgba(16,185,129,0.1);
+    border-radius: 4px;
+  }
+  
+  /* Metrics */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-box {
+    background: #111827;
+    border: 1px solid var(--border);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-top: 0.25rem; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .chart-box {
+    background: #111827;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    height: 150px;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .activity-log {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+  }
+  .log-entry { margin-bottom: 0.5rem; line-height: 1.4; border-bottom: 1px dashed #334155; padding-bottom: 0.25rem; }
+  .log-entry:last-child { border-bottom: none; }
+  .log-time { color: #64748b; margin-right: 0.5rem; }
+  .log-source { font-weight: 600; color: #818cf8; margin-right: 0.5rem; }
+  .log-msg { color: #cbd5e1; }
+  .log-entry.error .log-msg { color: var(--error); }
+  .log-entry.system .log-source { color: #10b981; }
+
+  /* Descriptions */
+  .desc-content h3 { font-size: 0.9rem; margin: 1rem 0 0.5rem; color: #e2e8f0; }
+  .desc-content ul { list-style: none; margin-bottom: 1rem; }
+  .desc-content li { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; padding-left: 1rem; position: relative; }
+  .desc-content li::before { content: '›'; position: absolute; left: 0; color: var(--accent); }
+  .desc-content p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* Loader */
+  .loader { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  @media (max-width: 1024px) {
+    .container { grid-template-columns: 1fr; overflow-y: auto; height: auto; }
+    body { height: auto; overflow-y: auto; }
+    .panel { min-height: 400px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Autonomous Agent Studio</h1>
+  <div style="font-size: 0.85rem; color: var(--text-muted);">Bug Fixing & Issue Resolution Pipeline</div>
+</header>
+
+<div class="container">
+  <!-- Left Panel -->
+  <div class="panel">
+    <div class="panel-header">Workflow Orchestration</div>
+    <div class="panel-content">
+      <div class="svg-container">
+        <svg viewBox="0 0 300 250" style="width:100%; height:100%;">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569" />
+            </marker>
+          </defs>
+          <!-- Edges -->
+          <line x1="50" y1="50" x2="150" y2="50" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+          <line x1="150" y1="50" x2="250" y2="100" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+          <line x1="250" y1="100" x2="150" y2="150" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+          <line x1="150" y1="150" x2="50" y2="150" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+          <path d="M 50 150 C 50 100, 200 100, 250 100" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)" />
+          <line x1="250" y1="100" x2="250" y2="200" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+
+          <!-- Nodes -->
+          <g class="node" id="node-Planner" transform="translate(50, 50)">
+            <circle cx="0" cy="0" r="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <text x="0" y="28" fill="#94a3b8" text-anchor="middle" font-size="10">Planner</text>
+          </g>
+          <g class="node" id="node-Executor" transform="translate(150, 50)">
+            <circle cx="0" cy="0" r="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <text x="0" y="28" fill="#94a3b8" text-anchor="middle" font-size="10">Executor</text>
+          </g>
+          <g class="node" id="node-Evaluator" transform="translate(250, 100)">
+            <circle cx="0" cy="0" r="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <text x="0" y="28" fill="#94a3b8" text-anchor="middle" font-size="10">Evaluator</text>
+          </g>
+          <g class="node" id="node-Critic" transform="translate(150, 150)">
+            <circle cx="0" cy="0" r="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <text x="0" y="28" fill="#94a3b8" text-anchor="middle" font-size="10">Critic</text>
+          </g>
+          <g class="node" id="node-Improver" transform="translate(50, 150)">
+            <circle cx="0" cy="0" r="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <text x="0" y="28" fill="#94a3b8" text-anchor="middle" font-size="10">Improver</text>
+          </g>
+          <g class="node" id="node-FinalReviewer" transform="translate(250, 200)">
+            <circle cx="0" cy="0" r="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+            <text x="0" y="28" fill="#94a3b8" text-anchor="middle" font-size="10">Reviewer</text>
+          </g>
+        </svg>
+      </div>
+      <div class="desc-content">
+        <h3>Agent Responsibilities</h3>
+        <ul>
+          <li><strong>Planner:</strong> Drafts the blueprint.</li>
+          <li><strong>Executor:</strong> Writes the initial code.</li>
+          <li><strong>Evaluator:</strong> Scores out of 100.</li>
+          <li><strong>Critic:</strong> Provides actionable feedback.</li>
+          <li><strong>Improver:</strong> Refines code iteratively.</li>
+        </ul>
+        <h3>Stop Conditions</h3>
+        <p>Loop ends if: (1) Score hits 100, (2) Improvement plateaus for 2 rounds, or (3) Max 5 rounds cap is reached.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center Panel -->
+  <div class="panel">
+    <div class="panel-header">Live Execution Feed</div>
+    <div class="panel-content" style="display: flex; flex-direction: column;">
+      <div id="setup-form">
+        <input type="password" id="api-key-input" placeholder="Groq API Key (gsk_...)" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: #000; color: white; margin-bottom: 1rem; font-family: inherit; font-size: 0.9rem;" />
+        <textarea id="task-input" placeholder="Describe the bug or issue to resolve... (e.g. 'Fix the null pointer exception in the auth middleware when user session is expired')"></textarea>
+        <button id="start-btn">Start Orchestration Pipeline</button>
+      </div>
+      <div id="outputs-container" style="margin-top: 1rem; flex: 1;"></div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="panel">
+    <div class="panel-header">Telemetry & Logs</div>
+    <div class="panel-content" style="display: flex; flex-direction: column;">
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Current Round</div>
+          <div class="stat-value" id="stat-round">-</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Best Score</div>
+          <div class="stat-value" id="stat-score">-</div>
+        </div>
+      </div>
+      <div class="chart-box">
+        <svg id="score-chart" viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%; overflow: visible;"></svg>
+      </div>
+      <div class="activity-log" id="activity-log"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let isRunning = false;
+  
+  document.getElementById('start-btn').addEventListener('click', () => {
+    const task = document.getElementById('task-input').value.trim();
+    if (!task) return alert('Please describe the bug first.');
+    startPipeline(task);
+  });
+
+  function logMsg(source, message, isError = false) {
+    const log = document.getElementById('activity-log');
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${isError ? 'error' : (source === 'System' ? 'system' : '')}`;
+    const time = new Date().toLocaleTimeString([], { hour12: false });
+    entry.innerHTML = `<span class="log-time">[${time}]</span><span class="log-source">${source}:</span><span class="log-msg">${message}</span>`;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setActiveNode(nodeId) {
+    document.querySelectorAll('.node circle').forEach(el => {
+      el.setAttribute('fill', '#1e293b');
+      el.setAttribute('stroke', '#334155');
+      el.style.filter = 'none';
+    });
+    if (nodeId) {
+      const activeEl = document.querySelector(`#node-${nodeId.replace(/ /g, '')} circle`);
+      if (activeEl) {
+        activeEl.setAttribute('fill', '#3730a3');
+        activeEl.setAttribute('stroke', '#6366f1');
+        activeEl.style.filter = 'drop-shadow(0 0 12px #6366f1)';
+      }
+    }
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.innerText = str;
+    return div.innerHTML;
+  }
+
+  function appendCard(agent, text, round = null) {
+    const container = document.getElementById('outputs-container');
+    const card = document.createElement('div');
+    card.className = 'agent-card';
+    
+    let safeText = escapeHTML(text);
+    safeText = safeText.replace(/(SCORE:\s*\d+)/gi, '<strong class="highlight-score">$1</strong>');
+    
+    card.innerHTML = `
+      <div class="agent-card-header">
+        <span class="agent-badge">${agent}</span>
+        ${round ? `<span class="round-badge">Round ${round}</span>` : ''}
+      </div>
+      <div class="agent-card-body">${safeText}</div>
+    `;
+    container.appendChild(card);
+    const panelContent = container.parentElement;
+    panelContent.scrollTop = panelContent.scrollHeight;
+  }
+
+  function updateChart(scores) {
+    const svg = document.getElementById('score-chart');
+    svg.innerHTML = '';
+    if (scores.length === 0) return;
+    
+    const maxScore = 100;
+    const w = 100;
+    const h = 100;
+    const dx = scores.length > 1 ? w / (scores.length - 1) : w;
+    
+    let pathD = '';
+    scores.forEach((s, i) => {
+      const x = i * dx;
+      const y = h - (s / maxScore) * h;
+      pathD += (i === 0 ? `M ${x} ${y} ` : `L ${x} ${y} `);
+      
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', 3);
+      circle.setAttribute('fill', '#10b981');
+      svg.appendChild(circle);
+    });
+    
+    if (scores.length > 1) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathD);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#10b981');
+      path.setAttribute('stroke-width', '2');
+      svg.insertBefore(path, svg.firstChild);
+    }
+  }
+
+  async function callLLM(prompt, system, retries = 5) {
+    const apiKey = document.getElementById('api-key-input').value.trim();
+    if (!apiKey) throw new Error("Please enter your Groq API Key.");
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        const targetUrl = 'https://api.groq.com/openai/v1/chat/completions';
+        
+        const res = await fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-8b-instant',
+            messages: [
+              { role: 'system', content: system },
+              { role: 'user', content: prompt }
+            ]
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`HTTP ${res.status}: ${errText}`);
+        }
+        const data = await res.json();
+        return data.choices[0].message.content;
+      } catch (err) {
+        logMsg('System', `API Error on attempt ${i+1}: ${err.message}`, true);
+        if (i === retries - 1) throw err;
+        
+        let waitTime = 2000;
+        if (err.message.includes('429')) {
+          const match = err.message.match(/try again in ([0-9.]+)s/i);
+          waitTime = match ? (parseFloat(match[1]) + 1) * 1000 : 10000;
+          logMsg('System', `Rate limit detected. Pausing execution for ${Math.ceil(waitTime/1000)} seconds...`, true);
+        }
+        await new Promise(r => setTimeout(r, waitTime));
+      }
+    }
+  }
+
+  async function runAgent(agent, prompt, system, round = null) {
+    setActiveNode(agent);
+    logMsg(agent, 'Processing task...');
+    const result = await callLLM(prompt, system);
+    appendCard(agent, result, round);
+    logMsg(agent, 'Output generated successfully.');
+    return result;
+  }
+
+  async function startPipeline(bugDescription) {
+    if (isRunning) return;
+    isRunning = true;
+    const btn = document.getElementById('start-btn');
+    btn.disabled = true;
+    btn.innerHTML = 'Pipeline Running <span class="loader" style="margin-left: 8px"></span>';
+    document.getElementById('outputs-container').innerHTML = '';
+    document.getElementById('activity-log').innerHTML = '';
+    document.getElementById('stat-round').innerText = 'Init';
+    document.getElementById('stat-score').innerText = '0';
+    updateChart([]);
+    
+    let scores = [];
+    let round = 1;
+    let plateauCount = 0;
+    let stopReason = null;
+    let currentDraft = '';
+
+    try {
+      logMsg('System', 'Initializing agent pipeline...');
+      
+      const planSystem = "You are an expert Software Architecture Planner. Given a bug report, create a concise, step-by-step plan to fix it.";
+      const plan = await runAgent('Planner', `Bug Report: ${bugDescription}`, planSystem);
+
+      const execSystem = "You are an expert Software Engineer. Given a bug report and a plan, output the exact code to fix it. Do not include markdown formatting if unnecessary. CRITICAL: Do NOT output any evaluation scores.";
+      currentDraft = await runAgent('Executor', `Bug Report: ${bugDescription}\n\nPlan:\n${plan}`, execSystem);
+
+      while (true) {
+        document.getElementById('stat-round').innerText = round;
+        logMsg('System', `Round ${round} — checking stop condition...`);
+
+        const evalSystem = "You are an expert QA Evaluator. Evaluate the provided code fix for accuracy. Provide detailed reasoning. CRITICAL: The very last line of your response MUST be exactly 'SCORE: X' where X is an integer 0-100.";
+        const evalResult = await runAgent('Evaluator', `Bug Report: ${bugDescription}\n\nCode Fix:\n${currentDraft}`, evalSystem, round);
+
+        // Parse Score
+        let score = 0;
+        const scoreMatch = evalResult.match(/SCORE:\s*(\d+)/i);
+        if (scoreMatch) score = parseInt(scoreMatch[1], 10);
+        else {
+          const numbers = evalResult.match(/\d+/g);
+          if (numbers) score = parseInt(numbers[numbers.length - 1], 10);
+        }
+        
+        scores.push(score);
+        updateChart(scores);
+        document.getElementById('stat-score').innerText = Math.max(...scores);
+
+        // Check Stops
+        if (score >= 100) {
+          stopReason = `Threshold reached (Score ${score}/100)`;
+          break;
+        }
+        
+        if (round >= 2) {
+          const improvement = score - scores[scores.length - 2];
+          if (improvement < 2) plateauCount++;
+          else plateauCount = 0;
+          
+          if (plateauCount >= 2) {
+            stopReason = `Plateau detected (Score improved by < 2 for two straight rounds)`;
+            break;
+          }
+        }
+        
+        if (round >= 5) {
+          stopReason = `Hard iteration cap reached (Max 5 rounds)`;
+          break;
+        }
+
+        // Critic
+        const criticSystem = "You are a Senior Code Critic. Review the code fix and Evaluator's critique. Identify exactly what must change to reach a perfect 100/100 score. Be specific. CRITICAL: DO NOT output or assign a SCORE yourself.";
+        const critique = await runAgent('Critic', `Code Fix:\n${currentDraft}\n\nEvaluation:\n${evalResult}`, criticSystem, round);
+
+        // Improver
+        const improverSystem = "You are an expert Software Engineer. Given the original bug, current draft, and Critic's feedback, output the newly updated code fix. CRITICAL: DO NOT output any evaluation scores.";
+        currentDraft = await runAgent('Improver', `Original Bug: ${bugDescription}\n\nCurrent Draft:\n${currentDraft}\n\nCritique:\n${critique}`, improverSystem, round);
+
+        round++;
+      }
+
+      // Final Reviewer
+      logMsg('System', `Stopping condition met: ${stopReason}`);
+      const reviewerSystem = "You are a Tech Lead. Summarize the final state of the fix, why we stopped iterating, and provide a final sign-off.";
+      await runAgent('Final Reviewer', `Stop Reason: ${stopReason}\nFinal Score: ${scores[scores.length-1]}\nFinal Code:\n${currentDraft}`, reviewerSystem);
+      
+      logMsg('System', 'Pipeline execution completed successfully.');
+
+    } catch (err) {
+      logMsg('System', 'Pipeline aborted due to critical error.', true);
+    } finally {
+      isRunning = false;
+      btn.disabled = false;
+      btn.innerText = 'Start Orchestration Pipeline';
+      setActiveNode(null);
+    }
+  }
+</script>
+</body>
+</html>
