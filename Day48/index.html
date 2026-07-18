@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare & Decide: Cloud Database Architect Decision Tool</title>
+  <meta name="description" content="A premium architect-grade decision matrix tool to compare cloud databases (MongoDB, PostgreSQL, Cloud Spanner, DynamoDB) based on cost, scalability, reliability, and velocity.">
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0f111a;
+      --bg-card: rgba(22, 28, 45, 0.45);
+      --bg-card-hover: rgba(28, 36, 58, 0.6);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(129, 140, 248, 0.5);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      
+      /* Vibrant Theme Palette */
+      --primary: #6366f1; /* Indigo */
+      --primary-glow: rgba(99, 102, 241, 0.15);
+      --secondary: #a855f7; /* Purple */
+      --accent-emerald: #10b981; /* Emerald */
+      --accent-amber: #f59e0b; /* Amber */
+      --accent-rose: #f43f5e; /* Rose */
+      
+      /* Font Families */
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Outfit', sans-serif;
+      
+      --transition-speed: 0.3s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 17, 26, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Header styling */
+    header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-audience {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #818cf8;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      font-family: var(--font-heading);
+    }
+
+    header h1 {
+      font-family: var(--font-heading);
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #ffffff, #c7d2fe, #f3e8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Glassmorphic Panel styling */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      position: sticky;
+      top: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .panel {
+        position: static;
+      }
+    }
+
+    .panel-title {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    /* Filters and Sliders styling */
+    .control-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .control-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: -0.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      transition: background 0.15s ease;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--primary-glow);
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: var(--secondary);
+    }
+
+    .weight-val {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      width: 32px;
+      text-align: right;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .3s;
+      border-radius: 34px;
+    }
+
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider-toggle {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider-toggle:before {
+      transform: translateX(22px);
+    }
+
+    .btn-reset {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    }
+
+    .btn-reset:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-focus);
+    }
+
+    /* Database Results list styling */
+    .results-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .search-filter-bar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .search-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      flex: 1;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+
+    /* Individual DB Card styling */
+    .db-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), transform var(--transition-speed);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .db-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .db-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .db-identity {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .db-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+    }
+
+    .db-logo svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .db-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .db-type {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .rank-score-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .rank-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .rank-1 {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .rank-2 {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03));
+      color: #e5e7eb;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .rank-3 {
+      background: linear-gradient(135deg, rgba(180, 83, 9, 0.2), rgba(180, 83, 9, 0.05));
+      color: #d97706;
+      border-color: rgba(180, 83, 9, 0.4);
+    }
+
+    .score-container {
+      text-align: right;
+    }
+
+    .score-val {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .score-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Score breakdown progress bars */
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .breakdown-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .breakdown-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .breakdown-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .breakdown-bar-bg {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .breakdown-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* Expandable Card Detail Panel */
+    .card-detail-drawer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 0;
+      border-top: 0 solid var(--border-color);
+      padding-top: 0;
+    }
+
+    .db-card.active .card-detail-drawer {
+      max-height: 1200px;
+      margin-top: 1.25rem;
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.25rem;
+    }
+
+    .detail-section-title {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .detail-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 1rem;
+      border-radius: 0.75rem;
+    }
+
+    .detail-metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.4rem;
+    }
+
+    .detail-metric-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .detail-metric-score {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+    }
+
+    .detail-metric-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+
+    .detail-citation-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--primary);
+      text-decoration: none;
+      transition: color var(--transition-speed);
+      font-weight: 500;
+    }
+
+    .detail-citation-link:hover {
+      color: var(--secondary);
+      text-decoration: underline;
+    }
+
+    /* Warning/Estimate Flag Badge */
+    .badge-estimate {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: var(--accent-amber);
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* Collapsible Bottom Panel styling */
+    .collapsible-container {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .collapsible-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      overflow: hidden;
+      transition: border-color var(--transition-speed);
+    }
+
+    .collapsible-header {
+      padding: 1.25rem 1.75rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      user-select: none;
+    }
+
+    .collapsible-header:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .collapsible-title {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .collapsible-icon-arrow {
+      transition: transform var(--transition-speed);
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+    }
+
+    .collapsible-card.open .collapsible-icon-arrow {
+      transform: rotate(180deg);
+    }
+
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .collapsible-card.open .collapsible-content {
+      max-height: 1500px;
+    }
+
+    .collapsible-body {
+      padding: 1.75rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .collapsible-body h3 {
+      font-family: var(--font-heading);
+      color: var(--text-main);
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .collapsible-body h3:first-of-type {
+      margin-top: 0;
+    }
+
+    .collapsible-body p {
+      margin-bottom: 1rem;
+    }
+
+    .collapsible-body ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+      list-style-type: square;
+    }
+
+    .collapsible-body li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Sources list layout */
+    .sources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .source-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.75rem;
+      transition: border-color var(--transition-speed), background-color var(--transition-speed);
+    }
+
+    .source-item:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      background: rgba(99, 102, 241, 0.02);
+    }
+
+    .source-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .source-label-category {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+    }
+
+    .source-title-text {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    .source-link-anchor {
+      font-size: 0.8rem;
+      color: var(--secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-weight: 500;
+      align-self: flex-start;
+    }
+
+    .source-link-anchor:hover {
+      text-decoration: underline;
+    }
+
+    /* Edge case and Empty states */
+    .empty-state {
+      background: var(--bg-card);
+      border: 1px dashed var(--border-color);
+      border-radius: 1.25rem;
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-dim);
+    }
+
+    .empty-state-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* CSS Utility Classes */
+    .flex-row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .warning-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-amber);
+      font-size: 0.9rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .warning-box svg {
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      width: 20px;
+      height: 20px;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 17, 26, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      border-radius: 1.25rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .loading-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <header>
+      <div class="badge-audience">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        Lead Developer & Architect Matrix
+      </div>
+      <h1>Compare & Decide Builder</h1>
+      <p>Evaluate and select the optimal standard database cluster for a new scalable, high-availability multi-tenant SaaS application based on customized architectural weights.</p>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="dashboard">
+      
+      <!-- Left Panel: Weights & Inputs -->
+      <aside class="panel">
+        <div class="panel-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+          Criteria Weighting
+        </div>
+
+        <!-- Warning Box for Weights Edge Case -->
+        <div id="weights-warning" class="warning-box" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div>
+            <strong>Zero Weights:</strong> Please increase the weight of at least one criterion below to compute matching scores.
+          </div>
+        </div>
+
+        <!-- Sliders -->
+        <div class="control-group">
+          <div class="control-label">
+            <span>Cost (TCO)</span>
+            <span class="weight-val" id="val-cost">50</span>
+          </div>
+          <div class="control-desc">Prioritizes low initial entry barrier, scale-to-zero model, and predictability.</div>
+          <div class="slider-container">
+            <input type="range" class="slider" id="weight-cost" min="0" max="100" value="50">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Scalability</span>
+            <span class="weight-val" id="val-scalability">50</span>
+          </div>
+          <div class="control-desc">Prioritizes effortless horizontal write scaling and stable low latency.</div>
+          <div class="slider-container">
+            <input type="range" class="slider" id="weight-scalability" min="0" max="100" value="50">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Reliability & Consistency</span>
+            <span class="weight-val" id="val-reliability">50</span>
+          </div>
+          <div class="control-desc">Prioritizes strict ACID compliance, five-nines global SLA, and fast automatic failover.</div>
+          <div class="slider-container">
+            <input type="range" class="slider" id="weight-reliability" min="0" max="100" value="50">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Developer Velocity</span>
+            <span class="weight-val" id="val-velocity">50</span>
+          </div>
+          <div class="control-desc">Prioritizes schema-less flexibility, simple querying (SQL/Document), and easy local tooling.</div>
+          <div class="slider-container">
+            <input type="range" class="slider" id="weight-velocity" min="0" max="100" value="50">
+          </div>
+        </div>
+
+        <!-- Toggles -->
+        <div class="toggle-container">
+          <div>
+            <span style="font-weight: 500; font-size: 0.95rem; display: block;">Exclude Fictional DBs</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Hides synthetic/estimated databases.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-synthetic" checked>
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+
+        <button class="btn-reset" id="btn-reset">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+          Reset Grid Weights
+        </button>
+      </aside>
+
+      <!-- Right Column: Results & Comparisons -->
+      <main class="results-section">
+        
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-dim);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" class="search-input" id="search-db" placeholder="Search databases by name, type, SQL/NoSQL structure...">
+        </div>
+
+        <!-- Loading Overlay (Simulated) -->
+        <div style="position: relative; min-height: 200px;">
+          <div class="loading-overlay" id="loading-overlay">
+            <div class="spinner"></div>
+          </div>
+          
+          <!-- Cards Container -->
+          <div class="cards-container" id="cards-container">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" id="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <div class="empty-state-title">No Databases Match Your Query</div>
+            <p>Try resetting the search terms or enabling synthetic database models to see matches.</p>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- Collapsible Panels -->
+    <div class="collapsible-container">
+      
+      <!-- Panel 1: How this was researched -->
+      <section class="collapsible-card" id="card-research">
+        <div class="collapsible-header" onclick="toggleCollapsible('card-research')">
+          <span class="collapsible-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            How This Was Researched & Evaluated
+          </span>
+          <svg class="collapsible-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="collapsible-content">
+          <div class="collapsible-body">
+            <h3>Methodology Overview</h3>
+            <p>Every scoring matrix entry is based on active developer specifications, pricing documents, published performance reviews, and compliance records collected from original vendors and neutral tech watchdogs. No numbers or ratings are synthetic, except for the clearly labeled, optional fictional database <strong>NebulaDB</strong> which acts as a design placeholder for validation purposes.</p>
+            
+            <h3>Key Conflict Resolutions</h3>
+            <ul>
+              <li><strong>Instance-Based vs. Serverless Cost Tiers:</strong> Comparing AWS RDS (Provisioned Node Instance) to DynamoDB (Pay-per-Request) requires workload baseline definitions. We scored cost on a hypothetical standard starter SaaS profile: low-to-medium throughput with variable user traffic. Hence, DynamoDB scores higher for cost efficiency and scale-to-zero flexibility, while provisioned systems like Google Cloud Spanner receive a lower cost score due to high minimum node entry thresholds.</li>
+              <li><strong>Scale Metrics:</strong> Databases scale in different dimensions. We separated scalability into throughput scalability (horizontal partitioning/sharding complexity) and latency stability. Spanner and DynamoDB receive premium scalability scores (9.5/10) because horizontal write-scaling occurs transparently, whereas PostgreSQL RDS is given a moderate 6/10 because write-sharding requires complex schema sharding strategies or extensions like Citus.</li>
+              <li><strong>Consistency Benchmarks:</strong> Relational systems guarantee serializability locally. However, global synchronization degrades throughput. Cloud Spanner resolves this via hardware locks (atomic clocks/GPS) to claim external consistency with 99.999% availability, justifying its perfect 10/10 consistency score.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Sourced Citations & References -->
+      <section class="collapsible-card" id="card-citations">
+        <div class="collapsible-header" onclick="toggleCollapsible('card-citations')">
+          <span class="collapsible-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            Visible Sources & Citation Log
+          </span>
+          <svg class="collapsible-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="collapsible-content">
+          <div class="collapsible-body">
+            <p style="margin-bottom: 1.5rem;">Below is the register of verified sources, links, and documents supporting every metric score inside the builder matrix:</p>
+            <div class="sources-grid" id="sources-grid">
+              <!-- Dynamically populated from JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Database Data Objects
+    const databases = [
+      {
+        id: "mongodb",
+        name: "MongoDB Atlas",
+        type: "Document (NoSQL)",
+        scores: {
+          cost: 8.0,
+          scalability: 8.0,
+          reliability: 8.0,
+          velocity: 9.0
+        },
+        logoColor: "#13aa52",
+        logoSvg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1c-1.3 0-5.8 4.2-5.8 11.2c0 5.4 3.7 9.5 5.3 10.7c.3.2.7.2 1 0c1.6-1.2 5.3-5.3 5.3-10.7C17.8 5.2 13.3 1 12 1zm0 2c.6 0 4.1 3.5 4.1 9.2c0 4.4-2.8 7.8-4.1 8.8c-1.3-1-4.1-4.4-4.1-8.8c0-5.7 3.5-9.2 4.1-9.2z"/><path d="M11.5 6.5c-.3 0-.5.2-.5.5v8c0 .3.2.5.5.5s.5-.2.5-.5V7c0-.3-.2-.5-.5-.5z"/></svg>',
+        details: {
+          cost: "Free tier (M0) available for initial developer sandbox. M10 dedicated clusters start at ~$57/mo. Serverless is pay-per-request: $0.10/million reads, $0.30/million writes.",
+          scalability: "Offers built-in horizontal partitioning (sharding) for cluster scaling. Automatic storage scaling and replica creation. Write-latency is single-digit ms.",
+          reliability: "Fully supports multi-document ACID transactions. 99.995% SLA for multi-region configurations with automatic node failovers (typically < 30 sec). Jepsen verified.",
+          velocity: "High developer velocity since document model matches OOP structures. Dynamic schema-less design allows quick code changes. Massive developer community."
+        },
+        citations: {
+          cost: { text: "MongoDB Atlas Core Pricing", url: "https://www.mongodb.com/pricing" },
+          scalability: { text: "MongoDB Scalability Architecture Details", url: "https://www.mongodb.com/docs/atlas/scalability/" },
+          reliability: { text: "Jepsen MongoDB 4.2.6 Consistency Evaluation", url: "https://jepsen.io/analyses/mongodb-4.2.6" },
+          velocity: { text: "DB-Engines Global Popularity Index", url: "https://db-engines.com/en/ranking/document+store" }
+        },
+        isSynthetic: false
+      },
+      {
+        id: "postgres",
+        name: "PostgreSQL (AWS RDS)",
+        type: "Relational (SQL)",
+        scores: {
+          cost: 7.0,
+          scalability: 6.0,
+          reliability: 8.5,
+          velocity: 8.5
+        },
+        logoColor: "#336791",
+        logoSvg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm.05-5.32c-.03.54-.48.97-1.02.97h-.06c-.54 0-.99-.43-1.02-.97L9.75 7.15c-.04-.63.46-1.15 1.09-1.15h2.32c.63 0 1.13.52 1.09 1.15l-.2 4.03z"/></svg>',
+        details: {
+          cost: "Requires server runtime provisioning. db.t4g.micro begins at ~$12/month. Multi-AZ high-perf node (db.m6g.xlarge) starts at ~$222/month + storage configuration fees.",
+          scalability: "Vertical resizing is simple. Horizontal scaling is limited to Read Replicas (up to 15 nodes). Horizontal write sharding is complex, needing application routing.",
+          reliability: "Strong relational reliability, strictly adhering to ACID parameters. Multi-AZ deployment auto-failovers within 1-2 minutes. SLA target is set at 99.95%.",
+          velocity: "Highly robust relational SQL schemas. Schema alterations require migrations. Rich ecosystem of open-source libraries, adapters, and ORMs (Prisma/Sequelize)."
+        },
+        citations: {
+          cost: { text: "AWS RDS PostgreSQL Standard Pricing", url: "https://aws.amazon.com/rds/postgresql/pricing/" },
+          scalability: { text: "AWS RDS PostgreSQL Read Replication Setup", url: "https://aws.amazon.com/rds/features/read-replicas/" },
+          reliability: { text: "AWS RDS Service Level Agreements", url: "https://aws.amazon.com/rds/sla/" },
+          velocity: { text: "Stack Overflow Developer Database Ranking", url: "https://survey.stackoverflow.co/2023/#section-most-popular-technologies-databases" }
+        },
+        isSynthetic: false
+      },
+      {
+        id: "spanner",
+        name: "Google Cloud Spanner",
+        type: "NewSQL (Distributed Relational)",
+        scores: {
+          cost: 5.0,
+          scalability: 9.5,
+          reliability: 10.0,
+          velocity: 7.0
+        },
+        logoColor: "#4285F4",
+        logoSvg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>',
+        details: {
+          cost: "Highly premium enterprise-grade cost structure. Compute resource units start at 0.1 allocation (~$47.45/mo in single-region), storage priced at $0.30/GB/mo. Multi-region starts at $200+/mo.",
+          scalability: "Limitless transparent horizontal scalability across both write and read paths. Eliminates manual sharding issues. Slight network consensus write latency.",
+          reliability: "External consistency backed by TrueTime hardware (atomic clocks & GPS). Global multi-region replication achieves five-nines SLA (99.999%).",
+          velocity: "Strictly typed SQL. Database structure updates run online without operational locking. Standard local database emulators are resource heavy to host."
+        },
+        citations: {
+          cost: { text: "Google Cloud Spanner Regional Computing Costs", url: "https://cloud.google.com/spanner/pricing" },
+          scalability: { text: "Spanner: Google's Globally Distributed Database Paper", url: "https://research.google/pubs/spanner-googles-globally-distributed-database/" },
+          reliability: { text: "Google Cloud Spanner Core SLA Specifications", url: "https://cloud.google.com/spanner/sla" },
+          velocity: { text: "GCP Spanner Schema Mutation Guidelines", url: "https://cloud.google.com/spanner/docs/schema-updates" }
+        },
+        isSynthetic: false
+      },
+      {
+        id: "dynamodb",
+        name: "Amazon DynamoDB",
+        type: "Key-Value / Document (NoSQL)",
+        scores: {
+          cost: 9.0,
+          scalability: 9.5,
+          reliability: 8.0,
+          velocity: 6.5
+        },
+        logoColor: "#FF9900",
+        logoSvg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zm0 18l-10-5 10 5 10-5-10 5zM2 12l10 5 10-5-10-5-10 5z"/></svg>',
+        details: {
+          cost: "True serverless pricing model. On-demand metrics: $0.25/million writes, $0.05/million reads. Storage pricing set at $0.25/GB-month. Includes a generous permanent free tier.",
+          scalability: "Virtual unlimited scale potential. Automatically self-allocates storage and compute to match application load. Predictable sub-10ms response lag.",
+          reliability: "Single-region SLA sits at 99.99%, rising to 99.999% with DynamoDB Global Tables. Supports transactional ACID reads/writes at double operation cost.",
+          velocity: "No migrations necessary for standard data shapes. Dynamic document attributes. Querying complex relations requires Single Table Design patterns. Steep query learning curve."
+        },
+        citations: {
+          cost: { text: "AWS DynamoDB Request & Storage Pricing Matrix", url: "https://aws.amazon.com/dynamodb/pricing/" },
+          scalability: { text: "DynamoDB Automated Resource Scaling and Capacity Guides", url: "https://aws.amazon.com/dynamodb/details/" },
+          reliability: { text: "AWS DynamoDB Multi-Region SLA Details", url: "https://aws.amazon.com/dynamodb/sla/" },
+          velocity: { text: "DynamoDB Relational Data Modeling & Single Table Design", url: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices-data-modeling.html" }
+        },
+        isSynthetic: false
+      },
+      {
+        id: "nebuladb",
+        name: "NebulaDB (Fictional Example)",
+        type: "Synthetic SQL-NoSQL hybrid",
+        scores: {
+          cost: 9.5,
+          scalability: 10.0,
+          reliability: 7.0,
+          velocity: 8.0
+        },
+        logoColor: "#a855f7",
+        logoSvg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>',
+        details: {
+          cost: "Synthetic benchmark estimate: Projected cost model of $0.05/million operations. Scale-to-zero model with zero idle cost structure.",
+          scalability: "Synthetic benchmark estimate: Projected capability to scale up to 100k operations per second with sub-millisecond response rates under simulated workloads.",
+          reliability: "Fictional estimate: Target of 99.99% reliability using hypothetical consensus protocols. Currently lacks real-world service-level agreements.",
+          velocity: "Fictional estimate: Uses AI-assisted query synthesis to convert natural language commands to internal schemas."
+        },
+        citations: {
+          cost: { text: "NebulaDB Simulation Lab Pricing Projections", url: "#" },
+          scalability: { text: "NebulaDB Lab Speed Test Simulations", url: "#" },
+          reliability: { text: "NebulaDB Architectural Whitepaper Proposal", url: "#" },
+          velocity: { text: "NebulaDB Spec draft on AI Query Engines", url: "#" }
+        },
+        isSynthetic: true
+      }
+    ];
+
+    // State Variables
+    let activeCardId = null;
+
+    // DOM Elements
+    const weightCost = document.getElementById("weight-cost");
+    const weightScalability = document.getElementById("weight-scalability");
+    const weightReliability = document.getElementById("weight-reliability");
+    const weightVelocity = document.getElementById("weight-velocity");
+
+    const valCost = document.getElementById("val-cost");
+    const valScalability = document.getElementById("val-scalability");
+    const valReliability = document.getElementById("val-reliability");
+    const valVelocity = document.getElementById("val-velocity");
+
+    const toggleSynthetic = document.getElementById("toggle-synthetic");
+    const searchDb = document.getElementById("search-db");
+    const cardsContainer = document.getElementById("cards-container");
+    const emptyState = document.getElementById("empty-state");
+    const weightsWarning = document.getElementById("weights-warning");
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const btnReset = document.getElementById("btn-reset");
+
+    // Initialize Event Listeners
+    [weightCost, weightScalability, weightReliability, weightVelocity].forEach(slider => {
+      slider.addEventListener("input", () => {
+        updateValLabels();
+        debounceCalculate();
+      });
+    });
+
+    toggleSynthetic.addEventListener("change", () => {
+      triggerLoading();
+      debounceCalculate();
+    });
+
+    searchDb.addEventListener("input", () => {
+      triggerLoading();
+      debounceCalculate();
+    });
+
+    btnReset.addEventListener("click", () => {
+      weightCost.value = 50;
+      weightScalability.value = 50;
+      weightReliability.value = 50;
+      weightVelocity.value = 50;
+      updateValLabels();
+      triggerLoading();
+      debounceCalculate();
+    });
+
+    // Debounce timer for smooth updates
+    let debounceTimer;
+    function debounceCalculate() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(calculateAndRender, 250);
+    }
+
+    function triggerLoading() {
+      loadingOverlay.classList.add("visible");
+    }
+
+    function updateValLabels() {
+      valCost.textContent = weightCost.value;
+      valScalability.textContent = weightScalability.value;
+      valReliability.textContent = weightReliability.value;
+      valVelocity.textContent = weightVelocity.value;
+    }
+
+    // Toggle Collapsible Logic
+    function toggleCollapsible(cardId) {
+      const card = document.getElementById(cardId);
+      card.classList.toggle("open");
+    }
+
+    // Toggle Detail Drawer Inside DB Card
+    function toggleCardActive(cardId) {
+      const allCards = document.querySelectorAll(".db-card");
+      const targetCard = document.getElementById(`card-${cardId}`);
+      
+      if (activeCardId === cardId) {
+        // Deactivate
+        targetCard.classList.remove("active");
+        activeCardId = null;
+      } else {
+        // Deactivate others
+        allCards.forEach(c => c.classList.remove("active"));
+        // Activate target
+        targetCard.classList.add("active");
+        activeCardId = cardId;
+        
+        // Smooth scroll details into view
+        setTimeout(() => {
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 300);
+      }
+    }
+
+    // FLIP Animation Helper
+    function getCardPositions() {
+      const positions = {};
+      const cards = cardsContainer.querySelectorAll(".db-card");
+      cards.forEach(card => {
+        const id = card.dataset.dbId;
+        positions[id] = card.getBoundingClientRect();
+      });
+      return positions;
+    }
+
+    function animateFLIP(startPositions) {
+      const cards = cardsContainer.querySelectorAll(".db-card");
+      cards.forEach(card => {
+        const id = card.dataset.dbId;
+        const startRect = startPositions[id];
+        if (!startRect) return; // New card or was hidden
+        
+        const endRect = card.getBoundingClientRect();
+        const deltaY = startRect.top - endRect.top;
+        
+        if (deltaY !== 0) {
+          card.style.transition = 'none';
+          card.style.transform = `translateY(${deltaY}px)`;
+          
+          // Force reflow
+          card.offsetHeight;
+          
+          card.style.transition = `transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color var(--transition-speed), background-color var(--transition-speed)`;
+          card.style.transform = 'translateY(0)';
+        }
+      });
+    }
+
+    // Core Calculation and UI Update
+    function calculateAndRender() {
+      // Hide loading state
+      loadingOverlay.classList.remove("visible");
+
+      // Extract slider values
+      const wCost = parseFloat(weightCost.value);
+      const wScalability = parseFloat(weightScalability.value);
+      const wReliability = parseFloat(weightReliability.value);
+      const wVelocity = parseFloat(weightVelocity.value);
+      const totalWeight = wCost + wScalability + wReliability + wVelocity;
+
+      // Handle Edge Case: All Weights are Zero
+      if (totalWeight === 0) {
+        weightsWarning.style.display = "flex";
+        
+        // Render 0 scores for all cards
+        const renderedDbs = databases.map(db => ({ ...db, calculatedScore: 0 }));
+        renderDatabaseCards(renderedDbs);
+        return;
+      } else {
+        weightsWarning.style.display = "none";
+      }
+
+      // Calculate scores
+      let processedDbs = databases.map(db => {
+        const weightedSum = (db.scores.cost * wCost) + 
+                            (db.scores.scalability * wScalability) + 
+                            (db.scores.reliability * wReliability) + 
+                            (db.scores.velocity * wVelocity);
+        const finalScore = weightedSum / totalWeight;
+        return {
+          ...db,
+          calculatedScore: parseFloat(finalScore.toFixed(1))
+        };
+      });
+
+      // Filter by Search Query
+      const query = searchDb.value.toLowerCase().trim();
+      if (query) {
+        processedDbs = processedDbs.filter(db => 
+          db.name.toLowerCase().includes(query) || 
+          db.type.toLowerCase().includes(query) ||
+          db.details.cost.toLowerCase().includes(query) ||
+          db.details.scalability.toLowerCase().includes(query)
+        );
+      }
+
+      // Filter out Synthetic Databases if toggled
+      const excludeSynthetic = toggleSynthetic.checked;
+      if (excludeSynthetic) {
+        processedDbs = processedDbs.filter(db => !db.isSynthetic);
+      }
+
+      // Sort by score (descending)
+      processedDbs.sort((a, b) => b.calculatedScore - a.calculatedScore);
+
+      // Record Positions for FLIP Animation
+      const startPositions = getCardPositions();
+
+      // Render cards to UI
+      renderDatabaseCards(processedDbs);
+
+      // Apply FLIP animation
+      animateFLIP(startPositions);
+    }
+
+    function renderDatabaseCards(dbList) {
+      if (dbList.length === 0) {
+        cardsContainer.style.display = "none";
+        emptyState.style.display = "flex";
+        return;
+      }
+
+      cardsContainer.style.display = "flex";
+      emptyState.style.display = "none";
+
+      cardsContainer.innerHTML = dbList.map((db, index) => {
+        const rank = index + 1;
+        const rankClass = rank <= 3 ? `rank-${rank}` : "";
+        const activeClass = db.id === activeCardId ? "active" : "";
+        const syntheticFlag = db.isSynthetic ? '<span class="badge-estimate" style="margin-left: 0.5rem;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>Estimate / Synthetic</span>' : '';
+
+        return `
+          <div class="db-card ${activeClass}" id="card-${db.id}" data-db-id="${db.id}" onclick="toggleCardActive('${db.id}')">
+            
+            <div class="card-header">
+              <div class="db-identity">
+                <div class="db-logo" style="color: ${db.logoColor}">
+                  ${db.logoSvg}
+                </div>
+                <div>
+                  <div class="db-title" style="display: flex; align-items: center; flex-wrap: wrap;">
+                    ${db.name}
+                    ${syntheticFlag}
+                  </div>
+                  <div class="db-type">${db.type}</div>
+                </div>
+              </div>
+              <div class="rank-score-badge">
+                <span class="rank-badge ${rankClass}">Rank #${rank}</span>
+                <div class="score-container">
+                  <div class="score-val">${db.calculatedScore}</div>
+                  <div class="score-label">Architect Score</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Score breakdowns -->
+            <div class="breakdown-grid">
+              <div class="breakdown-item">
+                <div class="breakdown-label">
+                  <span>Cost</span>
+                  <span>${db.scores.cost}/10</span>
+                </div>
+                <div class="breakdown-bar-bg">
+                  <div class="breakdown-bar-fill" style="width: ${db.scores.cost * 10}%"></div>
+                </div>
+              </div>
+              <div class="breakdown-item">
+                <div class="breakdown-label">
+                  <span>Scalability</span>
+                  <span>${db.scores.scalability}/10</span>
+                </div>
+                <div class="breakdown-bar-bg">
+                  <div class="breakdown-bar-fill" style="width: ${db.scores.scalability * 10}%"></div>
+                </div>
+              </div>
+              <div class="breakdown-item">
+                <div class="breakdown-label">
+                  <span>Reliability</span>
+                  <span>${db.scores.reliability}/10</span>
+                </div>
+                <div class="breakdown-bar-bg">
+                  <div class="breakdown-bar-fill" style="width: ${db.scores.reliability * 10}%"></div>
+                </div>
+              </div>
+              <div class="breakdown-item">
+                <div class="breakdown-label">
+                  <span>Velocity</span>
+                  <span>${db.scores.velocity}/10</span>
+                </div>
+                <div class="breakdown-bar-bg">
+                  <div class="breakdown-bar-fill" style="width: ${db.scores.velocity * 10}%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detail Drawer (Expands vertically) -->
+            <div class="card-detail-drawer">
+              <div class="detail-section-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 14 12 10 12"></polyline><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Detailed Evaluation & Researched Metrics
+              </div>
+              
+              <div class="detail-grid">
+                <div class="detail-card">
+                  <div class="detail-metric-header">
+                    <span class="detail-metric-title">Cost Metrics</span>
+                    <span class="detail-metric-score">${db.scores.cost}/10</span>
+                  </div>
+                  <p class="detail-metric-desc">${db.details.cost}</p>
+                  <a href="${db.citations.cost.url}" target="_blank" class="detail-citation-link" onclick="event.stopPropagation()">
+                    Source: ${db.citations.cost.text}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-metric-header">
+                    <span class="detail-metric-title">Scalability Details</span>
+                    <span class="detail-metric-score">${db.scores.scalability}/10</span>
+                  </div>
+                  <p class="detail-metric-desc">${db.details.scalability}</p>
+                  <a href="${db.citations.scalability.url}" target="_blank" class="detail-citation-link" onclick="event.stopPropagation()">
+                    Source: ${db.citations.scalability.text}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-metric-header">
+                    <span class="detail-metric-title">Reliability & SLA</span>
+                    <span class="detail-metric-score">${db.scores.reliability}/10</span>
+                  </div>
+                  <p class="detail-metric-desc">${db.details.reliability}</p>
+                  <a href="${db.citations.reliability.url}" target="_blank" class="detail-citation-link" onclick="event.stopPropagation()">
+                    Source: ${db.citations.reliability.text}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-metric-header">
+                    <span class="detail-metric-title">Developer Velocity</span>
+                    <span class="detail-metric-score">${db.scores.velocity}/10</span>
+                  </div>
+                  <p class="detail-metric-desc">${db.details.velocity}</p>
+                  <a href="${db.citations.velocity.url}" target="_blank" class="detail-citation-link" onclick="event.stopPropagation()">
+                    Source: ${db.citations.velocity.text}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+              </div>
+              
+              <div style="font-size: 0.8rem; color: var(--text-dim); text-align: right;">
+                * Click on card again to collapse detail view.
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Populate Sources list dynamically in the collapsible panel
+    function populateSourcesPanel() {
+      const sourcesGrid = document.getElementById("sources-grid");
+      const citations = [];
+
+      databases.forEach(db => {
+        Object.keys(db.citations).forEach(metric => {
+          const cite = db.citations[metric];
+          citations.push({
+            dbName: db.name,
+            metric: metric.charAt(0).toUpperCase() + metric.slice(1),
+            text: cite.text,
+            url: cite.url
+          });
+        });
+      });
+
+      sourcesGrid.innerHTML = citations.map(c => {
+        const isFictional = c.url === "#";
+        const linkHtml = isFictional 
+          ? `<span class="source-link-anchor" style="color: var(--text-dim); cursor: not-allowed;">Fictional / Projected Source</span>`
+          : `<a href="${c.url}" target="_blank" class="source-link-anchor">
+              Visit Original Document
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+             </a>`;
+
+        return `
+          <div class="source-item">
+            <div class="source-meta">
+              <span class="source-label-category">${c.dbName} — ${c.metric}</span>
+              <div class="source-title-text">${c.text}</div>
+            </div>
+            ${linkHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Page Load Setup
+    window.addEventListener("DOMContentLoaded", () => {
+      calculateAndRender();
+      populateSourcesPanel();
+    });
+  </script>
+</body>
+</html>
