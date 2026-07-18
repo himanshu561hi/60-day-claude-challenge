@@ -1,0 +1,2821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Intelligence Studio | AI Creator Consultant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #060913;
+            --bg-surface: rgba(13, 20, 38, 0.65);
+            --bg-surface-solid: #0d1426;
+            --border-glow: rgba(99, 102, 241, 0.18);
+            --border-glow-active: rgba(99, 102, 241, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --primary: #7c3aed;
+            --primary-glow: rgba(124, 58, 237, 0.2);
+            --secondary: #06b6d4;
+            --secondary-glow: rgba(6, 182, 212, 0.2);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.15);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+            
+            --accent-purple: #c084fc;
+            --accent-blue: #60a5fa;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* Utility Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* App Layout Container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+            flex-grow: 1;
+            gap: 24px;
+        }
+
+        /* Header section */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            padding: 20px 28px;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 5%;
+            width: 90%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        .logo-title h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #c084fc, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .interview-badge {
+            background: rgba(124, 58, 237, 0.12);
+            border: 1px solid rgba(124, 58, 237, 0.25);
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .interview-badge .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        .btn-settings {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-settings:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--accent-purple);
+            transform: rotate(30deg);
+        }
+
+        /* Two Column Panel Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 24px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Base Panel Style */
+        .panel {
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+        }
+
+        .panel-title svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        /* Left Panel Form Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        select, textarea, input[type="text"] {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        select:focus, textarea:focus, input[type="text"]:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.15);
+        }
+
+        option {
+            background-color: var(--bg-surface-solid);
+            color: var(--text-primary);
+        }
+
+        /* Drag-and-Drop Area */
+        .upload-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: rgba(255, 255, 255, 0.01);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--secondary);
+            background: rgba(6, 182, 212, 0.04);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+        }
+
+        .upload-zone svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .upload-zone:hover svg {
+            stroke: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-zone-text span {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .upload-zone-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .image-preview-container {
+            width: 100%;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .image-preview {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.3);
+            display: block;
+        }
+
+        .btn-remove-image {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.85);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-image:hover {
+            background: var(--danger);
+        }
+
+        /* Action Buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-glow {
+            flex-grow: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 14px 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5), 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-glow:active {
+            transform: translateY(0);
+        }
+
+        .btn-glow:disabled {
+            background: var(--text-muted);
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--secondary);
+        }
+
+        /* Reviewer Status Widget */
+        .reviewer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .reviewer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+
+        .reviewer-item.active {
+            border-color: var(--primary-glow);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reviewer-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .reviewer-1 .reviewer-avatar { background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); }
+        .reviewer-2 .reviewer-avatar { background: rgba(96, 165, 250, 0.15); color: var(--accent-blue); }
+        .reviewer-3 .reviewer-avatar { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); }
+        .reviewer-4 .reviewer-avatar { background: rgba(251, 146, 60, 0.15); color: var(--accent-orange); }
+
+        .reviewer-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .reviewer-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .reviewer-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Status Colors */
+        .status-idle { color: var(--text-muted); }
+        .status-running { color: var(--warning); }
+        .status-completed { color: var(--success); }
+        .status-failed { color: var(--danger); }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .status-idle .status-dot { background: var(--text-muted); }
+        .status-running .status-dot { 
+            background: var(--warning); 
+            animation: pulse-dot 1.2s infinite alternate; 
+        }
+        .status-completed .status-dot { background: var(--success); }
+        .status-failed .status-dot { background: var(--danger); }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 1; }
+        }
+
+        /* Live Activity Log Widget */
+        .terminal-log {
+            background: #03060d;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: #10b981;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .log-line {
+            display: flex;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .log-text {
+            word-break: break-all;
+        }
+
+        .log-line.system .log-text { color: var(--accent-blue); }
+        .log-line.error .log-text { color: var(--danger); }
+        .log-line.success .log-text { color: var(--success); }
+        .log-line.warn .log-text { color: var(--warning); }
+
+        /* Right Panel Result Views */
+        .right-panel {
+            min-height: 500px;
+            position: relative;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            height: 100%;
+            text-align: center;
+            padding: 60px 40px;
+            gap: 20px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid var(--border-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .empty-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--accent-purple);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .sample-draft-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .sample-draft-badge:hover {
+            border-color: var(--secondary);
+            background: rgba(6, 182, 212, 0.05);
+            color: var(--secondary);
+        }
+
+        /* Loading Skeleton */
+        .loading-state {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            width: 100%;
+            height: 100%;
+            padding: 10px 0;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-glow 1.5s infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes skeleton-glow {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .skeleton-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .skeleton-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .skeleton-line {
+            height: 16px;
+            width: 100%;
+        }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.title { height: 28px; width: 40%; margin-bottom: 8px; }
+
+        .skeleton-card {
+            height: 200px;
+            width: 100%;
+        }
+
+        /* Results Dashboard Layout */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Score Summary Block */
+        .results-header-grid {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 24px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        @media (max-width: 600px) {
+            .results-header-grid {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
+            }
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-circle {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 10;
+        }
+
+        .score-circle-progress {
+            fill: none;
+            stroke: url(#scoreGrad);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 377;
+            stroke-dashoffset: 377;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-text-val {
+            position: absolute;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .score-text-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+        }
+
+        .health-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .health-badge {
+            align-self: flex-start;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 600px) {
+            .health-badge {
+                align-self: center;
+            }
+        }
+
+        .health-critical { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+        .health-attention { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; }
+        .health-good { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
+        .health-elite { background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); color: #c084fc; }
+
+        .health-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .reasoning-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Subcategories Breakdown */
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+        }
+
+        .breakdown-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breakdown-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .breakdown-score {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .breakdown-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .breakdown-bar-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 99px;
+            transition: width 1.2s ease-out;
+        }
+
+        /* Tabs Interface */
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: white;
+        }
+
+        .tab-btn.active {
+            color: var(--secondary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--secondary);
+            box-shadow: 0 0 8px var(--secondary);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: tabFadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Insights tab grids */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .insight-card {
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .insight-card.strengths {
+            background: rgba(16, 185, 129, 0.02);
+            border-color: rgba(16, 185, 129, 0.08);
+        }
+
+        .insight-card.weaknesses {
+            background: rgba(239, 68, 68, 0.02);
+            border-color: rgba(239, 68, 68, 0.08);
+        }
+
+        .insight-card.opportunities {
+            background: rgba(245, 158, 11, 0.02);
+            border-color: rgba(245, 158, 11, 0.08);
+            grid-column: span 2;
+        }
+
+        @media (max-width: 800px) {
+            .insight-card.opportunities {
+                grid-column: span 1;
+            }
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .insight-header svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .strengths .insight-header { color: var(--accent-green); }
+        .weaknesses .insight-header { color: var(--danger); }
+        .opportunities .insight-header { color: var(--warning); }
+
+        .insight-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .insight-list li {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .insight-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .strengths .insight-list li::before { background: var(--success); }
+        .weaknesses .insight-list li::before { background: var(--danger); }
+        .opportunities .insight-list li::before { background: var(--warning); }
+
+        /* Compare View (Before/After) */
+        .compare-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .compare-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .compare-box {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .compare-badge {
+            align-self: flex-start;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .compare-before .compare-badge {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .compare-after .compare-badge {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .compare-content {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            min-height: 250px;
+        }
+
+        .compare-before .compare-content {
+            background: rgba(239, 68, 68, 0.01);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .compare-after .compare-content {
+            background: rgba(16, 185, 129, 0.01);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-copy {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--secondary);
+            color: white;
+        }
+
+        /* Hooks & Checklist Grid */
+        .hooks-checklist-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .hooks-checklist-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checklist-box {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .checklist-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .checklist-title svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 4px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .checklist-item-text {
+            font-size: 0.88rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .checklist-item input[type="checkbox"]:checked + .checklist-item-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .hook-box {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .hook-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .hook-title svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .hook-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .hook-item {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            position: relative;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .hook-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(124, 58, 237, 0.2);
+            color: white;
+        }
+
+        .hook-item::after {
+            content: 'Copy';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .hook-item:hover::after {
+            opacity: 1;
+        }
+
+        /* Executive Reports View */
+        .report-section {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 800px) {
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .report-card {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .report-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-card h4 svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .report-card p, .report-card ul {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .report-card ul {
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Prediction Card */
+        .predict-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.03), rgba(124, 58, 237, 0.03));
+            border: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .predict-card h4 {
+            color: var(--secondary);
+            border-color: rgba(6, 182, 212, 0.1);
+        }
+
+        .predict-badge {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: auto;
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #0d1222;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 450px;
+            width: 100%;
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(124, 58, 237, 0.15);
+            animation: modalScale 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-header h3 svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--accent-purple);
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+        .btn-close-modal:hover {
+            color: white;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 16px;
+        }
+
+        .modal-alert {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.78rem;
+            color: #f59e0b;
+            line-height: 1.4;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0d1e1c;
+            border: 1px solid #10b981;
+            color: #34d399;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 200;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            stroke: #34d399;
+        }
+
+        /* Custom alert styles inside reviews */
+        .ai-feedback-section {
+            border-left: 2px solid var(--primary);
+            background: rgba(124, 58, 237, 0.01);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: var(--text-secondary);
+        }
+
+        .ai-feedback-section p {
+            margin-bottom: 8px;
+        }
+
+        .ai-feedback-section ul {
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- HEADER -->
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="logo-title">
+                    <h1>Content Intelligence Studio</h1>
+                    <p>AI Creative Consultant</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="interview-badge" id="interviewSettingsBadge">
+                    <div class="dot"></div>
+                    <span>Initial Setup Loaded</span>
+                </div>
+                <button class="btn-settings" onclick="openSettings()" title="API Key and Server Settings">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN WORKSPACE -->
+        <div class="workspace-grid">
+            
+            <!-- LEFT PANEL: CONTROLS & LOGS -->
+            <div class="panel">
+                <h3 class="panel-title">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--primary)"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    Content Studio Controls
+                </h3>
+
+                <!-- Configuration settings -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contentType">Content Type</label>
+                        <select id="contentType">
+                            <option value="Written Article / Blog Post">Article / Blog Post</option>
+                            <option value="Social Media Post">Social Post</option>
+                            <option value="Landing Page / Ad Copy">Landing / Ad Copy</option>
+                            <option value="Video Script Outline">Video Script</option>
+                            <option value="Podcast / Audio Transcript">Podcast / Audio</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="targetPlatform">Platform</label>
+                        <select id="targetPlatform">
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Substack">Substack</option>
+                            <option value="X / Twitter">X / Twitter</option>
+                            <option value="Dev.to / Hashnode">Dev.to / Hashnode</option>
+                            <option value="Personal Blog / SEO">Personal SEO Blog</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="primaryGoal">Primary Goal</label>
+                        <select id="primaryGoal">
+                            <option value="Educate & Build Community">Educate & Build</option>
+                            <option value="Build Thought Leadership & Authority">Thought Leadership</option>
+                            <option value="Maximize Virality & Engagement">Virality & Reach</option>
+                            <option value="Drive Lead Generation & Conversions">Leads & Conversion</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewSeverity">Review Intensity</label>
+                        <select id="reviewSeverity">
+                            <option value="Highly Critical & Brutally Honest">Brutally Honest</option>
+                            <option value="Balanced & Constructive">Balanced Feedback</option>
+                            <option value="Gentle & Supportive">Gentle Support</option>
+                            <option value="Psychological & Persuasive Focus">Psychology Focus</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Input Draft -->
+                <div class="form-group">
+                    <label for="contentDraft">Content Copy / Script Draft</label>
+                    <textarea id="contentDraft" rows="8" placeholder="Paste your text draft or script here..."></textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form-group">
+                    <label>Visual Asset / Graphic (Optional)</label>
+                    <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <div class="upload-zone-text"><span>Click to upload</span> or drag and drop</div>
+                        <div class="upload-zone-sub">Thumbnail, graphic, or post banner (PNG, JPG, WebP)</div>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                    </div>
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <img src="" alt="Preview" class="image-preview" id="imagePreview">
+                        <button class="btn-remove-image" onclick="removeImage()">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            Remove
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="button-group">
+                    <button class="btn-glow" id="btnAnalyze" onclick="startAnalysisWorkflow()">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        Run Content Intelligence
+                    </button>
+                </div>
+
+                <!-- Reviewer Grid Status -->
+                <div class="form-group">
+                    <label>Reviewer Workflow Status</label>
+                    <div class="reviewer-list">
+                        <!-- Reviewer 1 -->
+                        <div class="reviewer-item reviewer-1" id="rev-hook">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">HK</div>
+                                <div>
+                                    <div class="reviewer-name">Hook & Visuals</div>
+                                    <div class="reviewer-role">Scroll-Stopper Analyst</div>
+                                </div>
+                            </div>
+                            <div class="reviewer-status status-idle" id="status-val-hook">
+                                <div class="status-dot"></div>
+                                <span>Idle</span>
+                            </div>
+                        </div>
+                        <!-- Reviewer 2 -->
+                        <div class="reviewer-item reviewer-2" id="rev-authority">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">AU</div>
+                                <div>
+                                    <div class="reviewer-name">Value & Authority</div>
+                                    <div class="reviewer-role">Credibility Reviewer</div>
+                                </div>
+                            </div>
+                            <div class="reviewer-status status-idle" id="status-val-authority">
+                                <div class="status-dot"></div>
+                                <span>Idle</span>
+                            </div>
+                        </div>
+                        <!-- Reviewer 3 -->
+                        <div class="reviewer-item reviewer-3" id="rev-psychology">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">PS</div>
+                                <div>
+                                    <div class="reviewer-name">Audience Psychology</div>
+                                    <div class="reviewer-role">Persuasion Specialist</div>
+                                </div>
+                            </div>
+                            <div class="reviewer-status status-idle" id="status-val-psychology">
+                                <div class="status-dot"></div>
+                                <span>Idle</span>
+                            </div>
+                        </div>
+                        <!-- Reviewer 4 -->
+                        <div class="reviewer-item reviewer-4" id="rev-synthesis">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">SY</div>
+                                <div>
+                                    <div class="reviewer-name">Synthesis Architect</div>
+                                    <div class="reviewer-role">Dashboard Synthesizer</div>
+                                </div>
+                            </div>
+                            <div class="reviewer-status status-idle" id="status-val-synthesis">
+                                <div class="status-dot"></div>
+                                <span>Idle</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Log Terminal -->
+                <div class="form-group">
+                    <label>Live Activity Logs</label>
+                    <div class="terminal-log" id="terminalLog">
+                        <div class="log-line system">
+                            <span class="log-time">[22:36:38]</span>
+                            <span class="log-text">Studio Initialized. Ready for analysis request.</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: DASHBOARD RESULTS -->
+            <div class="panel right-panel">
+                
+                <!-- EMPTY STATE -->
+                <div class="empty-state" id="dashboardEmptyState">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    </div>
+                    <h3>Awaiting Content Stream</h3>
+                    <p>Configure your content properties, load your script draft, optionally upload any media cards or graphics, and click "Run Content Intelligence" to spin up the specialized Claude reviewer swarm.</p>
+                    <button class="sample-draft-badge" onclick="loadSampleContentDraft()">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Load Sample LinkedIn Post Draft
+                    </button>
+                </div>
+
+                <!-- RUNNING / LOADING SKELETON STATE -->
+                <div class="loading-state" id="dashboardLoadingState">
+                    <div class="skeleton-header">
+                        <div class="skeleton skeleton-circle"></div>
+                        <div class="skeleton-lines">
+                            <div class="skeleton skeleton-line title"></div>
+                            <div class="skeleton skeleton-line"></div>
+                            <div class="skeleton skeleton-line short"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-line"></div>
+                    <div class="skeleton skeleton-line"></div>
+                </div>
+
+                <!-- DYNAMIC RESULTS DASHBOARD -->
+                <div class="results-container" id="dashboardResults">
+                    
+                    <!-- Top metrics banner -->
+                    <div class="results-header-grid">
+                        <div class="score-circle-wrapper">
+                            <svg class="score-circle" width="130" height="130">
+                                <circle class="score-circle-bg" cx="65" cy="65" r="60" />
+                                <circle class="score-circle-progress" id="svgProgressCircle" cx="65" cy="65" r="60" />
+                                <defs>
+                                    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="var(--primary)" />
+                                        <stop offset="100%" stop-color="var(--secondary)" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="score-text-val">
+                                <span id="scoreNumber">0</span>
+                                <span class="score-text-label">Score</span>
+                            </div>
+                        </div>
+                        <div class="health-summary">
+                            <div class="health-badge health-critical" id="dashboardHealthBadge">Elite Draft</div>
+                            <h3 class="health-title" id="dashboardHealthTitle">Strong potential, but needs critical changes</h3>
+                            <p class="reasoning-text" id="dashboardReasoning">Loading review reasoning details directly from Claude...</p>
+                        </div>
+                    </div>
+
+                    <!-- Category Breakdown -->
+                    <div class="breakdown-grid">
+                        <!-- Hook -->
+                        <div class="breakdown-card">
+                            <span class="breakdown-label">Hook & Setup</span>
+                            <span class="breakdown-score" id="score-hook">0</span>
+                            <div class="breakdown-bar-bg">
+                                <div class="breakdown-bar-fill" id="bar-hook" style="background: var(--accent-purple);"></div>
+                            </div>
+                        </div>
+                        <!-- Engagement -->
+                        <div class="breakdown-card">
+                            <span class="breakdown-label">Engagement</span>
+                            <span class="breakdown-score" id="score-engagement">0</span>
+                            <div class="breakdown-bar-bg">
+                                <div class="breakdown-bar-fill" id="bar-engagement" style="background: var(--accent-blue);"></div>
+                            </div>
+                        </div>
+                        <!-- Readability -->
+                        <div class="breakdown-card">
+                            <span class="breakdown-label">Readability</span>
+                            <span class="breakdown-score" id="score-readability">0</span>
+                            <div class="breakdown-bar-bg">
+                                <div class="breakdown-bar-fill" id="bar-readability" style="background: var(--accent-green);"></div>
+                            </div>
+                        </div>
+                        <!-- Authority -->
+                        <div class="breakdown-card">
+                            <span class="breakdown-label">Value depth</span>
+                            <span class="breakdown-score" id="score-authority">0</span>
+                            <div class="breakdown-bar-bg">
+                                <div class="breakdown-bar-fill" id="bar-authority" style="background: var(--accent-orange);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs Header -->
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab(event, 'tab-insights')">Key Insights</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'tab-optimization')">Copy & Hooks</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'tab-report')">Executive Report</button>
+                    </div>
+
+                    <!-- TAB 1: KEY INSIGHTS -->
+                    <div class="tab-content active" id="tab-insights">
+                        <div class="insights-grid">
+                            <!-- Strengths -->
+                            <div class="insight-card strengths">
+                                <div class="insight-header">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Draft Strengths
+                                </div>
+                                <ul class="insight-list" id="listStrengths"></ul>
+                            </div>
+                            <!-- Weaknesses -->
+                            <div class="insight-card weaknesses">
+                                <div class="insight-header">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    Weaknesses & Pitfalls
+                                </div>
+                                <ul class="insight-list" id="listWeaknesses"></ul>
+                            </div>
+                            <!-- Opportunities -->
+                            <div class="insight-card opportunities">
+                                <div class="insight-header">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                    Missed Growth Opportunities
+                                </div>
+                                <ul class="insight-list" id="listOpportunities"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: COPY & HOOKS -->
+                    <div class="tab-content" id="tab-optimization">
+                        <!-- Before vs After Side-by-Side -->
+                        <div class="compare-layout">
+                            <!-- Before Box -->
+                            <div class="compare-box compare-before">
+                                <div class="compare-badge">Original Content</div>
+                                <div class="compare-content" id="compareOriginal">Draft text goes here...</div>
+                            </div>
+                            <!-- After Box -->
+                            <div class="compare-box compare-after">
+                                <div class="compare-badge">Optimized Swarm Copy</div>
+                                <button class="btn-copy" onclick="copyOptimizedText()">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copy Optimized Content
+                                </button>
+                                <div class="compare-content" id="compareOptimized">Loading optimized version...</div>
+                            </div>
+                        </div>
+
+                        <!-- Hooks and checklist grid -->
+                        <div class="hooks-checklist-grid">
+                            <!-- Alternatives Hooks -->
+                            <div class="hook-box">
+                                <div class="hook-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    Alternate Hooks / Click-stoppers
+                                </div>
+                                <div class="hook-list" id="listHooks"></div>
+                            </div>
+                            <!-- Publishing Checklist -->
+                            <div class="checklist-box">
+                                <div class="checklist-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    Pre-Publish checklist
+                                </div>
+                                <div class="checklist-items" id="listChecklist"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: EXECUTIVE REPORT -->
+                    <div class="tab-content" id="tab-report">
+                        <div class="report-section">
+                            <div class="report-grid">
+                                <!-- Executive Summary -->
+                                <div class="report-card">
+                                    <h4>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                        Executive Summary
+                                    </h4>
+                                    <p id="reportSummary">Loading summary...</p>
+                                </div>
+                                <!-- Health Report -->
+                                <div class="report-card">
+                                    <h4>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                        Content Health Report
+                                    </h4>
+                                    <p id="reportHealth">Loading health assessment...</p>
+                                </div>
+                                <!-- Highest Impact Improvements -->
+                                <div class="report-card">
+                                    <h4>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                                        Highest-Impact Improvements
+                                    </h4>
+                                    <ul id="reportImprovements"></ul>
+                                </div>
+                                <!-- Performance Potential -->
+                                <div class="report-card predict-card">
+                                    <h4>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/><polygon points="12 17 4 17 4 21 20 21 20 17 12 17"/></svg>
+                                        Performance Projection
+                                        <span class="predict-badge">AI Estimate</span>
+                                    </h4>
+                                    <div id="reportPerformance" style="font-size: 0.88rem; line-height: 1.5; color: var(--text-secondary);">Loading estimations...</div>
+                                </div>
+                            </div>
+
+                            <!-- Before vs After Explanation -->
+                            <div class="report-card" style="width:100%;">
+                                <h4>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                                    Before-vs-After Strategy Breakdown
+                                </h4>
+                                <ul id="reportBeforeAfter" style="padding-left: 20px;"></ul>
+                            </div>
+
+                            <!-- Deeper Prompts -->
+                            <div class="report-card" style="width:100%;">
+                                <h4>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    Swarm prompts for deeper optimization
+                                </h4>
+                                <div id="reportPrompts" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    Studio Settings
+                </h3>
+                <button class="btn-close-modal" onclick="closeSettings()">&times;</button>
+            </div>
+            
+            <div class="modal-alert">
+                Configure your API Provider, API Key, and Endpoint URL. Groq is selected by default for ultra-fast, OpenAI-compatible evaluations.
+            </div>
+
+            <div class="form-group">
+                <label for="apiProvider">API Provider</label>
+                <select id="apiProvider" onchange="handleProviderChange()">
+                    <option value="groq">Groq</option>
+                    <option value="anthropic">Anthropic Claude</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="apiKey" id="apiKeyLabel">Groq API Key</label>
+                <input type="text" id="apiKey" placeholder="gsk_...">
+            </div>
+
+            <div class="form-group">
+                <label for="apiEndpoint">API Endpoint URL</label>
+                <input type="text" id="apiEndpoint" value="https://api.groq.com/openai/v1/chat/completions" placeholder="https://api.groq.com/openai/v1/chat/completions">
+            </div>
+
+            <div class="form-group">
+                <label for="corsProxyPrefix">CORS Proxy Prefix URL</label>
+                <input type="text" id="corsProxyPrefix" value="https://corsproxy.io/?" placeholder="https://corsproxy.io/?">
+            </div>
+
+            <div class="form-group" style="flex-direction: row; align-items: center; gap: 10px; cursor: pointer; margin-top: 5px;">
+                <input type="checkbox" id="useCorsProxy" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;">
+                <label for="useCorsProxy" style="text-transform: none; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; user-select: none;">Use CORS Proxy (Recommended for local runs)</label>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+                <button class="btn-glow" style="padding: 10px 20px; font-size: 0.9rem;" onclick="saveSettings()">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="toastText">Content copied successfully!</span>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // Global State variables
+        let uploadedImageBase64 = null;
+        let uploadedImageMediaType = null;
+        const defaultApiKey = '';
+        
+        // Log stack
+        const logs = [];
+
+        // Preloaded Settings from interview:
+        // What type of content would you like to analyze? Written Article / Blog Post
+        // Which platform is it for? LinkedIn
+        // What was your primary goal? Educate & Build Community
+        // What would you like to upload? Text content only
+        // How critical should the review be? Highly Critical & Brutally Honest (Rigorous standard, no sugarcoating)
+        
+        // Helper to update settings UI dynamically based on the selected API provider
+        function handleProviderChange(updateEndpoint = true) {
+            const provider = document.getElementById('apiProvider').value;
+            const label = document.getElementById('apiKeyLabel');
+            const apiKeyInput = document.getElementById('apiKey');
+            const endpoint = document.getElementById('apiEndpoint');
+            
+            if (provider === 'groq') {
+                label.innerText = "Groq API Key";
+                apiKeyInput.placeholder = "gsk_...";
+                if (updateEndpoint) {
+                    endpoint.value = "https://api.groq.com/openai/v1/chat/completions";
+                }
+            } else {
+                label.innerText = "Claude API Key (Optional Override)";
+                apiKeyInput.placeholder = "sk-ant-...";
+                if (updateEndpoint) {
+                    endpoint.value = "https://api.anthropic.com/v1/messages";
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedProvider = localStorage.getItem('cis_api_provider') || 'groq'; // Default to groq
+            document.getElementById('apiProvider').value = savedProvider;
+
+            // Load credentials and config
+            const savedKey = localStorage.getItem('cis_api_key');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+            }
+            
+            const savedEndpoint = localStorage.getItem('cis_api_endpoint');
+            if (savedEndpoint) {
+                document.getElementById('apiEndpoint').value = savedEndpoint;
+            } else {
+                document.getElementById('apiEndpoint').value = savedProvider === 'groq' 
+                    ? "https://api.groq.com/openai/v1/chat/completions" 
+                    : "https://api.anthropic.com/v1/messages";
+            }
+            
+            const savedUseCors = localStorage.getItem('cis_use_cors_proxy');
+            if (savedUseCors !== null) {
+                document.getElementById('useCorsProxy').checked = savedUseCors === 'true';
+            } else {
+                document.getElementById('useCorsProxy').checked = true; // Default to true
+            }
+
+            const savedProxyPrefix = localStorage.getItem('cis_cors_proxy_prefix');
+            if (savedProxyPrefix) {
+                document.getElementById('corsProxyPrefix').value = savedProxyPrefix;
+            } else {
+                document.getElementById('corsProxyPrefix').value = "https://corsproxy.io/?";
+            }
+
+            // Sync the settings UI labels without overwriting the loaded endpoint
+            handleProviderChange(false);
+
+            // Populate settings with interview results
+            document.getElementById('contentType').value = "Written Article / Blog Post";
+            document.getElementById('targetPlatform').value = "LinkedIn";
+            document.getElementById('primaryGoal').value = "Educate & Build Community";
+            document.getElementById('reviewSeverity').value = "Gentle & Supportive";
+            
+            updateInterviewBadge();
+
+            // Setup drag-and-drop listener
+            const uploadZone = document.getElementById('uploadZone');
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadZone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadZone.classList.remove('dragover');
+                }, false);
+            });
+
+            uploadZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    processFile(files[0]);
+                }
+            }, false);
+        });
+
+        function updateInterviewBadge() {
+            const platform = document.getElementById('targetPlatform').value;
+            const goal = document.getElementById('primaryGoal').value;
+            const intensity = document.getElementById('reviewSeverity').value;
+            
+            document.getElementById('interviewSettingsBadge').innerHTML = `
+                <div class="dot"></div>
+                <span>${platform} | ${intensity.split('&')[0]} | ${goal.split('&')[0]}</span>
+            `;
+        }
+
+        // Dropdown changes trigger badge updates
+        document.getElementById('contentType').addEventListener('change', updateInterviewBadge);
+        document.getElementById('targetPlatform').addEventListener('change', updateInterviewBadge);
+        document.getElementById('primaryGoal').addEventListener('change', updateInterviewBadge);
+        document.getElementById('reviewSeverity').addEventListener('change', updateInterviewBadge);
+
+        // Load pre-configured sample script draft
+        function loadSampleContentDraft() {
+            const sampleDraft = `I think learning to code is very important in 2026. A lot of people are trying to learn it. In this post I will share some tips. First, you should practice every day. Second, you should build projects. Third, you shouldn't give up. Let me know what you think in the comments!`;
+            document.getElementById('contentDraft').value = sampleDraft;
+            logAction('system', 'Sample LinkedIn Post loaded successfully.');
+            showToast('Sample draft loaded.');
+        }
+
+        // Log Helper
+        function logAction(type, text) {
+            const logContainer = document.getElementById('terminalLog');
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            line.innerHTML = `
+                <span class="log-time">[${timeStr}]</span>
+                <span class="log-text">${escapeHTML(text)}</span>
+            `;
+            
+            logContainer.appendChild(line);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            logs.push({ time: timeStr, type, text });
+        }
+
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Image Selection Mechanics
+        function triggerFileInput() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            if (!file.type.startsWith('image/')) {
+                logAction('error', 'Uploaded file must be a visual asset (image).');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                const dataUrl = reader.result;
+                const parts = dataUrl.split(';base64,');
+                uploadedImageMediaType = parts[0].replace('data:', '');
+                uploadedImageBase64 = parts[1];
+                
+                // Show in UI
+                document.getElementById('imagePreview').src = dataUrl;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+                document.getElementById('uploadZone').style.display = 'none';
+                
+                logAction('system', `Loaded visual asset: ${file.name} (${Math.round(file.size / 1024)} KB)`);
+            };
+            reader.onerror = function (error) {
+                logAction('error', 'Error reading uploaded graphic asset.');
+                console.error(error);
+            };
+        }
+
+        function removeImage() {
+            uploadedImageBase64 = null;
+            uploadedImageMediaType = null;
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('uploadZone').style.display = 'flex';
+            document.getElementById('fileInput').value = '';
+            logAction('system', 'Removed graphic asset from input stream.');
+        }
+
+        // Settings Dialog Management
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('apiKey').value.trim();
+            if (key) {
+                localStorage.setItem('cis_api_key', key);
+            } else {
+                localStorage.removeItem('cis_api_key');
+            }
+            
+            const endpoint = document.getElementById('apiEndpoint').value.trim();
+            if (endpoint) {
+                localStorage.setItem('cis_api_endpoint', endpoint);
+            } else {
+                localStorage.removeItem('cis_api_endpoint');
+            }
+            
+            const useCors = document.getElementById('useCorsProxy').checked;
+            localStorage.setItem('cis_use_cors_proxy', useCors ? 'true' : 'false');
+
+            const prefix = document.getElementById('corsProxyPrefix').value.trim();
+            if (prefix) {
+                localStorage.setItem('cis_cors_proxy_prefix', prefix);
+            } else {
+                localStorage.removeItem('cis_cors_proxy_prefix');
+            }
+
+            const provider = document.getElementById('apiProvider').value;
+            localStorage.setItem('cis_api_provider', provider);
+            
+            logAction('system', 'API configuration updated.');
+            closeSettings();
+            showToast('Settings saved successfully!');
+        }
+
+        // Tabs switcher
+        function switchTab(evt, tabId) {
+            const tabButtons = document.getElementsByClassName('tab-btn');
+            for (let btn of tabButtons) {
+                btn.classList.remove('active');
+            }
+            evt.currentTarget.classList.add('active');
+
+            const contents = document.getElementsByClassName('tab-content');
+            for (let content of contents) {
+                content.classList.remove('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Toast Helper
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = text;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Agent Status Setter
+        function setReviewerUI(id, status, text) {
+            const item = document.getElementById(`rev-${id}`);
+            const statusVal = document.getElementById(`status-val-${id}`);
+            
+            item.className = `reviewer-item reviewer-${id === 'hook' ? '1' : id === 'authority' ? '2' : id === 'psychology' ? '3' : '4'}`;
+            statusVal.className = `reviewer-status status-${status}`;
+            statusVal.querySelector('span').innerText = text;
+
+            if (status === 'running') {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        }
+
+        // Markdown Mini Parser
+        function parseMarkdown(mdText) {
+            if (!mdText) return '';
+            
+            // Handle checklist blocks
+            let processed = mdText
+                .replace(/- \[\s\] (.*?)(?:\n|$)/g, '<div class="checklist-item"><input type="checkbox" onclick="return false;"><span class="checklist-item-text">$1</span></div>')
+                .replace(/- \[x\] (.*?)(?:\n|$)/g, '<div class="checklist-item"><input type="checkbox" checked onclick="return false;"><span class="checklist-item-text" style="text-decoration: line-through; color: var(--text-muted);">$1</span></div>');
+
+            // Replace headings
+            processed = processed.replace(/### (.*?)(?:\n|$)/g, '<h5>$1</h5>');
+            processed = processed.replace(/#### (.*?)(?:\n|$)/g, '<h6>$1</h6>');
+
+            // Bold formatting
+            processed = processed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Inline code
+            processed = processed.replace(/`([^`]+)`/g, '<code style="font-family: \'Fira Code\', monospace; font-size: 0.85em; background: rgba(255,255,255,0.06); padding: 2px 4px; border-radius: 4px;">$1</code>');
+            
+            // Paragraph formatting split by double newline
+            const blocks = processed.split(/\n\n/);
+            return blocks.map(block => {
+                if (block.trim().startsWith('<div') || block.trim().startsWith('<h')) {
+                    return block;
+                }
+                if (block.trim().startsWith('- ') || block.trim().startsWith('* ')) {
+                    const listItems = block.split(/\n/)
+                        .map(li => {
+                            const cleanedLi = li.replace(/^[-*]\s+/, '');
+                            return `<li>${cleanedLi}</li>`;
+                        })
+                        .join('');
+                    return `<ul class="insight-list" style="margin-bottom: 12px;">${listItems}</ul>`;
+                }
+                return `<p style="margin-bottom: 12px; line-height: 1.55;">${block.replace(/\n/g, '<br>')}</p>`;
+            }).join('');
+        }
+
+        // XML Custom resilient tag extractor
+        function extractXMLTag(text, tag) {
+            if (!text) return '';
+            const openTag = `<${tag}>`;
+            const closeTag = `</${tag}>`;
+            
+            // Regex match
+            const regex = new RegExp(`<${tag}>(.*?)</${tag}>`, 'is');
+            const match = text.match(regex);
+            if (match) return match[1].trim();
+
+            // Case-insensitive regex
+            const upperRegex = new RegExp(`<${tag.toUpperCase()}>(.*?)</${tag.toUpperCase()}>`, 'is');
+            const upperMatch = text.match(upperRegex);
+            if (upperMatch) return upperMatch[1].trim();
+
+            // Fallback indices
+            const startIdx = text.toLowerCase().indexOf(openTag.toLowerCase());
+            if (startIdx !== -1) {
+                const contentStart = startIdx + openTag.length;
+                const endIdx = text.toLowerCase().indexOf(closeTag.toLowerCase(), contentStart);
+                if (endIdx !== -1) {
+                    return text.substring(contentStart, endIdx).trim();
+                }
+                // If close tag is missing, look for next tag indicator '<'
+                const nextTagIdx = text.indexOf('<', contentStart);
+                if (nextTagIdx !== -1) {
+                    return text.substring(contentStart, nextTagIdx).trim();
+                }
+                return text.substring(contentStart).trim();
+            }
+            return '';
+        }
+
+        // Core Swarm API Caller
+        async function callClaudeAPI(systemPrompt, userPrompt, imageBase64 = null, imageMediaType = null) {
+            const provider = localStorage.getItem('cis_api_provider') || 'groq';
+            const customKey = localStorage.getItem('cis_api_key') || defaultApiKey;
+            const customEndpoint = localStorage.getItem('cis_api_endpoint') || 
+                (provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.anthropic.com/v1/messages');
+            const useCors = localStorage.getItem('cis_use_cors_proxy') !== 'false'; // Default to true
+            const corsPrefix = localStorage.getItem('cis_cors_proxy_prefix') || 'https://corsproxy.io/?';
+
+            let fetchUrl = customEndpoint;
+            if (useCors) {
+                if (corsPrefix.includes('corsproxy.io')) {
+                    fetchUrl = corsPrefix + customEndpoint; // unencoded for corsproxy.io
+                } else {
+                    fetchUrl = corsPrefix + encodeURIComponent(customEndpoint);
+                }
+            }
+
+            const headers = {
+                'content-type': 'application/json'
+            };
+
+            if (provider === 'anthropic') {
+                headers['anthropic-version'] = '2023-06-01';
+                headers['dangerously-allow-html-user-agents'] = 'true';
+                if (customKey) {
+                    headers['x-api-key'] = customKey;
+                }
+            } else {
+                // Groq & OpenAI style
+                if (customKey) {
+                    headers['authorization'] = `Bearer ${customKey}`;
+                }
+            }
+
+            let body;
+            if (provider === 'anthropic') {
+                const contentArray = [];
+                if (imageBase64 && imageMediaType) {
+                    contentArray.push({
+                        type: 'image',
+                        source: {
+                            type: 'base64',
+                            media_type: imageMediaType,
+                            data: imageBase64
+                        }
+                    });
+                }
+                contentArray.push({
+                    type: 'text',
+                    text: userPrompt
+                });
+
+                body = {
+                    model: 'claude-3-5-sonnet-20241022',
+                    max_tokens: 4000,
+                    system: systemPrompt,
+                    messages: [
+                        {
+                            role: 'user',
+                            content: contentArray
+                        }
+                    ]
+                };
+            } else {
+                // Groq provider (OpenAI compatible schema)
+                const messages = [];
+                if (systemPrompt) {
+                    messages.push({ role: 'system', content: systemPrompt });
+                }
+                
+                if (imageBase64 && imageMediaType) {
+                    messages.push({
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'image_url',
+                                image_url: {
+                                    url: `data:${imageMediaType};base64,${imageBase64}`
+                                }
+                            },
+                            {
+                                type: 'text',
+                                text: userPrompt
+                            }
+                        ]
+                    });
+                } else {
+                    messages.push({
+                        role: 'user',
+                        content: userPrompt
+                    });
+                }
+
+                // Groq Model selection: Vision models support both, otherwise standard versatile text model
+                const groqModel = imageBase64 ? 'llama-3.2-90b-vision-preview' : 'llama-3.3-70b-versatile';
+
+                body = {
+                    model: groqModel,
+                    messages: messages,
+                    max_tokens: 4000,
+                    temperature: 0.7
+                };
+            }
+
+            // Setup retry logic
+            const maxRetries = 2;
+            let attempt = 0;
+            let lastError = null;
+
+            while (attempt <= maxRetries) {
+                try {
+                    if (attempt > 0) {
+                        logAction('warn', `API request failed. Retrying (Attempt ${attempt}/${maxRetries})...`);
+                        await new Promise(resolve => setTimeout(resolve, 1500 * attempt));
+                    }
+
+                    const response = await fetch(fetchUrl, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(body)
+                    });
+
+                    if (!response.ok) {
+                        let errMsg = `HTTP Error ${response.status}`;
+                        try {
+                            const errJson = await response.json();
+                            if (errJson.error && errJson.error.message) {
+                                errMsg = errJson.error.message;
+                            }
+                        } catch(e) {}
+                        throw new Error(errMsg);
+                    }
+
+                    const resData = await response.json();
+                    if (provider === 'anthropic') {
+                        if (resData.content && resData.content.length > 0) {
+                            return resData.content[0].text;
+                        } else {
+                            throw new Error('Received empty response layout from Anthropic Messages API.');
+                        }
+                    } else {
+                        // Groq
+                        if (resData.choices && resData.choices.length > 0 && resData.choices[0].message) {
+                            return resData.choices[0].message.content;
+                        } else {
+                            throw new Error('Received empty response layout from Groq API.');
+                        }
+                    }
+
+                } catch (error) {
+                    lastError = error;
+                    attempt++;
+                }
+            }
+
+            throw lastError;
+        }
+
+        // Swarm Execution Flow
+        async function startAnalysisWorkflow() {
+            const draft = document.getElementById('contentDraft').value.trim();
+            if (!draft) {
+                logAction('error', 'Input draft cannot be empty.');
+                alert('Please enter a content draft or script outline first.');
+                return;
+            }
+
+            const contentType = document.getElementById('contentType').value;
+            const platform = document.getElementById('targetPlatform').value;
+            const goal = document.getElementById('primaryGoal').value;
+            const severity = document.getElementById('reviewSeverity').value;
+
+            // Build dynamic severity-based tone guidelines
+            let severityInstructions = "";
+            let synthesisSeverityInstr = "";
+            
+            if (severity.includes("Highly Critical") || severity.includes("Brutally")) {
+                severityInstructions = `Review Intensity: Brutally Honest. Be extremely direct, critically sharp, and brutally honest. Do not sugarcoat any issues; point out weaknesses, generic filler, clichés, and major reasons why readers would scroll past.`;
+                synthesisSeverityInstr = `You must remain highly critical, brutally honest, and direct in your final assessments and scores. Make sure the score reflects a rigorous, high bar.`;
+            } else if (severity.includes("Balanced") || severity.includes("Constructive")) {
+                severityInstructions = `Review Intensity: Balanced & Constructive. Provide a balanced, fair review. Call out issues clearly, but also highlight what is working well. Provide practical and encouraging tips for improvement.`;
+                synthesisSeverityInstr = `You must remain balanced and constructive. Reflect both strengths and growth opportunities fairly in the scores and analysis.`;
+            } else if (severity.includes("Gentle") || severity.includes("Supportive")) {
+                severityInstructions = `Review Intensity: Soft & Supportive. Be encouraging, gentle, and positive. Focus on building the writer's confidence. Point out suggestions for improvement in a soft, encouraging tone, emphasizing how to polish the strengths.`;
+                synthesisSeverityInstr = `You must write in an encouraging, supportive, and gentle tone. Emphasize growth potential and keep scores constructive to build confidence.`;
+            } else if (severity.includes("Psychological") || severity.includes("Persuasive")) {
+                severityInstructions = `Review Intensity: Psychological & Persuasive Focus. Focus deeply on human psychology, emotional resonance, copy framework structures, and logical persuasion levers. Critically assess if the copy captures the subconscious mind.`;
+                synthesisSeverityInstr = `Analyze the copy from a deep persuasion design and psychological impact standpoint. Reflect these dimensions clearly in the scores and recommendations.`;
+            } else {
+                severityInstructions = `Review Intensity: ${severity}. Audit the draft constructively.`;
+                synthesisSeverityInstr = `Adopt a constructive review tone matching the user's selected intensity.`;
+            }
+
+            // Reset dashboard state
+            document.getElementById('dashboardEmptyState').style.display = 'none';
+            document.getElementById('dashboardResults').style.display = 'none';
+            document.getElementById('dashboardLoadingState').style.display = 'flex';
+            document.getElementById('btnAnalyze').disabled = true;
+
+            // Log initialization
+            logAction('system', 'Starting Content Swarm Review Agents...');
+            logAction('system', `Context setup: ${contentType} | ${platform} | ${goal} | Tone Intensity: ${severity}`);
+            
+            // Set statuses to Idle
+            setReviewerUI('hook', 'idle', 'Waiting...');
+            setReviewerUI('authority', 'idle', 'Waiting...');
+            setReviewerUI('psychology', 'idle', 'Waiting...');
+            setReviewerUI('synthesis', 'idle', 'Waiting...');
+
+            let hookAnalysis = '';
+            let authorityAnalysis = '';
+            let psychologyAnalysis = '';
+
+            try {
+                // ==========================================
+                // STAGE 1: Hook and Visuals Scroll-Stopper
+                // ==========================================
+                logAction('system', 'Spawning Agent 1: Hook & Visual Scroll-Stopper...');
+                setReviewerUI('hook', 'running', 'Analyzing Hook...');
+                
+                const hookSystemPrompt = `You are a world-class platform engagement expert and Scroll-Stopping Hook Analyst. 
+Your goal is to inspect visual files (if provided) and content opening hook text (first 3 lines of copy). 
+Review the platform formatting style, spacing, emoji density, visual flow, and immediate scroll-stopping power. 
+Analyze for: ${platform}. Primary Content Type: ${contentType}.
+
+${severityInstructions}
+
+Do not wrap your answer in JSON or markdown blocks. Enclose your full critique inside a single <feedback>...</feedback> tag structure.`;
+
+                const hookUserPrompt = `Here is my content draft:\n---\n${draft}\n---\nEvaluate the opening and visual potential.`;
+                
+                hookAnalysis = await callClaudeAPI(hookSystemPrompt, hookUserPrompt, uploadedImageBase64, uploadedImageMediaType);
+                setReviewerUI('hook', 'completed', 'Analysis Saved');
+                logAction('success', 'Agent 1: Hook scroll-stopper review completed.');
+
+                // ==========================================
+                // STAGE 2: Value and Authority Assessor
+                // ==========================================
+                logAction('system', 'Spawning Agent 2: Value & Authority Assessor...');
+                setReviewerUI('authority', 'running', 'Evaluating Value...');
+
+                const authoritySystemPrompt = `You are a senior creator strategist and Content Authority & Value Assessor.
+Your goal is to critically check the informational depth, practical utility, thought leadership credibility, and originality of the draft.
+Look out for generic tropes, cliché corporate jargon, unbacked claims, fluff sentences, and content that fails to deliver genuine educational value.
+Analyze for: ${platform}. Primary Content Goal: ${goal}.
+
+${severityInstructions}
+
+Do not wrap your answer in JSON or markdown blocks. Enclose your full critique inside a single <feedback>...</feedback> tag structure.`;
+
+                const authorityUserPrompt = `Here is my content draft:\n---\n${draft}\n---\nEvaluate the informational value depth and authority credibility.`;
+                
+                authorityAnalysis = await callClaudeAPI(authoritySystemPrompt, authorityUserPrompt, null, null);
+                setReviewerUI('authority', 'completed', 'Analysis Saved');
+                logAction('success', 'Agent 2: Value & Authority review completed.');
+
+                // ==========================================
+                // STAGE 3: Audience Psychology Specialist
+                // ==========================================
+                logAction('system', 'Spawning Agent 3: Audience Psychology Specialist...');
+                setReviewerUI('psychology', 'running', 'Inspecting Psychology...');
+
+                const psychologySystemPrompt = `You are a veteran behavioral psychologist and copy writer specialized in social persuasion.
+Your goal is to audit emotional triggers, cognitive reading load, curiosity loops, community connection markers, and the psychological layout of the copy.
+Check if the Call-To-Action (CTA) creates action friction, if text blocks are too dense, if it triggers empathy or community support, and if the overall tone triggers resistance.
+Analyze for: ${platform}. Primary Content Goal: ${goal}.
+
+${severityInstructions}
+
+Do not wrap your answer in JSON or markdown blocks. Enclose your full critique inside a single <feedback>...</feedback> tag structure.`;
+
+                const psychologyUserPrompt = `Here is my content draft:\n---\n${draft}\n---\nEvaluate the cognitive load, behavioral layout, and emotional hooks.`;
+
+                psychologyAnalysis = await callClaudeAPI(psychologySystemPrompt, psychologyUserPrompt, null, null);
+                setReviewerUI('psychology', 'completed', 'Analysis Saved');
+                logAction('success', 'Agent 3: Audience Psychology review completed.');
+
+                // ==========================================
+                // STAGE 4: Synthesis Architect
+                // ==========================================
+                logAction('system', 'Spawning Agent 4: Synthesis Coordinator...');
+                setReviewerUI('synthesis', 'running', 'Synthesizing Report...');
+
+                const synthesisSystemPrompt = `You are the Lead Content Intelligence Synthesis Architect. Your job is to compile the reviews from the Scroll-Stopper Analyst, the Authority Assessor, and the Psychology Specialist, and produce a single comprehensive dashboard report.
+You must analyze the original content and the three reviews, and output the final dashboard metrics, copy variations, checklist, and reports.
+
+${synthesisSeverityInstr}
+
+Format your entire response using the following XML tags. Do not wrap the tags in markdown blocks, do not include JSON, and do not write conversational filler. Write the tags directly.
+
+<overall_score>[An integer from 1 to 100 representing the total average score]</overall_score>
+<hook_score>[An integer from 1 to 100]</hook_score>
+<engagement_score>[An integer from 1 to 100]</engagement_score>
+<readability_score>[An integer from 1 to 100]</readability_score>
+<authority_score>[An integer from 1 to 100]</authority_score>
+<visual_score>[An integer from 1 to 100, evaluate if visual exists or default to 50 if text-only]</visual_score>
+<reasoning>[Write 2-3 sentences explaining the scores and current content health]</reasoning>
+<strengths>[List 2-3 strong points in markdown format (bullet points)]</strengths>
+<weaknesses>[List 3-4 weak points in markdown format (bullet points)]</weaknesses>
+<missed_opportunities>[List 3-4 missed opportunities in markdown format (bullet points)]</missed_opportunities>
+<platform_recommendations>[List 3-4 platform-specific tips for LinkedIn in markdown format]</platform_recommendations>
+<rewritten_version>[Write a rewritten, polished, highly engaging version of the post copy. Keep it formatted nicely with proper line breaks, spacing, and hooks, appropriate for LinkedIn. Educate and build community.]</rewritten_version>
+<hooks_and_titles>[Provide 4 alternative hooks or titles, separated by markdown bullet points]</hooks_and_titles>
+<checklist>[Provide a 4-5 item publishing checklist, in markdown check list format e.g., - [ ] Check format, - [ ] Verify links]</checklist>
+<executive_summary>[Provide a detailed executive summary of the content's state and growth potential in 2 paragraphs]</executive_summary>
+<health_report>[Provide a content health report paragraph detailing structural viability, tone fit, and clarity]</health_report>
+<impact_improvements>[List 3-4 highest-impact improvements in markdown bullet points]</impact_improvements>
+<performance_potential>[Detail the predicted performance potential (reach, engagement, conversion) as a markdown section with high-impact estimation]</performance_potential>
+<before_after>[A side-by-side explanation of what was changed and why in the rewritten version, using markdown bullet points]</before_after>
+<deeper_prompts>[List 3-4 custom follow-up prompts the user can copy to further optimize their content in Claude, in markdown bullet points]</deeper_prompts>`;
+
+                const synthesisUserPrompt = `Original Draft:
+${draft}
+
+Hook Critic Analysis:
+${extractXMLTag(hookAnalysis, 'feedback') || hookAnalysis}
+
+Value Critic Analysis:
+${extractXMLTag(authorityAnalysis, 'feedback') || authorityAnalysis}
+
+Psychology Critic Analysis:
+${extractXMLTag(psychologyAnalysis, 'feedback') || psychologyAnalysis}
+
+Platform: ${platform}
+Goal: ${goal}
+Severity/Intensity: ${severity}
+
+Synthesize these inputs into the dashboard XML formats specified.`;
+
+                const synthesisOutput = await callClaudeAPI(synthesisSystemPrompt, synthesisUserPrompt, null, null);
+                setReviewerUI('synthesis', 'completed', 'Report Ready');
+                logAction('success', 'Synthesis Architect completed final review compilation.');
+
+                // Render metrics
+                populateDashboard(draft, synthesisOutput);
+
+            } catch (error) {
+                // Find running agents and fail them
+                ['hook', 'authority', 'psychology', 'synthesis'].forEach(key => {
+                    const statusVal = document.getElementById(`status-val-${key}`);
+                    if (statusVal.className.includes('running') || statusVal.className.includes('idle')) {
+                        setReviewerUI(key, 'failed', 'Errored');
+                    }
+                });
+                
+                logAction('error', `Workflow Interrupted: ${error.message}`);
+                console.error(error);
+                
+                // Switch back loader
+                document.getElementById('dashboardLoadingState').style.display = 'none';
+                document.getElementById('dashboardEmptyState').style.display = 'flex';
+                alert(`Error executing content review: ${error.message}\n\nPlease check your internet connection or API settings modal.`);
+            } finally {
+                document.getElementById('btnAnalyze').disabled = false;
+            }
+        }
+
+        // Render response data to Dashboard
+        function populateDashboard(originalDraft, synthesisText) {
+            // Extract and clean metrics
+            const overallScore = parseInt(extractXMLTag(synthesisText, 'overall_score')) || 70;
+            const hookScore = parseInt(extractXMLTag(synthesisText, 'hook_score')) || 70;
+            const engagementScore = parseInt(extractXMLTag(synthesisText, 'engagement_score')) || 70;
+            const readabilityScore = parseInt(extractXMLTag(synthesisText, 'readability_score')) || 70;
+            const authorityScore = parseInt(extractXMLTag(synthesisText, 'authority_score')) || 70;
+            const visualScore = parseInt(extractXMLTag(synthesisText, 'visual_score')) || 50;
+
+            const reasoning = extractXMLTag(synthesisText, 'reasoning') || 'Compilation finished.';
+            const strengths = extractXMLTag(synthesisText, 'strengths');
+            const weaknesses = extractXMLTag(synthesisText, 'weaknesses');
+            const missedOpportunities = extractXMLTag(synthesisText, 'missed_opportunities');
+            const platformRecs = extractXMLTag(synthesisText, 'platform_recommendations');
+            const rewrittenCopy = extractXMLTag(synthesisText, 'rewritten_version') || 'Error fetching rewritten text copy.';
+            const hooksAndTitles = extractXMLTag(synthesisText, 'hooks_and_titles');
+            const checklist = extractXMLTag(synthesisText, 'checklist');
+            
+            const execSummary = extractXMLTag(synthesisText, 'executive_summary');
+            const healthReport = extractXMLTag(synthesisText, 'health_report');
+            const impactImprovements = extractXMLTag(synthesisText, 'impact_improvements');
+            const perfPotential = extractXMLTag(synthesisText, 'performance_potential');
+            const beforeAfter = extractXMLTag(synthesisText, 'before_after');
+            const deeperPrompts = extractXMLTag(synthesisText, 'deeper_prompts');
+
+            // Apply to score gauge (Circumference is 377)
+            const strokeDashoffset = 377 - (377 * overallScore) / 100;
+            document.getElementById('svgProgressCircle').style.strokeDashoffset = strokeDashoffset;
+            document.getElementById('scoreNumber').innerText = overallScore;
+
+            // Health Status badge
+            const healthBadge = document.getElementById('dashboardHealthBadge');
+            if (overallScore >= 90) {
+                healthBadge.className = 'health-badge health-elite';
+                healthBadge.innerText = 'Elite content';
+                document.getElementById('dashboardHealthTitle').innerText = 'Highly engaging, ready for release!';
+            } else if (overallScore >= 75) {
+                healthBadge.className = 'health-badge health-good';
+                healthBadge.innerText = 'Optimized';
+                document.getElementById('dashboardHealthTitle').innerText = 'Solid draft, minor tweaks recommended';
+            } else if (overallScore >= 50) {
+                healthBadge.className = 'health-badge health-attention';
+                healthBadge.innerText = 'Critical attention';
+                document.getElementById('dashboardHealthTitle').innerText = 'Moderately weak. Structural gaps present';
+            } else {
+                healthBadge.className = 'health-badge health-critical';
+                healthBadge.innerText = 'High Risk';
+                document.getElementById('dashboardHealthTitle').innerText = 'Severe copy errors. Rework required';
+            }
+
+            document.getElementById('dashboardReasoning').innerText = reasoning;
+
+            // Subcategory metrics values
+            document.getElementById('score-hook').innerText = hookScore;
+            document.getElementById('bar-hook').style.width = `${hookScore}%`;
+            
+            document.getElementById('score-engagement').innerText = engagementScore;
+            document.getElementById('bar-engagement').style.width = `${engagementScore}%`;
+
+            document.getElementById('score-readability').innerText = readabilityScore;
+            document.getElementById('bar-readability').style.width = `${readabilityScore}%`;
+
+            document.getElementById('score-authority').innerText = authorityScore;
+            document.getElementById('bar-authority').style.width = `${authorityScore}%`;
+
+            // Strengths and Weaknesses
+            document.getElementById('listStrengths').innerHTML = parseMarkdown(strengths);
+            document.getElementById('listWeaknesses').innerHTML = parseMarkdown(weaknesses);
+            document.getElementById('listOpportunities').innerHTML = parseMarkdown(missedOpportunities);
+
+            // Compare views
+            document.getElementById('compareOriginal').innerText = originalDraft;
+            document.getElementById('compareOptimized').innerText = rewrittenCopy;
+
+            // Alternative Hooks list
+            const rawHooks = hooksAndTitles.split('\n');
+            const hookListContainer = document.getElementById('listHooks');
+            hookListContainer.innerHTML = '';
+            
+            rawHooks.forEach(hookLine => {
+                const cleanHook = hookLine.replace(/^[-*•\d\.\s]+/, '').trim();
+                if (cleanHook) {
+                    const hCard = document.createElement('div');
+                    hCard.className = 'hook-item';
+                    hCard.innerText = cleanHook;
+                    hCard.onclick = () => {
+                        navigator.clipboard.writeText(cleanHook);
+                        showToast('Hook copied to clipboard!');
+                    };
+                    hookListContainer.appendChild(hCard);
+                }
+            });
+
+            // Publishing Checklist
+            const rawChecklist = checklist.split('\n');
+            const listChecklistContainer = document.getElementById('listChecklist');
+            listChecklistContainer.innerHTML = '';
+
+            rawChecklist.forEach(chkLine => {
+                const cleanChk = chkLine.replace(/^[-*•\d\.\s\[\]xX]+/, '').trim();
+                if (cleanChk) {
+                    const uid = 'chk-' + Math.random().toString(36).substr(2, 9);
+                    const item = document.createElement('label');
+                    item.className = 'checklist-item';
+                    item.htmlFor = uid;
+                    
+                    item.innerHTML = `
+                        <input type="checkbox" id="${uid}">
+                        <span class="checklist-item-text">${cleanChk}</span>
+                    `;
+                    
+                    listChecklistContainer.appendChild(item);
+                }
+            });
+
+            // Executive Summary & Reports tab
+            document.getElementById('reportSummary').innerHTML = parseMarkdown(execSummary);
+            document.getElementById('reportHealth').innerHTML = parseMarkdown(healthReport);
+            document.getElementById('reportImprovements').innerHTML = parseMarkdown(impactImprovements);
+            document.getElementById('reportPerformance').innerHTML = parseMarkdown(perfPotential);
+            document.getElementById('reportBeforeAfter').innerHTML = parseMarkdown(beforeAfter);
+            document.getElementById('reportPrompts').innerHTML = parseMarkdown(deeperPrompts);
+
+            // Toggle screens
+            document.getElementById('dashboardLoadingState').style.display = 'none';
+            document.getElementById('dashboardResults').style.display = 'flex';
+            
+            logAction('success', 'Analysis values fully integrated into the dashboard.');
+        }
+
+        // Copy button action
+        function copyOptimizedText() {
+            const txt = document.getElementById('compareOptimized').innerText;
+            navigator.clipboard.writeText(txt);
+            showToast('Optimized post copy copied!');
+        }
+    </script>
+</body>
+</html>
