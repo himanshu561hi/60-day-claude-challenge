@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEFEND YOUR EXPERIENCE // Cyber Command Defense Studio</title>
+  <!-- Google Fonts for Modern Tech Aesthetics -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       CYBER COMMAND / DARK TERMINAL DESIGN SYSTEM & CSS VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-dark: #080b11;
+      --bg-card: #0e1420;
+      --bg-card-hover: #141c2c;
+      --bg-panel: rgba(14, 20, 32, 0.85);
+      --bg-input: #0a0e17;
+      
+      --cyan-main: #00f0ff;
+      --cyan-glow: rgba(0, 240, 255, 0.35);
+      --cyan-border: rgba(0, 240, 255, 0.2);
+      
+      --emerald-main: #00ff9d;
+      --emerald-glow: rgba(0, 255, 157, 0.3);
+      
+      --amber-main: #ffb700;
+      --amber-glow: rgba(255, 183, 0, 0.3);
+      
+      --crimson-main: #ff2a6d;
+      --crimson-glow: rgba(255, 42, 109, 0.35);
+      
+      --text-main: #e2e8f0;
+      --text-muted: #8492a6;
+      --text-dim: #475569;
+      
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      
+      --border-radius-sm: 6px;
+      --border-radius-md: 10px;
+      --border-radius-lg: 16px;
+
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(0, 255, 157, 0.04) 0%, transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid var(--cyan-border);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan-main);
+    }
+
+    /* Cyber Command Header */
+    header {
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--cyan-border);
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--cyan-main);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan-main);
+      box-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    .brand-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+
+    .brand-title span {
+      color: var(--cyan-main);
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .badge-cyan {
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--cyan-main);
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+
+    .badge-emerald {
+      background: rgba(0, 255, 157, 0.1);
+      color: var(--emerald-main);
+      border-color: rgba(0, 255, 157, 0.3);
+    }
+
+    .badge-amber {
+      background: rgba(255, 183, 0, 0.1);
+      color: var(--amber-main);
+      border-color: rgba(255, 183, 0, 0.3);
+    }
+
+    .badge-crimson {
+      background: rgba(255, 42, 109, 0.1);
+      color: var(--crimson-main);
+      border-color: rgba(255, 42, 109, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald-main);
+      box-shadow: 0 0 8px var(--emerald-main);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Main Container & Grid Layout */
+    .app-container {
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition-fast);
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      color: var(--cyan-main);
+      background: rgba(0, 240, 255, 0.08);
+      border-color: var(--cyan-border);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+    }
+
+    /* Section Panels */
+    .section-panel {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .section-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glass Cards */
+    .cyber-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cyber-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--cyan-main);
+      opacity: 0.5;
+    }
+
+    .cyber-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-title {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Buttons */
+    .btn {
+      background: var(--bg-card-hover);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition-normal);
+    }
+
+    .btn:hover {
+      border-color: var(--cyan-main);
+      box-shadow: 0 0 12px var(--cyan-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 255, 157, 0.1));
+      border-color: var(--cyan-main);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(0, 255, 157, 0.2));
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    }
+
+    .btn-danger {
+      background: rgba(255, 42, 109, 0.15);
+      border-color: var(--crimson-main);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 42, 109, 0.3);
+      box-shadow: 0 0 15px var(--crimson-glow);
+    }
+
+    /* Form & Input Controls */
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--border-radius-sm);
+      color: var(--text-main);
+      padding: 0.8rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-fast);
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--cyan-main);
+      box-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    /* Phase 1: Ingest Styles */
+    .ingest-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .ingest-grid { grid-template-columns: 1fr; }
+    }
+
+    .dropzone {
+      border: 2px dashed rgba(0, 240, 255, 0.3);
+      background: rgba(0, 240, 255, 0.02);
+      border-radius: var(--border-radius-md);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--cyan-main);
+      background: rgba(0, 240, 255, 0.08);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+    }
+
+    .dropzone-icon {
+      font-size: 2.5rem;
+      color: var(--cyan-main);
+      margin-bottom: 0.75rem;
+    }
+
+    .preset-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+      border-radius: var(--border-radius-sm);
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .preset-card:hover {
+      border-color: var(--emerald-main);
+      background: rgba(0, 255, 157, 0.05);
+    }
+
+    .preset-title {
+      font-weight: 700;
+      color: #fff;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .preset-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Claim Extraction Display */
+    .claims-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .claim-item {
+      background: rgba(10, 14, 23, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--amber-main);
+      padding: 0.85rem 1rem;
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: var(--transition-fast);
+    }
+
+    .claim-item:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(20, 28, 44, 0.9);
+    }
+
+    .claim-content {
+      flex: 1;
+    }
+
+    .claim-text {
+      font-size: 0.88rem;
+      color: #fff;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .claim-meta {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .claim-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+    }
+
+    /* Phase 2: Defense Terminal Studio */
+    .terminal-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 1.5rem;
+      height: calc(100vh - 170px);
+      min-height: 600px;
+    }
+
+    @media (max-width: 1200px) {
+      .terminal-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* Claims Board Sidebar */
+    .claims-board {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .claim-status-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.75rem;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .claim-status-card:hover, .claim-status-card.active {
+      border-color: var(--cyan-main);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+    }
+
+    .claim-status-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .status-untested { background: rgba(132, 146, 166, 0.15); color: var(--text-muted); }
+    .status-under-fire { background: rgba(255, 183, 0, 0.2); color: var(--amber-main); border: 1px solid var(--amber-main); }
+    .status-defended { background: rgba(0, 255, 157, 0.2); color: var(--emerald-main); border: 1px solid var(--emerald-main); }
+    .status-vulnerable { background: rgba(255, 42, 109, 0.2); color: var(--crimson-main); border: 1px solid var(--crimson-main); }
+
+    /* Dialogue Terminal */
+    .terminal-window {
+      background: var(--bg-card);
+      border: 1px solid var(--cyan-border);
+      border-radius: var(--border-radius-md);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      background: rgba(10, 14, 23, 0.9);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .terminal-body {
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-width: 90%;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .chat-msg.interviewer {
+      align-self: flex-start;
+    }
+
+    .chat-msg.user-msg {
+      align-self: flex-end;
+    }
+
+    .msg-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .msg-bubble {
+      padding: 1rem 1.2rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .interviewer .msg-bubble {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      color: #e2e8f0;
+      border-left: 4px solid var(--cyan-main);
+    }
+
+    .user-msg .msg-bubble {
+      background: linear-gradient(135deg, rgba(0, 255, 157, 0.12), rgba(0, 240, 255, 0.08));
+      border: 1px solid rgba(0, 255, 157, 0.3);
+      color: #fff;
+      border-right: 4px solid var(--emerald-main);
+    }
+
+    .msg-claim-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--amber-main);
+      background: rgba(255, 183, 0, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 183, 0, 0.25);
+      margin-bottom: 0.5rem;
+    }
+
+    .terminal-input-bar {
+      padding: 1rem;
+      background: rgba(10, 14, 23, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .input-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .voice-btn {
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--cyan-main);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    .voice-btn.recording {
+      background: rgba(255, 42, 109, 0.2);
+      color: var(--crimson-main);
+      border-color: var(--crimson-main);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Live Telemetry Radar Sidebar */
+    .telemetry-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      overflow-y: auto;
+    }
+
+    .radar-box {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--border-radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .radar-svg {
+      width: 100%;
+      max-width: 260px;
+      height: 220px;
+      margin: 0 auto;
+    }
+
+    /* Live Response Quality Coach */
+    .quality-coach-card {
+      background: rgba(10, 14, 23, 0.8);
+      border: 1px solid rgba(255, 183, 0, 0.3);
+      border-radius: var(--border-radius-sm);
+      padding: 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    .coach-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--amber-main);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .vague-alert {
+      color: var(--crimson-main);
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .metric-progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.3rem;
+    }
+
+    .metric-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan-main), var(--emerald-main));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Phase 3: Final Report */
+    .report-hero {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 255, 157, 0.05));
+      border: 1px solid var(--cyan-border);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .score-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(10, 14, 23, 0.9);
+      border: 3px solid var(--cyan-main);
+      box-shadow: 0 0 25px var(--cyan-glow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-grade {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--cyan-main);
+    }
+
+    .score-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .report-grid { grid-template-columns: 1fr; }
+    }
+
+    .strength-card {
+      border-left: 4px solid var(--emerald-main);
+    }
+
+    .weakness-card {
+      border-left: 4px solid var(--crimson-main);
+    }
+
+    /* Utility Helpers */
+    .hidden { display: none !important; }
+
+    .glow-text {
+      text-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(4, 6, 10, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--cyan-border);
+      border-radius: var(--border-radius-md);
+      max-width: 550px;
+      width: 100%;
+      padding: 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cyber Command Header -->
+  <header>
+    <div class="brand-logo">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-title">DEFEND<span>.EXP</span> // TECH PANEL</div>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-cyan"><span class="status-dot"></span> AUDIENCE: SENIOR TECH LEADS</span>
+      <span class="badge badge-amber" id="header-claim-count">CLAIMS: 0 DETECTED</span>
+      <span class="badge badge-emerald" id="api-status-badge">ENGINE: CLAUDE AI + INTEL FALLBACK</span>
+      <button class="btn" onclick="openSettingsModal()" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">⚙️ SETTINGS</button>
+    </div>
+  </header>
+
+  <!-- App Main Container -->
+  <main class="app-container">
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-ingest')" id="btn-tab-ingest">
+        📁 1. INGEST DOSSIER
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-terminal')" id="btn-tab-terminal">
+        ⚔️ 2. DEFENSE TERMINAL
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-report')" id="btn-tab-report">
+        📊 3. DEFENSE REPORT
+      </button>
+    </nav>
+
+    <!-- SECTION 1: DOSSIER INGESTION & CLAIM EXTRACTION -->
+    <section id="tab-ingest" class="section-panel active">
+      <div class="ingest-grid">
+        <!-- Left: Upload & Input Area -->
+        <div class="cyber-card">
+          <div class="cyber-card-header">
+            <h2 class="card-title">📥 Upload & Extract Experience Claims</h2>
+            <span class="badge badge-cyan">TEXT / MD / CODE / RESUME</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Upload your project case study, README, resume, architecture RFC, or past code documentation. Our intelligent skeptic parser extracts every technical claim to challenge.
+          </p>
+
+          <!-- Dropzone -->
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+            <div class="dropzone-icon">📄</div>
+            <div style="font-weight: 700; color: #fff; margin-bottom: 0.25rem;">
+              Drag & Drop your document here
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              or click to browse local files (.txt, .md, .json, .js, .py, .pdf text)
+            </div>
+            <input type="file" id="file-input" class="hidden" accept=".txt,.md,.json,.js,.py,.ts,.cpp,.csv" onchange="handleFileUpload(event)">
+          </div>
+
+          <div style="margin: 1rem 0; text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+            — OR PASTE TEXT DIRECTLY BELOW —
+          </div>
+
+          <textarea id="raw-dossier-input" rows="7" placeholder="Paste your project case study, architectural overview, performance metrics, or technical resume claims here..."></textarea>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <button class="btn" onclick="clearDossierInput()">🗑️ Clear</button>
+            <button class="btn btn-primary" onclick="processDossierClaims()">
+              ⚡ Extract & Categorize Claims
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Sample Technical Dossier Presets -->
+        <div class="cyber-card">
+          <div class="cyber-card-header">
+            <h2 class="card-title">🚀 Or Load Sample Dossier Presets</h2>
+            <span class="badge badge-emerald">QUICK START</span>
+          </div>
+
+          <div class="preset-card" onclick="loadPresetDossier('streaming')">
+            <div class="preset-title">⚡ High-Throughput Real-Time Event Engine</div>
+            <div class="preset-desc">
+              Kafka, Flink, Rust microservices. Processed 250,000 events/sec with sub-10ms P99 latency and 99.999% SLA.
+            </div>
+          </div>
+
+          <div class="preset-card" onclick="loadPresetDossier('webgl')">
+            <div class="preset-title">🎨 High-Performance WebGL & WASM Shader Studio</div>
+            <div class="preset-desc">
+              C++, Rust, TypeScript, Web Assembly. Achieved steady 60 FPS rendering 1M particles with zero GC pauses.
+            </div>
+          </div>
+
+          <div class="preset-card" onclick="loadPresetDossier('microservices')">
+            <div class="preset-title">☁️ Distributed Zero-Trust Microservices Migration</div>
+            <div class="preset-desc">
+              Go, Kubernetes, Istio mesh. Migrated monolith to 45 microservices, cutting infrastructure cloud spend by 40%.
+            </div>
+          </div>
+
+          <!-- Claims Preview Container -->
+          <div id="extracted-claims-container" class="hidden" style="margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.5rem;">
+              <h3 style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--emerald-main);">
+                🔍 Extracted Target Claims (<span id="extracted-count">0</span>)
+              </h3>
+              <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" onclick="startDefenseSession()">
+                ⚔️ Start Defense Interview →
+              </button>
+            </div>
+            <div class="claims-list" id="claims-list"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: DEFENSE TERMINAL STUDIO -->
+    <section id="tab-terminal" class="section-panel">
+      <div class="terminal-layout">
+
+        <!-- Left Sidebar: Claims Target Board -->
+        <div class="cyber-card" style="display: flex; flex-direction: column;">
+          <div class="cyber-card-header" style="margin-bottom: 0.75rem;">
+            <h3 class="card-title" style="font-size: 0.88rem;">🎯 Claim Defense Targets</h3>
+            <span class="badge badge-amber" style="font-size: 0.65rem;" id="board-claim-ratio">0/0</span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Click any claim to direct the next challenge specifically to it:
+          </div>
+          <div class="claims-board" id="terminal-claims-board"></div>
+        </div>
+
+        <!-- Center: Interactive Defense Terminal Dialogue -->
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="terminal-dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan-main);">
+                session@interviewer-panel:~$ defend-experience --strict
+              </span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="speakLastQuestion()" title="Text-To-Speech">
+                🔊 Audio
+              </button>
+              <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;" onclick="resetCurrentSession()">
+                🔄 Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Dialogue Scroll Area -->
+          <div class="terminal-body" id="chat-dialogue">
+            <!-- Initialized dynamically -->
+          </div>
+
+          <!-- Terminal User Input Area -->
+          <div class="terminal-input-bar">
+            <textarea id="user-defense-input" rows="3" placeholder="Type your detailed defense argument (explain architectural rationale, benchmarks, trade-offs, and failure recovery)..."></textarea>
+            
+            <div class="input-actions">
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button class="btn voice-btn" id="voice-rec-btn" onclick="toggleVoiceInput()">
+                  🎙️ Voice Dictation
+                </button>
+                <button class="btn" onclick="insertFrameworkTemplate('STAR')" style="font-size: 0.75rem;">
+                  💡 STAR Rationale
+                </button>
+                <button class="btn" onclick="insertFrameworkTemplate('TRADEOFF')" style="font-size: 0.75rem;">
+                  ⚖️ Trade-off Rationale
+                </button>
+              </div>
+
+              <button class="btn btn-primary" onclick="submitUserDefenseResponse()" id="btn-submit-defense">
+                🚀 Submit Defense Answer ↵
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Telemetry & Live Coach -->
+        <div class="telemetry-sidebar">
+          
+          <!-- Live Radar Chart -->
+          <div class="radar-box">
+            <h4 style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--cyan-main); margin-bottom: 0.5rem;">
+              📡 DEFENSE TELEMETRY RADAR
+            </h4>
+            <svg class="radar-svg" viewBox="0 0 200 200" id="radar-chart-svg">
+              <!-- Rendered via JS -->
+            </svg>
+          </div>
+
+          <!-- Live Coach Quality Detector -->
+          <div class="quality-coach-card">
+            <div class="coach-title">
+              💡 RESPONSE QUALITY ANALYZER
+            </div>
+            <div id="coach-feedback-body" style="color: var(--text-muted); line-height: 1.4;">
+              Start answering questions to receive real-time feedback on vague language, metric backing, and trade-off depth.
+            </div>
+          </div>
+
+          <!-- Telemetry Gauges -->
+          <div class="cyber-card" style="padding: 1rem;">
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: #fff; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+              <span>EVIDENCE & METRIC DEPTH</span>
+              <span id="score-val-depth" style="color: var(--cyan-main)">0%</span>
+            </div>
+            <div class="metric-progress-bar"><div class="metric-progress-fill" id="fill-depth"></div></div>
+
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: #fff; margin-bottom: 0.5rem; margin-top: 0.8rem; display: flex; justify-content: space-between;">
+              <span>TRADE-OFF AWARENESS</span>
+              <span id="score-val-tradeoff" style="color: var(--emerald-main)">0%</span>
+            </div>
+            <div class="metric-progress-bar"><div class="metric-progress-fill" id="fill-tradeoff"></div></div>
+
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: #fff; margin-bottom: 0.5rem; margin-top: 0.8rem; display: flex; justify-content: space-between;">
+              <span>FAILURE MODE PREPAREDNESS</span>
+              <span id="score-val-failure" style="color: var(--amber-main)">0%</span>
+            </div>
+            <div class="metric-progress-bar"><div class="metric-progress-fill" id="fill-failure"></div></div>
+
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: #fff; margin-bottom: 0.5rem; margin-top: 0.8rem; display: flex; justify-content: space-between;">
+              <span>PRECISION & CLARITY</span>
+              <span id="score-val-precision" style="color: var(--crimson-main)">0%</span>
+            </div>
+            <div class="metric-progress-bar"><div class="metric-progress-fill" id="fill-precision"></div></div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 3: COMPREHENSIVE DEFENSE REPORT -->
+    <section id="tab-report" class="section-panel">
+      <!-- Hero Score Header -->
+      <div class="report-hero">
+        <div>
+          <h1 style="font-family: var(--font-mono); font-size: 1.8rem; color: #fff; margin-bottom: 0.5rem;">
+            DEFENSE AUDIT & EVALUATION REPORT
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 650px;">
+            Based on your responses during the technical defense panel. Review claims that are well-fortified versus those requiring stronger metrics, edge-case analysis, and trade-off justification.
+          </p>
+        </div>
+        <div class="score-circle">
+          <span class="score-grade" id="report-grade-letter">B+</span>
+          <span class="score-label" id="report-grade-label">STAFF READY</span>
+        </div>
+      </div>
+
+      <!-- Action & Export Controls -->
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; justify-content: flex-end;">
+        <button class="btn" onclick="exportReportJSON()">💾 Export JSON</button>
+        <button class="btn" onclick="exportReportMarkdown()">📝 Export Markdown</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+      </div>
+
+      <div class="report-grid">
+        <!-- Left: Defended Claims Breakdown -->
+        <div class="cyber-card strength-card">
+          <div class="cyber-card-header">
+            <h3 class="card-title" style="color: var(--emerald-main);">
+              ✅ Well-Defended Experience Claims (<span id="defended-claims-count">0</span>)
+            </h3>
+          </div>
+          <div id="defended-claims-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Rendered JS -->
+          </div>
+        </div>
+
+        <!-- Right: Vulnerable & Flagged Claims -->
+        <div class="cyber-card weakness-card">
+          <div class="cyber-card-header">
+            <h3 class="card-title" style="color: var(--crimson-main);">
+              ⚠️ Vulnerable Claims Needing Fortification (<span id="vulnerable-claims-count">0</span>)
+            </h3>
+          </div>
+          <div id="vulnerable-claims-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Rendered JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Actionable Advice & Interview Script Prep -->
+      <div class="cyber-card" style="margin-top: 1.5rem;">
+        <div class="cyber-card-header">
+          <h3 class="card-title">💡 Personalized Action Plan for Real Panel Defense</h3>
+        </div>
+        <div id="action-plan-content" style="line-height: 1.6; color: var(--text-main); font-size: 0.92rem;">
+          <!-- Rendered JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Settings & Custom API Key Modal -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-family: var(--font-mono); color: var(--cyan-main);">⚙️ ENGINE & API CONFIGURATION</h3>
+        <button class="btn" onclick="closeSettingsModal()">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        This application operates automatically inside Anthropic HTML artifact containers using native authentication, and includes an intelligent rule-based local fallback engine for offline or rate-limited environments.
+      </p>
+      
+      <label style="font-family: var(--font-mono); font-size: 0.8rem; color: #fff; display: block; margin-bottom: 0.4rem;">
+        Optional Custom Anthropic API Key (Overide):
+      </label>
+      <input type="text" id="custom-api-key" placeholder="sk-ant-api03-..." style="margin-bottom: 1rem;">
+
+      <label style="font-family: var(--font-mono); font-size: 0.8rem; color: #fff; display: block; margin-bottom: 0.4rem;">
+        Interviewer Rigor Level:
+      </label>
+      <select id="interviewer-rigor-select" style="width: 100%; background: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; padding: 0.6rem; border-radius: var(--border-radius-sm); font-family: var(--font-mono); margin-bottom: 1.5rem;">
+        <option value="rigorous">🔥 Rigorous Senior Tech Lead (Probing & Direct)</option>
+        <option value="adversarial">⚔️ Adversarial Staff Architect (Pushes Edge Cases & Bottlenecks)</option>
+        <option value="supportive">🤝 Constructive Hiring Manager (Guided Feedback)</option>
+      </select>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Configuration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT CORE APPLICATION ENGINE -->
+  <script>
+    /* ==========================================================================
+       APPLICATION STATE MANAGEMENT
+       ========================================================================== */
+    const appState = {
+      dossierText: "",
+      claims: [], // { id, text, category, vulnerability, status: 'UNTESTED'|'UNDER_FIRE'|'DEFENDED'|'VULNERABLE', metrics: { depth, tradeoff, failure, precision } }
+      activeClaimId: null,
+      dialogueHistory: [], // { role: 'interviewer'|'user', content, claimId, timestamp }
+      telemetry: {
+        evidenceDepth: 0,
+        tradeoffAwareness: 0,
+        failurePreparedness: 0,
+        precisionClarity: 0
+      },
+      settings: {
+        apiKey: localStorage.getItem('ant_api_key') || "",
+        rigor: localStorage.getItem('interviewer_rigor') || "rigorous"
+      },
+      isSpeechRecording: false,
+      speechRecognition: null
+    };
+
+    /* ==========================================================================
+       PRESET DOSSIERS
+       ========================================================================== */
+    const PRESETS = {
+      streaming: `Project Dossier: High-Throughput Real-Time Event Engine
+Built a distributed event ingestion pipeline using Apache Kafka, Apache Flink, and Rust microservices.
+- Processed 250,000 real-time financial telemetry events per second with sub-10ms P99 latency.
+- Achieved 99.999% SLA uptime across multi-region AWS deployment (us-east-1 and us-west-2).
+- Designed zero-allocation custom binary deserializer in Rust, reducing memory allocations by 85%.
+- Implemented stateful windowing in Flink with RocksDB state backend to handle out-of-order event arrivals up to 15 seconds.
+- Handled complete region failover with automated DNS switching without data loss.`,
+
+      webgl: `Project Dossier: High-Performance WebGL & WASM Shader Studio
+Developed a browser-based 3D CAD visualization studio rendering massive industrial blueprints.
+- Engineered WebGL 2.0 and WebAssembly (C++/Rust compiled via Emscripten) rendering pipeline.
+- Rendered 1.2 million dynamic 3D polygon meshes at consistent 60 FPS on standard integrated GPUs.
+- Built multithreaded geometry worker pipeline using Web Workers and SharedArrayBuffer to eliminate main-thread stutter.
+- Reduced initial bundle size by 65% through custom WebAssembly binary compression and lazy asset streaming.
+- Solved garbage collection memory leaks by implementing a manual typed-array arena memory allocator in JavaScript.`,
+
+      microservices: `Project Dossier: Distributed Microservices & Cloud Infrastructure Migration
+Led architectural modernization of legacy monolith into cloud-native microservices architecture.
+- Migrated Ruby on Rails monolith into 45 microservices using Go and gRPC with Protobuf schema contracts.
+- Deployed on Amazon EKS with Istio service mesh for mutual TLS, canary deployments, and rate limiting.
+- Cut total AWS cloud infrastructure costs by 40% ($35,000/month savings) through automated Kubernetes horizontal pod autoscaling.
+- Reduced API p95 response latencies from 420ms to 45ms.
+- Built automated continuous integration pipeline in GitHub Actions with 92% integration test coverage.`
+    };
+
+    /* ==========================================================================
+       INITIALIZATION & TAB SWITCHING
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      initRadarChart();
+      initSpeechRecognition();
+      loadSessionFromStorage();
+      renderTelemetryGauges();
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.section-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      document.getElementById(`btn-${tabId}`).classList.add('active');
+
+      if (tabId === 'tab-report') {
+        generateFinalReport();
+      }
+    }
+
+    /* ==========================================================================
+       DOSSIER INGESTION & CLAIM EXTRACTION PARSER
+       ========================================================================== */
+    function loadPresetDossier(key) {
+      if (PRESETS[key]) {
+        document.getElementById('raw-dossier-input').value = PRESETS[key];
+        processDossierClaims();
+      }
+    }
+
+    function clearDossierInput() {
+      document.getElementById('raw-dossier-input').value = "";
+      document.getElementById('extracted-claims-container').classList.add('hidden');
+      appState.claims = [];
+      updateHeaderClaimCount();
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        document.getElementById('raw-dossier-input').value = evt.target.result;
+        processDossierClaims();
+      };
+      reader.readAsText(file);
+    }
+
+    // Drag and Drop Handling
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          document.getElementById('raw-dossier-input').value = evt.target.result;
+          processDossierClaims();
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    function processDossierClaims() {
+      const text = document.getElementById('raw-dossier-input').value.trim();
+      if (!text) {
+        alert("Please paste text or select a preset dossier first.");
+        return;
+      }
+      appState.dossierText = text;
+
+      // Extract meaningful technical bullet claims
+      const lines = text.split(/\n+/).map(l => l.replace(/^[-*•\d.\s]+/, '').trim()).filter(l => l.length > 15);
+      
+      appState.claims = lines.map((line, idx) => {
+        const category = inferClaimCategory(line);
+        const vulnerability = detectClaimVulnerability(line);
+        return {
+          id: `claim-${idx + 1}`,
+          text: line,
+          category: category,
+          vulnerability: vulnerability,
+          status: 'UNTESTED',
+          defenseCount: 0,
+          notes: []
+        };
+      });
+
+      renderExtractedClaims();
+      updateHeaderClaimCount();
+      saveSessionToStorage();
+    }
+
+    function inferClaimCategory(text) {
+      const lower = text.toLowerCase();
+      if (lower.includes('ms') || lower.includes('fps') || lower.includes('qps') || lower.includes('latency') || lower.includes('throughput') || lower.includes('%')) {
+        return 'Scale & Performance';
+      }
+      if (lower.includes('kafka') || lower.includes('rust') || lower.includes('grpc') || lower.includes('go') || lower.includes('webgl') || lower.includes('microservice') || lower.includes('architecture')) {
+        return 'Architecture & Stack';
+      }
+      if (lower.includes('failover') || lower.includes('sla') || lower.includes('uptime') || lower.includes('leak') || lower.includes('recovery')) {
+        return 'Failure & Reliability';
+      }
+      return 'Engineering Rationale';
+    }
+
+    function detectClaimVulnerability(text) {
+      // Claims with concrete metrics are less vulnerable initially; vague claims are high vulnerability
+      const hasNumbers = /\d+/.test(text);
+      const containsVagueWords = /scalable|optimized|fast|modern|efficient|seamless/i.test(text);
+
+      if (hasNumbers && !containsVagueWords) return 'LOW';
+      if (hasNumbers && containsVagueWords) return 'MEDIUM';
+      return 'HIGH';
+    }
+
+    function renderExtractedClaims() {
+      const container = document.getElementById('extracted-claims-container');
+      const listEl = document.getElementById('claims-list');
+      const countEl = document.getElementById('extracted-count');
+
+      container.classList.remove('hidden');
+      countEl.textContent = appState.claims.length;
+
+      listEl.innerHTML = appState.claims.map(c => `
+        <div class="claim-item">
+          <div class="claim-content">
+            <div class="claim-text">${escapeHtml(c.text)}</div>
+            <div class="claim-meta">
+              <span class="claim-tag">🏷️ ${c.category}</span>
+              <span class="claim-tag" style="color: ${c.vulnerability === 'HIGH' ? 'var(--crimson-main)' : c.vulnerability === 'MEDIUM' ? 'var(--amber-main)' : 'var(--emerald-main)'}">
+                VULNERABILITY: ${c.vulnerability}
+              </span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateHeaderClaimCount() {
+      document.getElementById('header-claim-count').textContent = `CLAIMS: ${appState.claims.length} DETECTED`;
+    }
+
+    /* ==========================================================================
+       PHASE 2: DEFENSE TERMINAL ENGINE & CLAUDE AI INTEGRATION
+       ========================================================================== */
+    function startDefenseSession() {
+      if (appState.claims.length === 0) {
+        alert("Please extract claims first.");
+        return;
+      }
+      switchTab('tab-terminal');
+      renderClaimsBoard();
+
+      if (appState.dialogueHistory.length === 0) {
+        // Trigger first interviewer challenge
+        const initialClaim = appState.claims[0];
+        appState.activeClaimId = initialClaim.id;
+        initialClaim.status = 'UNDER_FIRE';
+        renderClaimsBoard();
+
+        triggerInterviewerQuestion(initialClaim, true);
+      }
+    }
+
+    function renderClaimsBoard() {
+      const board = document.getElementById('terminal-claims-board');
+      const ratioEl = document.getElementById('board-claim-ratio');
+
+      const defended = appState.claims.filter(c => c.status === 'DEFENDED').length;
+      ratioEl.textContent = `${defended}/${appState.claims.length} DEFENDED`;
+
+      board.innerHTML = appState.claims.map(c => {
+        const isActive = c.id === appState.activeClaimId;
+        const statusClass = c.status === 'DEFENDED' ? 'status-defended' :
+                            c.status === 'UNDER_FIRE' ? 'status-under-fire' :
+                            c.status === 'VULNERABLE' ? 'status-vulnerable' : 'status-untested';
+        return `
+          <div class="claim-status-card ${isActive ? 'active' : ''}" onclick="selectClaimForTargeting('${c.id}')">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+              <span class="claim-status-badge ${statusClass}">${c.status.replace('_', ' ')}</span>
+              <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">${c.category}</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #fff; line-height: 1.3;">
+              ${escapeHtml(c.text.length > 75 ? c.text.substring(0, 75) + '...' : c.text)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectClaimForTargeting(claimId) {
+      const claim = appState.claims.find(c => c.id === claimId);
+      if (!claim) return;
+
+      appState.activeClaimId = claimId;
+      if (claim.status === 'UNTESTED') {
+        claim.status = 'UNDER_FIRE';
+      }
+      renderClaimsBoard();
+      triggerInterviewerQuestion(claim, false);
+    }
+
+    async function triggerInterviewerQuestion(claim, isInitial = false) {
+      showTerminalTypingIndicator();
+
+      const prompt = `You are a relentless, highly technical Senior Staff Engineer and Architect interviewing a developer on their claim:
+CLAIM: "${claim.text}"
+CATEGORY: ${claim.category}
+
+Generate a sharp, direct, technical question challenging this specific claim. Ask about:
+1. Architectural trade-offs and alternative choices considered.
+2. What happens under extreme edge cases, failure scenarios, or race conditions.
+3. How they specifically benchmarked or proved the performance metric.
+
+Keep your response under 3 sentences. Be direct, professional, and skeptical.`;
+
+      let questionText = "";
+
+      try {
+        questionText = await callAnthropicMessagesAPI(prompt);
+      } catch (err) {
+        console.warn("Using local intelligent skeptic engine fallback:", err);
+        questionText = generateLocalSkepticQuestion(claim, appState.dialogueHistory.length);
+      }
+
+      removeTerminalTypingIndicator();
+
+      const msgObj = {
+        role: 'interviewer',
+        content: questionText,
+        claimId: claim.id,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      appState.dialogueHistory.push(msgObj);
+      renderChatDialogue();
+      saveSessionToStorage();
+    }
+
+    /* ==========================================================================
+       ANTHROPIC MESSAGES API CLIENT & FALLBACK ENGINE
+       ========================================================================== */
+    async function callAnthropicMessagesAPI(promptText) {
+      const apiKey = appState.settings.apiKey;
+      const headers = {
+        'content-type': 'application/json',
+        'anthropic-version': '2023-06-01'
+      };
+      if (apiKey) {
+        headers['x-api-key'] = apiKey;
+      }
+
+      // Format full system & dialogue context
+      const messages = [
+        { role: 'user', content: promptText }
+      ];
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 300,
+          temperature: 0.7,
+          messages: messages
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.content && data.content[0] && data.content[0].text) {
+        return data.content[0].text.trim();
+      }
+      throw new Error("Invalid response schema");
+    }
+
+    function generateLocalSkepticQuestion(claim, turnIndex) {
+      const text = claim.text.toLowerCase();
+      if (text.includes('kafka') || text.includes('flink') || text.includes('event') || text.includes('latency')) {
+        const qList = [
+          `You claimed ${claim.text}. When handling 250k events/sec, how did you handle out-of-order events and consumer group rebalancing under partition failures?`,
+          `What specific garbage collection or memory buffer tuning did you perform in Rust/Flink to prevent GC pauses from blowing past your 10ms P99 latency SLA?`,
+          `If a downstream database sink throttled by 50%, how did backpressure propagate through your Flink pipeline without causing out-of-memory crashes?`
+        ];
+        return qList[turnIndex % qList.length];
+      }
+
+      if (text.includes('webgl') || text.includes('wasm') || text.includes('fps') || text.includes('60')) {
+        const qList = [
+          `You stated you achieved 60 FPS rendering 1.2M polygons. How did you structure your GPU draw calls and vertex buffer layouts to prevent driver overhead bottlenecking?`,
+          `SharedArrayBuffer requires strict cross-origin isolation headers. How did you handle fallback modes for browser security policies while avoiding main-thread data copying?`,
+          `What exact profiling tools did you use to verify that frame times stayed below 16.6ms under heavy user pan/zoom interactions?`
+        ];
+        return qList[turnIndex % qList.length];
+      }
+
+      if (text.includes('microservice') || text.includes('migration') || text.includes('grpc') || text.includes('cost')) {
+        const qList = [
+          `You cited a 40% AWS cost reduction after migrating to 45 microservices. Did that figure factor in cross-AZ network ingress/egress costs and service mesh CPU sidecar overhead?`,
+          `When breaking down the monolith, how did you handle distributed transactions and eventual consistency between dependent services without triggering cascading retries?`,
+          `What breaking schema change policy did you enforce in Protobuf gRPC contracts to prevent deployment locks across disparate engineering teams?`
+        ];
+        return qList[turnIndex % qList.length];
+      }
+
+      return `Regarding your claim "${claim.text}": What specific architectural trade-offs did you accept when choosing this approach over standard industry defaults, and how did you validate the metric under stress testing?`;
+    }
+
+    /* ==========================================================================
+       SUBMIT DEFENSE RESPONSE & TELEMETRY SCORING
+       ========================================================================== */
+    async function submitUserDefenseResponse() {
+      const inputEl = document.getElementById('user-defense-input');
+      const userText = inputEl.value.trim();
+      if (!userText) return;
+
+      const activeClaim = appState.claims.find(c => c.id === appState.activeClaimId) || appState.claims[0];
+
+      // Add user message to dialogue
+      appState.dialogueHistory.push({
+        role: 'user',
+        content: userText,
+        claimId: activeClaim.id,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+
+      inputEl.value = "";
+      renderChatDialogue();
+
+      // Analyze response quality & update telemetry
+      evaluateDefenseQuality(userText, activeClaim);
+
+      // Trigger follow-up or next claim challenge
+      setTimeout(() => {
+        // Advance claim status
+        if (activeClaim.status === 'UNDER_FIRE') {
+          activeClaim.status = 'DEFENDED';
+        }
+        renderClaimsBoard();
+
+        // Find next untested claim
+        const nextUntested = appState.claims.find(c => c.status === 'UNTESTED');
+        if (nextUntested) {
+          appState.activeClaimId = nextUntested.id;
+          nextUntested.status = 'UNDER_FIRE';
+          renderClaimsBoard();
+          triggerInterviewerQuestion(nextUntested, false);
+        } else {
+          // All claims challenged!
+          triggerFollowUpQuestion(activeClaim, userText);
+        }
+      }, 1000);
+    }
+
+    async function triggerFollowUpQuestion(claim, userText) {
+      showTerminalTypingIndicator();
+      const prompt = `The candidate just defended their claim "${claim.text}" with this explanation:
+"${userText}"
+
+Act as a Senior Staff Engineer. Provide a brief follow-up skepticism probe or acknowledge their point before asking them to summarize their key lesson learned.`;
+
+      let text = "";
+      try {
+        text = await callAnthropicMessagesAPI(prompt);
+      } catch (e) {
+        text = `Solid explanation regarding ${claim.category}. However, if you had to re-architect this solution today with 10x higher traffic volume, what fundamental constraint would break first?`;
+      }
+
+      removeTerminalTypingIndicator();
+      appState.dialogueHistory.push({
+        role: 'interviewer',
+        content: text,
+        claimId: claim.id,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+
+      renderChatDialogue();
+      saveSessionToStorage();
+    }
+
+    /* ==========================================================================
+       RESPONSE QUALITY COACH & TELEMETRY EVALUATOR
+       ========================================================================== */
+    function evaluateDefenseQuality(userResponse, claim) {
+      const text = userResponse.toLowerCase();
+      
+      let depthAdd = 0;
+      let tradeoffAdd = 0;
+      let failureAdd = 0;
+      let precisionAdd = 0;
+
+      // 1. Evidence & Depth check
+      if (/\d+/.test(userResponse) || /ms|gb|kb|qps|fps|%|seconds|mb/.test(text)) depthAdd += 25;
+      if (/benchmarked|profiled|measured|latency|throughput|load tested/.test(text)) depthAdd += 20;
+
+      // 2. Trade-off Awareness check
+      if (/trade-off|sacrificed|instead of|alternative|compromise|downside|cost/.test(text)) tradeoffAdd += 30;
+
+      // 3. Failure Mode Preparedness
+      if (/failover|fallback|outage|bottleneck|circuit breaker|retry|graceful|backpressure/.test(text)) failureAdd += 30;
+
+      // 4. Precision & Clarity
+      if (userResponse.length > 80 && userResponse.length < 500) precisionAdd += 25;
+
+      // Update global telemetry scores
+      appState.telemetry.evidenceDepth = Math.min(100, appState.telemetry.evidenceDepth + depthAdd + 15);
+      appState.telemetry.tradeoffAwareness = Math.min(100, appState.telemetry.tradeoffAwareness + tradeoffAdd + 15);
+      appState.telemetry.failurePreparedness = Math.min(100, appState.telemetry.failurePreparedness + failureAdd + 15);
+      appState.telemetry.precisionClarity = Math.min(100, appState.telemetry.precisionClarity + precisionAdd + 20);
+
+      renderTelemetryGauges();
+      updateRadarChart();
+
+      // Real-time quality coach feedback
+      const coachEl = document.getElementById('coach-feedback-body');
+      const vagueMatches = userResponse.match(/scalable|fast|lots of|we used|basically|pretty good/gi);
+      
+      if (vagueMatches) {
+        coachEl.innerHTML = `
+          <div class="vague-alert">⚠️ Vague Language Detected: "${vagueMatches.join(', ')}"</div>
+          <div style="margin-top: 0.4rem;">
+            Tip: Replace subjective terms with exact metrics or technical mechanisms (e.g. state p99 latency or memory bounds).
+          </div>
+        `;
+      } else if (tradeoffAdd > 0) {
+        coachEl.innerHTML = `
+          <div style="color: var(--emerald-main); font-weight: 700;">✅ Excellent Trade-off Rationale!</div>
+          <div style="margin-top: 0.4rem;">
+            You clearly articulated what engineering trade-offs were accepted. Senior tech leads value this maturity.
+          </div>
+        `;
+      } else {
+        coachEl.innerHTML = `
+          <div style="color: var(--cyan-main); font-weight: 700;">⚡ Strong Technical Detail</div>
+          <div style="margin-top: 0.4rem;">
+            Remember to address edge-case recovery and alternative options considered.
+          </div>
+        `;
+      }
+    }
+
+    function renderTelemetryGauges() {
+      const t = appState.telemetry;
+      document.getElementById('score-val-depth').textContent = `${t.evidenceDepth}%`;
+      document.getElementById('fill-depth').style.width = `${t.evidenceDepth}%`;
+
+      document.getElementById('score-val-tradeoff').textContent = `${t.tradeoffAwareness}%`;
+      document.getElementById('fill-tradeoff').style.width = `${t.tradeoffAwareness}%`;
+
+      document.getElementById('score-val-failure').textContent = `${t.failurePreparedness}%`;
+      document.getElementById('fill-failure').style.width = `${t.failurePreparedness}%`;
+
+      document.getElementById('score-val-precision').textContent = `${t.precisionClarity}%`;
+      document.getElementById('fill-precision').style.width = `${t.precisionClarity}%`;
+    }
+
+    /* ==========================================================================
+       CHAT TERMINAL UI RENDERING
+       ========================================================================== */
+    function renderChatDialogue() {
+      const container = document.getElementById('chat-dialogue');
+      container.innerHTML = appState.dialogueHistory.map(msg => {
+        const isInterviewer = msg.role === 'interviewer';
+        const claim = appState.claims.find(c => c.id === msg.claimId);
+        return `
+          <div class="chat-msg ${isInterviewer ? 'interviewer' : 'user-msg'}">
+            <div class="msg-header">
+              <span>${isInterviewer ? '🛡️ INTERVIEW PANEL' : '👤 CANDIDATE DEFENSE'}</span>
+              <span>[${msg.timestamp}]</span>
+            </div>
+            ${claim ? `<div class="msg-claim-badge">🎯 TARGET: ${escapeHtml(claim.text.substring(0, 50))}...</div>` : ''}
+            <div class="msg-bubble">
+              ${escapeHtml(msg.content)}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function showTerminalTypingIndicator() {
+      const container = document.getElementById('chat-dialogue');
+      const typingDiv = document.createElement('div');
+      typingDiv.id = 'typing-indicator';
+      typingDiv.className = 'chat-msg interviewer';
+      typingDiv.innerHTML = `
+        <div class="msg-bubble" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan-main);">
+          ⚡ Panel is analyzing claims & formulating question...
+        </div>
+      `;
+      container.appendChild(typingDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function removeTerminalTypingIndicator() {
+      const indicator = document.getElementById('typing-indicator');
+      if (indicator) indicator.remove();
+    }
+
+    function insertFrameworkTemplate(type) {
+      const input = document.getElementById('user-defense-input');
+      if (type === 'STAR') {
+        input.value = `Situation/Context: \nTask/Challenge: \nAction & Rationale: \nResult & Metric Proof: `;
+      } else if (type === 'TRADEOFF') {
+        input.value = `Primary Rationale: We chose X over Y because...\nTrade-off Accepted: The main sacrifice was...\nValidation: We proved this under load by...`;
+      }
+      input.focus();
+    }
+
+    /* ==========================================================================
+       SVG RADAR CHART RENDERING
+       ========================================================================== */
+    function initRadarChart() {
+      updateRadarChart();
+    }
+
+    function updateRadarChart() {
+      const svg = document.getElementById('radar-chart-svg');
+      const t = appState.telemetry;
+
+      const center = 100;
+      const radius = 70;
+
+      // 4 axes: Depth (top), Tradeoff (right), Failure (bottom), Precision (left)
+      const values = [
+        t.evidenceDepth / 100,
+        t.tradeoffAwareness / 100,
+        t.failurePreparedness / 100,
+        t.precisionClarity / 100
+      ];
+
+      const angles = [ -Math.PI/2, 0, Math.PI/2, Math.PI ];
+      
+      const points = values.map((val, idx) => {
+        const r = val * radius;
+        const x = center + r * Math.cos(angles[idx]);
+        const y = center + r * Math.sin(angles[idx]);
+        return `${x},${y}`;
+      }).join(' ');
+
+      const axisLines = angles.map(a => {
+        const x = center + radius * Math.cos(a);
+        const y = center + radius * Math.sin(a);
+        return `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1" />`;
+      }).join('');
+
+      svg.innerHTML = `
+        <!-- Outer Concentric Polygons -->
+        <polygon points="100,30 170,100 100,170 30,100" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1"/>
+        <polygon points="100,65 135,100 100,135 65,100" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1"/>
+        ${axisLines}
+        <!-- Data Polygon -->
+        <polygon points="${points}" fill="rgba(0, 240, 255, 0.25)" stroke="var(--cyan-main)" stroke-width="2"/>
+        <!-- Labels -->
+        <text x="100" y="20" fill="var(--cyan-main)" font-size="9" text-anchor="middle" font-family="monospace">DEPTH</text>
+        <text x="180" y="103" fill="var(--emerald-main)" font-size="9" text-anchor="start" font-family="monospace">TRADE-OFF</text>
+        <text x="100" y="185" fill="var(--amber-main)" font-size="9" text-anchor="middle" font-family="monospace">FAILURE</text>
+        <text x="20" y="103" fill="var(--crimson-main)" font-size="9" text-anchor="end" font-family="monospace">PRECISION</text>
+      `;
+    }
+
+    /* ==========================================================================
+       SPEECH RECOGNITION & SYNTHESIS
+       ========================================================================== */
+    function initSpeechRecognition() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        appState.speechRecognition = new SpeechRecognition();
+        appState.speechRecognition.continuous = false;
+        appState.speechRecognition.interimResults = false;
+
+        appState.speechRecognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          const input = document.getElementById('user-defense-input');
+          input.value += (input.value ? " " : "") + transcript;
+          toggleVoiceInput(false);
+        };
+
+        appState.speechRecognition.onerror = () => toggleVoiceInput(false);
+        appState.speechRecognition.onend = () => toggleVoiceInput(false);
+      }
+    }
+
+    function toggleVoiceInput(forceState) {
+      const btn = document.getElementById('voice-rec-btn');
+      if (!appState.speechRecognition) {
+        alert("Speech Recognition is not supported in this browser environment.");
+        return;
+      }
+
+      if (forceState === false || appState.isSpeechRecording) {
+        appState.isSpeechRecording = false;
+        appState.speechRecognition.stop();
+        btn.classList.remove('recording');
+        btn.textContent = "🎙️ Voice Dictation";
+      } else {
+        appState.isSpeechRecording = true;
+        appState.speechRecognition.start();
+        btn.classList.add('recording');
+        btn.textContent = "⏹️ Listening...";
+      }
+    }
+
+    function speakLastQuestion() {
+      if (!('speechSynthesis' in window)) return;
+      const lastInterviewerMsg = [...appState.dialogueHistory].reverse().find(m => m.role === 'interviewer');
+      if (lastInterviewerMsg) {
+        const utterance = new SpeechSynthesisUtterance(lastInterviewerMsg.content);
+        utterance.rate = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    /* ==========================================================================
+       PHASE 3: COMPREHENSIVE REPORT GENERATION
+       ========================================================================== */
+    function generateFinalReport() {
+      const defendedList = document.getElementById('defended-claims-list');
+      const vulnerableList = document.getElementById('vulnerable-claims-list');
+
+      const defendedClaims = appState.claims.filter(c => c.status === 'DEFENDED');
+      const vulnerableClaims = appState.claims.filter(c => c.status !== 'DEFENDED');
+
+      document.getElementById('defended-claims-count').textContent = defendedClaims.length;
+      document.getElementById('vulnerable-claims-count').textContent = vulnerableClaims.length;
+
+      // Grade calculation
+      const avgScore = (appState.telemetry.evidenceDepth + appState.telemetry.tradeoffAwareness + appState.telemetry.failurePreparedness + appState.telemetry.precisionClarity) / 4;
+      let grade = 'B+';
+      let label = 'STAFF READY';
+
+      if (avgScore >= 85) { grade = 'A+'; label = 'PRINCIPAL / DEFENSE FORTIFIED'; }
+      else if (avgScore >= 70) { grade = 'A-'; label = 'SENIOR LEAD READY'; }
+      else if (avgScore >= 55) { grade = 'B'; label = 'SOLID TECHNICAL DEFENSE'; }
+      else { grade = 'C+'; label = 'NEEDS METRIC PROOF & EDGE CASES'; }
+
+      document.getElementById('report-grade-letter').textContent = grade;
+      document.getElementById('report-grade-label').textContent = label;
+
+      // Render defended claims list
+      defendedList.innerHTML = defendedClaims.length > 0 ? defendedClaims.map(c => `
+        <div style="background: rgba(0, 255, 157, 0.05); border: 1px solid rgba(0, 255, 157, 0.2); padding: 0.75rem; border-radius: 6px;">
+          <div style="font-weight: 700; color: #fff; font-size: 0.85rem;">${escapeHtml(c.text)}</div>
+          <div style="font-size: 0.75rem; color: var(--emerald-main); margin-top: 0.25rem;">
+            ✔ Successfully defended against panel technical cross-examination.
+          </div>
+        </div>
+      `).join('') : `<div style="color: var(--text-muted); font-size: 0.85rem;">No claims defended yet. Complete the defense terminal interview first.</div>`;
+
+      // Render vulnerable claims list
+      vulnerableList.innerHTML = vulnerableClaims.length > 0 ? vulnerableClaims.map(c => `
+        <div style="background: rgba(255, 42, 109, 0.05); border: 1px solid rgba(255, 42, 109, 0.2); padding: 0.75rem; border-radius: 6px;">
+          <div style="font-weight: 700; color: #fff; font-size: 0.85rem;">${escapeHtml(c.text)}</div>
+          <div style="font-size: 0.75rem; color: var(--crimson-main); margin-top: 0.25rem;">
+            ⚠️ Vulnerability: Needs quantifiable latency/throughput benchmarks & failure failover rationale.
+          </div>
+        </div>
+      `).join('') : `<div style="color: var(--emerald-main); font-size: 0.85rem;">All claims successfully fortified!</div>`;
+
+      // Render Action Plan
+      document.getElementById('action-plan-content').innerHTML = `
+        <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <li><strong>Quantify Vague Language:</strong> Audit your case study for subjective words like "fast", "scalable", or "optimized". Replace them with exact P99 latencies, RAM footprints, or peak QPS numbers.</li>
+          <li><strong>Prepare Failure Case Stories:</strong> Interviewers will press on outage scenarios. Ensure you can explain how circuit breakers, rate limiters, or region failovers behaved during actual stress events.</li>
+          <li><strong>Articulate Alternative Trade-offs:</strong> Practice answering "Why didn't you use X technology instead?" Be ready to cite 2 alternative solutions you evaluated and why they were rejected.</li>
+        </ul>
+      `;
+    }
+
+    /* ==========================================================================
+       STORAGE & EXPORT HELPERS
+       ========================================================================== */
+    function saveSessionToStorage() {
+      localStorage.setItem('defend_exp_state', JSON.stringify({
+        claims: appState.claims,
+        dialogueHistory: appState.dialogueHistory,
+        telemetry: appState.telemetry
+      }));
+    }
+
+    function loadSessionFromStorage() {
+      const saved = localStorage.getItem('defend_exp_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.claims && parsed.claims.length > 0) {
+            appState.claims = parsed.claims;
+            appState.dialogueHistory = parsed.dialogueHistory || [];
+            appState.telemetry = parsed.telemetry || appState.telemetry;
+            renderExtractedClaims();
+            renderClaimsBoard();
+            renderChatDialogue();
+            renderTelemetryGauges();
+            updateRadarChart();
+            updateHeaderClaimCount();
+          }
+        } catch (e) {
+          console.error("Error loading session:", e);
+        }
+      }
+    }
+
+    function resetCurrentSession() {
+      if (confirm("Reset current defense session dialogue and progress?")) {
+        appState.dialogueHistory = [];
+        appState.claims.forEach(c => c.status = 'UNTESTED');
+        appState.telemetry = { evidenceDepth: 0, tradeoffAwareness: 0, failurePreparedness: 0, precisionClarity: 0 };
+        renderClaimsBoard();
+        renderChatDialogue();
+        renderTelemetryGauges();
+        updateRadarChart();
+        localStorage.removeItem('defend_exp_state');
+      }
+    }
+
+    function exportReportJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `defense_report_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function exportReportMarkdown() {
+      let md = `# DEFENSE REPORT & AUDIT DOSSIER\n\n`;
+      md += `## Telemetry Scores\n- Evidence & Depth: ${appState.telemetry.evidenceDepth}%\n- Trade-off Awareness: ${appState.telemetry.tradeoffAwareness}%\n- Failure Preparedness: ${appState.telemetry.failurePreparedness}%\n- Precision: ${appState.telemetry.precisionClarity}%\n\n`;
+      md += `## Extracted Claims & Status\n`;
+      appState.claims.forEach(c => {
+        md += `- [${c.status}] ${c.text} (Category: ${c.category})\n`;
+      });
+
+      const dataStr = "data:text/markdown;charset=utf-8," + encodeURIComponent(md);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `defense_report_${Date.now()}.md`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // Modal Helpers
+    function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
+    function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+    function saveSettings() {
+      const key = document.getElementById('custom-api-key').value.trim();
+      const rigor = document.getElementById('interviewer-rigor-select').value;
+      appState.settings.apiKey = key;
+      appState.settings.rigor = rigor;
+      if (key) localStorage.setItem('ant_api_key', key);
+      localStorage.setItem('interviewer_rigor', rigor);
+      closeSettingsModal();
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
