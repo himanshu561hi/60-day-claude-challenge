@@ -24,6 +24,8 @@ Here is exactly what I built today:
 
 The scaffolding is done. Tomorrow (Day 4), we start building the **Interview Creation Flow** — allowing recruiters to define job roles and generate shareable voice-interview links for candidates. 🎯
 
+🔗 **Live Demo:** https://interviewerr.vercel.app/
+
 Follow along as this AI recruiter comes to life! 👇
 
 #Nextjs #Supabase #GeminiAI #Vapi #WebDevelopment #SoftwareEngineering #BuildInPublic #100DaysOfCode #AI #ReactJS
