@@ -17,6 +17,8 @@ app/
     │       ├── route.jsx          # GET (Fetch Job Details)
     │       └── submissions/
     │           └── route.jsx      # GET (List submissions under interview)
+    ├── ai-model/
+    │   └── route.jsx              # POST (Parse Resume PDF & Gemini AI Persona Config)
     ├── candidates/
     │   └── register/
     │       └── route.jsx          # POST (Register & Parse Resume PDF)
@@ -106,28 +108,36 @@ app/
 
 ---
 
-### 2.4 POST `/api/candidates/register`
-* **Purpose**: Register a candidate, parse their uploaded PDF resume, call Gemini to align resume with job details, create an empty submission entry in DB, and yield Vapi system prompt.
-* **Authentication**: None (Public).
+### 2.4 POST `/api/ai-model` (Candidate Onboarding & Resume AI Parser)
+* **Purpose**: Parse candidate uploaded PDF resume (via `pdf-parse`), analyze technical skills against target job description via Google Gemini AI (`@google/generative-ai`), format tailored Vapi system prompt, and return evaluation payload.
+* **Authentication**: None (Public - Accessible by candidates via unique interview link).
 * **Content-Type**: `multipart/form-data`
 * **Request Data**:
-  - `candidate_name`: Text string
-  - `candidate_email`: Text string (email format)
-  - `interview_id`: UUID
-  - `resume`: File binary (PDF format, max 5MB)
+  - `candidateName`: Text string
+  - `candidateEmail`: Text string (email format)
+  - `jobRole`: Text string
+  - `jobDescription`: Text string
+  - `resume`: File binary (PDF format, max 5MB) OR `resumeText` (string in Demo Data mode)
 * **Response (200 OK)**:
   ```json
   {
     "success": true,
-    "submission_id": "fb472b53-48ee-444a-b50a-e3db98242a9b",
-    "job_role": "Frontend Engineer",
-    "candidate_name": "John Doe",
-    "vapi_system_prompt": "You are a professional technical interviewer screening John Doe for a Frontend Engineer position. Their resume states they worked at Acme Corp. Ask them 5 structured questions. Keep answers short."
+    "mode": "live_gemini",
+    "candidateName": "Alex Morgan",
+    "candidateEmail": "alex@example.com",
+    "jobRole": "Senior Full-Stack Engineer",
+    "resumeText": "Extracted resume text content...",
+    "aiPrompt": "You are Alex, an engaging AI Technical Interviewer screening Alex Morgan...",
+    "analysis": {
+      "matchedSkills": ["React 19", "Next.js 15", "PostgreSQL", "Tailwind CSS"],
+      "experienceLevel": "Senior Professional",
+      "interviewFocus": ["Deep-dive into state management", "Clarify system scalability patterns"]
+    }
   }
   ```
-* **Error Cases**:
-  - `400 Bad Request`: File is not a PDF, file exceeds size, missing text parameters.
-  - `500 Internal Server Error`: PDF text parser extraction error or Gemini failure.
+* **Error Cases & Fallbacks**:
+  - `400 Bad Request`: Insufficient text or invalid file type.
+  - `Simulation Fallback`: If `GEMINI_API_KEY` is unconfigured or offline, returns high-fidelity simulated persona (`mode: 'simulation'`) so candidate onboarding testing never blocks.
 
 ---
 
