@@ -21,20 +21,29 @@ import {
   Radio,
   Sliders,
   ShieldCheck,
-  MessageSquare
+  MessageSquare,
+  Lightbulb,
+  TrendingUp,
+  Brain,
+  Target,
+  Activity,
+  Award,
+  Zap,
+  HelpCircle
 } from 'lucide-react';
 
 /**
  * app/interview/[interview_Id]/start/_components/VapiCallContainer.jsx
  *
- * Day 6 / Day 56: Vapi Voice Interview Integration & Real-Time Call Interface
+ * Day 7 / Day 57: Real-Time Vapi Voice Calling Engine, Live Transcription & Dynamic AI Mentor Tips
  *
  * Responsibilities:
  * 1. Reads candidate profile and custom Gemini AI instructions from sessionStorage (`active_vapi_session`).
- * 2. Initializes @vapi-ai/web cloud voice SDK or intelligent Voice Simulation mode if Vapi keys aren't set.
- * 3. Requests browser microphone audio device permissions and synthesizes real-time speech dialogue.
- * 4. Renders live audio indicators, speaker turn indicators, conversational logs, and duration timer loops.
- * 5. Handles graceful call termination and transition to completed evaluation showcase.
+ * 2. Initializes @vapi-ai/web cloud voice SDK or high-fidelity Voice Simulation mode if keys aren't set.
+ * 3. Handles hardware microphone audio permissions, FFT frequency analysis, and visual speech bars.
+ * 4. Subscribes to active transcript streaming events and displays an animated, auto-scrolling conversation timeline.
+ * 5. Integrates debounced real-time API calls to `/api/ai-feedback` to serve live AI mentor coaching tips, speech clarity scores, tone metrics, and probing angles on the sliding dashboard sidebar.
+ * 6. Safely handles call termination and stores historical dialogue logs into browser session memory (`completed_interview_transcript`) for upcoming evaluations.
  */
 export default function VapiCallContainer({ interviewId }) {
   const router = useRouter();
@@ -54,7 +63,20 @@ export default function VapiCallContainer({ interviewId }) {
   // Conversational Timeline Messages
   const [messages, setMessages] = useState([]);
   const [simulatedTurnIndex, setSimulatedTurnIndex] = useState(0);
+  const transcriptEndRef = useRef(null);
   
+  // Day 7: Live AI Mentor & Speech Coaching State
+  const [mentorFeedback, setMentorFeedback] = useState({
+    suggestion: 'Initiating real-time voice intelligence... Start speaking to receive dynamic evaluation guidance.',
+    tone: 'Monitoring Speech...',
+    topics: ['System Architecture', 'Core Competencies'],
+    clarity_score: 90,
+    next_angle: 'Awaiting opening conversational exchange.',
+    isUpdating: false,
+    turnCount: 0
+  });
+  const feedbackTimeoutRef = useRef(null);
+
   // References for Web Audio & SDK
   const vapiRef = useRef(null);
   const audioStreamRef = useRef(null);
@@ -64,6 +86,13 @@ export default function VapiCallContainer({ interviewId }) {
   const timerIntervalRef = useRef(null);
   
   const MAX_CALL_DURATION = 420; // 7 Minutes maximum limit
+
+  // Auto-scroll transcript on new messages
+  useEffect(() => {
+    if (transcriptEndRef.current) {
+      transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, mentorFeedback]);
 
   // 1. Load Session on Mount & Check Environment Engine Mode
   useEffect(() => {
@@ -122,10 +151,11 @@ export default function VapiCallContainer({ interviewId }) {
       setIsLoadingSession(false);
     }
 
-    // Cleanup audio resources on unmount
+    // Cleanup audio resources and debouncing timers on unmount
     return () => {
       stopAudioMonitoring();
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
       if (vapiRef.current) {
         try { vapiRef.current.stop(); } catch (e) {}
       }
@@ -143,14 +173,14 @@ export default function VapiCallContainer({ interviewId }) {
     vapiRef.current.on('call-start', () => {
       setCallStatus('active');
       startCallTimer();
-      addLogMessage('system', 'Vapi cloud speech connection established.');
+      addLogMessage('system', 'Vapi cloud speech connection established. AI interviewer audio ready.');
     });
 
     vapiRef.current.on('call-end', () => {
       setCallStatus('ended');
       stopCallTimer();
       stopAudioMonitoring();
-      addLogMessage('system', 'Voice interview concluded by caller or limit.');
+      addLogMessage('system', 'Voice interview concluded cleanly by caller or session limit.');
     });
 
     vapiRef.current.on('speech-start', () => {
@@ -167,13 +197,19 @@ export default function VapiCallContainer({ interviewId }) {
 
     vapiRef.current.on('message', (message) => {
       if (message.type === 'transcript' && message.transcript) {
-        addLogMessage(message.role === 'assistant' ? 'ai' : 'candidate', message.transcript);
+        const role = message.role === 'assistant' ? 'ai' : 'candidate';
+        addLogMessage(role, message.transcript);
+        
+        // Day 7 Feature: When candidate finishes speaking a sentence or turn, compute real-time mentor coaching
+        if (role === 'candidate' && message.transcript.trim().length > 15) {
+          triggerRealtimeAiMentorFeedback(message.transcript);
+        }
       }
     });
 
     vapiRef.current.on('error', (error) => {
       console.error('Vapi calling error:', error);
-      addLogMessage('error', `Connection alert: Switching to high-fidelity Voice Simulation mode.`);
+      addLogMessage('error', `Connection alert: Switching immediately to high-fidelity Local Voice Simulation mode.`);
       setEngineMode('simulation');
       setCallStatus('idle');
     });
@@ -185,6 +221,41 @@ export default function VapiCallContainer({ interviewId }) {
       ...prev,
       { id: Date.now() + Math.random(), sender, text, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }
     ]);
+  };
+
+  // ── Day 7: Real-Time AI Mentor Debounced Evaluation ─────────────────────
+  const triggerRealtimeAiMentorFeedback = async (speechText) => {
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    
+    setMentorFeedback((prev) => ({ ...prev, isUpdating: true }));
+    
+    feedbackTimeoutRef.current = setTimeout(async () => {
+      try {
+        const nextTurn = mentorFeedback.turnCount + 1;
+        const res = await fetch('/api/ai-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transcript_snippet: speechText,
+            job_role: sessionData?.jobRole || 'Senior AI Engineer',
+            candidate_name: sessionData?.candidateName || 'Candidate',
+            turn_count: nextTurn
+          })
+        });
+        
+        const data = await res.json();
+        if (data && data.evaluation) {
+          setMentorFeedback({
+            ...data.evaluation,
+            isUpdating: false,
+            turnCount: nextTurn
+          });
+        }
+      } catch (err) {
+        console.warn('Real-time AI mentor fetch failed, preserving previous coaching insights:', err);
+        setMentorFeedback((prev) => ({ ...prev, isUpdating: false }));
+      }
+    }, 400); // Debounced interval for smooth UI experience
   };
 
   // Timer Manager
@@ -244,7 +315,7 @@ export default function VapiCallContainer({ interviewId }) {
       return true;
     } catch (err) {
       console.warn('Microphone permission denied or unavailable:', err);
-      addLogMessage('system', '⚠️ Microphone hardware access restricted; continuing in audio simulation display mode.');
+      addLogMessage('system', '⚠️ Microphone hardware access restricted; continuing in interactive display mode.');
       return false;
     }
   };
@@ -282,7 +353,7 @@ export default function VapiCallContainer({ interviewId }) {
   const handleStartCall = async () => {
     setCallStatus('connecting');
     setMessages([]);
-    addLogMessage('system', 'Requesting microphone permissions and initiating call loop...');
+    addLogMessage('system', 'Requesting microphone permissions and initializing Vapi conversational loop...');
     
     await startAudioMonitoring();
 
@@ -330,7 +401,7 @@ export default function VapiCallContainer({ interviewId }) {
     // Speak via Browser Web Speech Synthesis API
     speakSimulatedAudio(initialGreeting, () => {
       setActiveSpeaker('candidate');
-      addLogMessage('system', '🎙️ AI is listening... Speak into your microphone or click "Simulate Next Interview Turn" below to test live dialogue round!');
+      addLogMessage('system', '🎙️ AI is listening... Speak into your microphone or click "Simulate Next Interview Turn" below to test live speech coaching & dialogue!');
     });
   };
 
@@ -376,14 +447,17 @@ export default function VapiCallContainer({ interviewId }) {
     setActiveSpeaker('candidate');
     
     // Sample high-quality candidate answer simulation
-    let candidateSpeech = 'In my recent project, I architected a full-stack Next.js application integrated with Google Gemini AI and serverless PostgreSQL endpoints, reducing response latency by over 40%.';
+    let candidateSpeech = 'In my recent enterprise project, I architected a full-stack Next.js 15 application integrated with Google Gemini AI and serverless PostgreSQL endpoints, reducing response latency by over 40% while handling thousands of concurrent requests.';
     if (nextTurn === 2) {
-      candidateSpeech = 'For state management and data layer security, I implemented strict Supabase Row Level Security policies alongside custom JWT auth tokens to guarantee zero data leaks across multi-tenant dashboards.';
+      candidateSpeech = 'For state management and database data layer security, I implemented strict Supabase Row Level Security policies alongside custom JWT auth tokens to guarantee zero data leaks across multi-tenant corporate dashboards.';
     } else if (nextTurn >= 3) {
-      candidateSpeech = 'I believe continuous automated evaluation and clear developer team communication are paramount when shipping generative AI production features at scale.';
+      candidateSpeech = 'I firmly believe continuous automated evaluation, clear pull-request mentorship, and proactive developer team communication are paramount when shipping generative AI production features at scale.';
     }
 
     addLogMessage('candidate', candidateSpeech);
+    
+    // Trigger Day 7 Live Mentor Coaching immediately upon simulated speech
+    triggerRealtimeAiMentorFeedback(candidateSpeech);
 
     // Respond after short delay
     setTimeout(() => {
@@ -398,7 +472,7 @@ export default function VapiCallContainer({ interviewId }) {
         setActiveSpeaker('candidate');
         addLogMessage('system', '🎙️ Waiting for candidate response... (Or click End Interview to complete evaluation)');
       });
-    }, 1500);
+    }, 1800);
   };
 
   // 3. Terminate Call Loop
@@ -416,15 +490,17 @@ export default function VapiCallContainer({ interviewId }) {
     
     setActiveSpeaker(null);
     setVolumeLevel(0);
-    addLogMessage('system', '🔴 Call terminated cleanly. Storing interview dialogue records into session memory...');
+    addLogMessage('system', '🔴 Call terminated cleanly. Archiving interview dialogue records into session memory...');
     
     // Save transcript history for Day 8 completion evaluations
     try {
       sessionStorage.setItem('completed_interview_transcript', JSON.stringify({
         interviewId,
         candidateName: sessionData?.candidateName,
+        jobRole: sessionData?.jobRole,
         durationSeconds: callDuration,
         messages,
+        finalMentorClarityScore: mentorFeedback.clarity_score,
         timestamp: new Date().toISOString()
       }));
     } catch (e) {}
@@ -439,42 +515,46 @@ export default function VapiCallContainer({ interviewId }) {
 
   if (isLoadingSession) {
     return (
-      <div className="flex items-center justify-center p-16">
-        <RefreshCw className="w-8 h-8 text-[hsl(258,90%,76%)] animate-spin" />
+      <div className="flex items-center justify-center p-24">
+        <RefreshCw className="w-9 h-9 text-[hsl(258,90%,76%)] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-12">
+    <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-16">
       {/* ── Top Header Navigation & Status ──────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 glass p-6 rounded-3xl border border-[hsl(222,25%,18%)] shadow-xl">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 glass p-6 rounded-3xl border border-[hsl(222,25%,18%)] shadow-2xl relative overflow-hidden">
+        <div className="flex items-center gap-4 relative z-10">
           <Button
             type="button"
             variant="ghost"
             onClick={() => router.push(`/interview/${interviewId}`)}
-            className="p-3 rounded-2xl bg-[hsl(222,47%,12%)] hover:bg-[hsl(222,47%,16%)] text-[hsl(210,40%,98%)] border border-[hsl(222,25%,20%)]"
+            className="p-3.5 rounded-2xl bg-[hsl(222,47%,12%)] hover:bg-[hsl(222,47%,16%)] text-[hsl(210,40%,98%)] border border-[hsl(222,25%,20%)] transition-all shadow-md"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[hsl(258,90%,66%)]/20 text-[hsl(258,90%,80%)] border border-[hsl(258,90%,66%)]/30">
-                Day 6 Live Demo Active
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[hsl(258,90%,66%)]/20 text-[hsl(258,90%,80%)] border border-[hsl(258,90%,66%)]/35 shadow-sm">
+                Day 7 Live Screening Room
               </span>
-              <span className="text-[10px] font-mono text-[hsl(215,20%,50%)]">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                ⚡ AI Mentor Active
+              </span>
+              <span className="text-[11px] font-mono text-[hsl(215,20%,50%)]">
                 ID: {interviewId}
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-[hsl(210,40%,98%)] tracking-tight mt-1">
-              Live AI Voice Screening: <span className="gradient-text">{sessionData?.jobRole}</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[hsl(210,40%,98%)] tracking-tight mt-1.5 flex items-center gap-2">
+              <span>Live AI Screening:</span>
+              <span className="gradient-text">{sessionData?.jobRole}</span>
             </h1>
           </div>
         </div>
 
         {/* Engine Mode Notification Badge */}
-        <div className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-2xl bg-[hsl(222,47%,10%)] border border-[hsl(222,25%,20%)]">
+        <div className="flex items-center gap-2.5 text-xs font-semibold px-4 py-2.5 rounded-2xl bg-[hsl(222,47%,10%)] border border-[hsl(222,25%,20%)] shadow-inner relative z-10">
           {engineMode === 'cloud' ? (
             <>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
@@ -483,43 +563,42 @@ export default function VapiCallContainer({ interviewId }) {
           ) : (
             <>
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-amber-300">Interactive Speech Simulation Engine</span>
+              <span className="text-amber-300">Interactive Speech Simulator</span>
             </>
           )}
         </div>
       </div>
 
-      {/* ── Main Interactive Calling Portal ─────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* ── Main 3-Column Command Dashboard (Day 7 Architectural Upgrade) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        {/* Left Column (7 Spans): Audio Visualizer & Call Controllers */}
-        <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
-          <div className="glass rounded-3xl p-8 border border-[hsl(258,90%,66%)]/30 shadow-2xl relative overflow-hidden bg-gradient-to-b from-[hsl(222,47%,8%)] to-[hsl(222,47%,12%)] text-center space-y-8 min-h-[440px] flex flex-col justify-between">
+        {/* Left Panel (4 Spans): AI Voice Calling Engine & Audio Chamber */}
+        <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
+          <div className="glass rounded-3xl p-6 border border-[hsl(258,90%,66%)]/30 shadow-2xl relative overflow-hidden bg-gradient-to-b from-[hsl(222,47%,8%)] to-[hsl(222,47%,12%)] text-center space-y-6 flex-1 flex flex-col justify-between min-h-[520px]">
             
             {/* Top Call Info & Timer */}
-            <div className="flex items-center justify-between border-b border-[hsl(222,25%,18%)] pb-4 text-xs text-[hsl(215,20%,65%)] font-semibold">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Candidate: <strong className="text-[hsl(210,40%,98%)]">{sessionData?.candidateName}</strong></span>
+            <div className="flex items-center justify-between border-b border-[hsl(222,25%,18%)] pb-3.5 text-xs text-[hsl(215,20%,65%)] font-semibold">
+              <div className="flex items-center gap-1.5 truncate">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span className="truncate">Candidate: <strong className="text-[hsl(210,40%,98%)]">{sessionData?.candidateName}</strong></span>
               </div>
-              <div className="flex items-center gap-2 font-mono bg-[hsl(222,47%,14%)] px-3 py-1.5 rounded-xl border border-[hsl(222,25%,22%)] text-[hsl(210,40%,98%)]">
+              <div className="flex items-center gap-1.5 font-mono bg-[hsl(222,47%,14%)] px-2.5 py-1 rounded-xl border border-[hsl(222,25%,22%)] text-[hsl(210,40%,98%)] flex-shrink-0">
                 <Clock className="w-3.5 h-3.5 text-[hsl(258,90%,76%)]" />
-                <span>{formatTime(callDuration)} / {formatTime(MAX_CALL_DURATION)}</span>
+                <span>{formatTime(callDuration)}</span>
               </div>
             </div>
 
             {/* Central Visualizer & Speaker Status */}
-            <div className="py-6 space-y-6">
-              {/* Speaker Icon Badge */}
+            <div className="py-4 space-y-5 flex-1 flex flex-col justify-center">
+              {/* Speaker Icon Badge with Pulse Effect */}
               <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
-                {/* Outer Pulsating Ring when speaking */}
                 {callStatus === 'active' && volumeLevel > 10 && (
                   <div 
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[hsl(258,90%,66%)] to-emerald-500 opacity-30 animate-ping"
-                    style={{ transform: `scale(${1 + (volumeLevel / 150)})` }}
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[hsl(258,90%,66%)] to-emerald-500 opacity-35 animate-ping"
+                    style={{ transform: `scale(${1 + (volumeLevel / 160)})` }}
                   />
                 )}
-                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[hsl(222,47%,16%)] to-[hsl(258,90%,66%)]/30 border-2 border-[hsl(258,90%,76%)]/50 flex items-center justify-center shadow-2xl relative z-10">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[hsl(222,47%,16%)] to-[hsl(258,90%,66%)]/35 border-2 border-[hsl(258,90%,76%)]/50 flex items-center justify-center shadow-2xl relative z-10 transition-all duration-300">
                   {activeSpeaker === 'ai' ? (
                     <Bot className="w-12 h-12 text-[hsl(258,90%,80%)] animate-bounce" />
                   ) : activeSpeaker === 'candidate' ? (
@@ -531,38 +610,37 @@ export default function VapiCallContainer({ interviewId }) {
               </div>
 
               {/* Status Message */}
-              <div className="space-y-2">
-                <h3 className="text-xl font-extrabold text-[hsl(210,40%,98%)]">
-                  {callStatus === 'idle' && 'Ready to Connect Audio Call'}
-                  {callStatus === 'connecting' && 'Establishing Secure Audio Tunnel...'}
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-extrabold text-[hsl(210,40%,98%)] leading-tight">
+                  {callStatus === 'idle' && 'Ready to Begin Screening'}
+                  {callStatus === 'connecting' && 'Establishing Audio Tunnel...'}
                   {callStatus === 'active' && (
                     activeSpeaker === 'ai' 
-                      ? '🎙️ Alex (AI Recruiter) is Speaking...' 
+                      ? '🎙️ Alex is Speaking...' 
                       : activeSpeaker === 'candidate' 
-                        ? '🟢 Listening to You (Microphone Active)' 
-                        : 'Call Active — Waiting for Speech'
+                        ? '🟢 Listening to You (Mic On)' 
+                        : 'Call Active — Awaiting Speech'
                   )}
-                  {callStatus === 'ended' && '✔ Interview Completed Successfully'}
+                  {callStatus === 'ended' && '✔ Interview Concluded'}
                 </h3>
-                <p className="text-xs text-[hsl(215,20%,60%)] max-w-md mx-auto">
-                  {callStatus === 'idle' && 'Click below to initiate speech evaluation. Ensure your browser microphone permissions are allowed when prompted.'}
-                  {callStatus === 'active' && 'Speak naturally at a normal conversational volume. The AI recruiter evaluates technical fluency, depth, and communication clarity.'}
-                  {callStatus === 'ended' && 'Your conversational feedback and transcript recordings have been archived for executive review.'}
+                <p className="text-[11px] text-[hsl(215,20%,60%)] px-2 leading-relaxed">
+                  {callStatus === 'idle' && 'Click below to launch speech screening. Ensure browser microphone permissions are enabled.'}
+                  {callStatus === 'active' && 'Speak naturally. Our AI evaluates structural clarity, depth, and resume alignments in real-time.'}
+                  {callStatus === 'ended' && 'Your conversational feedback and evaluation records have been saved into memory.'}
                 </p>
               </div>
 
               {/* Real-Time Audio Spectrum Bars */}
               {callStatus === 'active' && (
-                <div className="flex items-center justify-center gap-1.5 h-10">
-                  {[...Array(16)].map((_, i) => {
-                    // Calculate dynamic bar height
+                <div className="flex items-center justify-center gap-1.5 h-9 pt-1">
+                  {[...Array(14)].map((_, i) => {
                     const multiplier = Math.sin((i + 1) * 0.5) * 0.8 + 0.5;
-                    const height = Math.max(6, Math.min(38, Math.floor(volumeLevel * multiplier * 0.4)));
+                    const height = Math.max(5, Math.min(34, Math.floor(volumeLevel * multiplier * 0.4)));
                     return (
                       <div
                         key={i}
                         style={{ height: `${height}px` }}
-                        className="w-1.5 rounded-full bg-gradient-to-t from-emerald-500 to-[hsl(258,90%,76%)] transition-all duration-75 shadow-sm"
+                        className="w-1.5 rounded-full bg-gradient-to-t from-emerald-500 via-[hsl(258,90%,70%)] to-[hsl(258,90%,80%)] transition-all duration-75 shadow-sm"
                       />
                     );
                   })}
@@ -571,114 +649,119 @@ export default function VapiCallContainer({ interviewId }) {
             </div>
 
             {/* Bottom Primary Controllers */}
-            <div className="pt-4 border-t border-[hsl(222,25%,18%)] flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="pt-4 border-t border-[hsl(222,25%,18%)] flex flex-col gap-3">
               {callStatus === 'idle' || callStatus === 'ended' ? (
                 <Button
                   type="button"
                   onClick={handleStartCall}
                   disabled={callStatus === 'connecting'}
-                  className="w-full sm:w-auto px-8 py-4 h-13 rounded-2xl bg-gradient-to-r from-emerald-500 to-[hsl(258,90%,66%)] hover:from-emerald-600 hover:to-[hsl(258,90%,60%)] text-white font-bold text-base shadow-xl hover:shadow-[hsl(258,90%,66%)]/40 transition-all flex items-center justify-center gap-3 cursor-pointer"
+                  className="w-full py-4 h-12 rounded-2xl bg-gradient-to-r from-emerald-500 to-[hsl(258,90%,66%)] hover:from-emerald-600 hover:to-[hsl(258,90%,60%)] text-white font-bold text-sm shadow-xl hover:shadow-[hsl(258,90%,66%)]/40 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
                 >
-                  <PhoneCall className="w-5 h-5 animate-bounce" />
+                  <PhoneCall className="w-4 h-4 animate-bounce" />
                   <span>{callStatus === 'ended' ? 'Re-Launch Voice Call' : 'Start Live Voice Interview'}</span>
                 </Button>
               ) : (
-                <div className="flex flex-wrap items-center justify-center gap-4 w-full">
-                  {/* Mute Button */}
-                  <Button
-                    type="button"
-                    variant={isMuted ? 'destructive' : 'secondary'}
-                    onClick={toggleMute}
-                    disabled={callStatus !== 'active'}
-                    className={`px-6 py-3.5 h-12 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-md ${
-                      isMuted 
-                        ? 'bg-rose-500 text-white hover:bg-rose-600' 
-                        : 'bg-[hsl(222,47%,16%)] text-[hsl(210,40%,98%)] hover:bg-[hsl(222,47%,20%)] border border-[hsl(222,25%,25%)]'
-                    }`}
-                  >
-                    {isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-emerald-400" />}
-                    <span>{isMuted ? 'Unmute Mic' : 'Mute Mic'}</span>
-                  </Button>
+                <div className="flex flex-col gap-2.5 w-full">
+                  <div className="grid grid-cols-2 gap-2.5 w-full">
+                    {/* Mute Button */}
+                    <Button
+                      type="button"
+                      variant={isMuted ? 'destructive' : 'secondary'}
+                      onClick={toggleMute}
+                      disabled={callStatus !== 'active'}
+                      className={`py-3 h-11 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md ${
+                        isMuted 
+                          ? 'bg-rose-500 text-white hover:bg-rose-600' 
+                          : 'bg-[hsl(222,47%,16%)] text-[hsl(210,40%,98%)] hover:bg-[hsl(222,47%,20%)] border border-[hsl(222,25%,25%)]'
+                      }`}
+                    >
+                      {isMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-emerald-400" />}
+                      <span>{isMuted ? 'Unmute Mic' : 'Mute Mic'}</span>
+                    </Button>
 
-                  {/* End Call Button */}
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={handleEndCall}
-                    className="px-8 py-3.5 h-12 rounded-2xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold text-sm shadow-xl hover:shadow-rose-600/30 transition-all flex items-center gap-2 cursor-pointer"
-                  >
-                    <PhoneOff className="w-4 h-4" />
-                    <span>End Interview & Save Results</span>
-                  </Button>
+                    {/* End Call Button */}
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={handleEndCall}
+                      className="py-3 h-11 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold text-xs shadow-xl hover:shadow-rose-600/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <PhoneOff className="w-3.5 h-3.5" />
+                      <span>End & Save</span>
+                    </Button>
+                  </div>
+
+                  {/* Simulation Demo Turn Button (Only in simulation mode) */}
+                  {engineMode === 'simulation' && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSimulateNextTurn}
+                      className="w-full text-[11px] font-semibold py-2.5 h-10 rounded-xl bg-[hsl(258,90%,66%)]/15 hover:bg-[hsl(258,90%,66%)]/25 text-[hsl(258,90%,80%)] border border-[hsl(258,90%,66%)]/40 flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 animate-spin text-[hsl(258,90%,80%)]" />
+                      <span>✨ Simulate Next Answer Turn</span>
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Simulation Demo Turn Button (Only displayed in simulation mode during active calls) */}
-            {callStatus === 'active' && engineMode === 'simulation' && (
-              <div className="pt-3 pb-1 border-t border-[hsl(222,25%,15%)]">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleSimulateNextTurn}
-                  className="w-full text-xs font-semibold py-2.5 h-10 rounded-xl bg-[hsl(258,90%,66%)]/15 hover:bg-[hsl(258,90%,66%)]/25 text-[hsl(258,90%,80%)] border border-[hsl(258,90%,66%)]/40 flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4 animate-spin" />
-                  <span>✨ Demo Helper: Simulate Next Candidate Answer & AI Follow-Up</span>
-                </Button>
-              </div>
-            )}
-
           </div>
         </div>
 
-        {/* Right Column (5 Spans): Live Conversational Transcript Board */}
+        {/* Center Panel (5 Spans): Real-Time Conversational Transcript Feed */}
         <div className="lg:col-span-5 flex flex-col">
-          <div className="glass rounded-3xl p-6 border border-[hsl(222,25%,18%)] shadow-xl flex-1 flex flex-col h-[520px]">
-            <div className="flex items-center justify-between border-b border-[hsl(222,25%,16%)] pb-4 mb-4">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[hsl(258,90%,76%)]">
-                <MessageSquare className="w-4 h-4" />
-                <span>Live Conversation Transcript</span>
+          <div className="glass rounded-3xl p-6 border border-[hsl(222,25%,18%)] shadow-2xl flex-1 flex flex-col h-[520px]">
+            <div className="flex items-center justify-between border-b border-[hsl(222,25%,16%)] pb-3.5 mb-4">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[hsl(258,90%,80%)]">
+                <MessageSquare className="w-4 h-4 text-[hsl(258,90%,76%)]" />
+                <span>Live Dialogue Transcript</span>
               </div>
-              <span className="text-[11px] font-mono text-[hsl(215,20%,50%)] bg-[hsl(222,47%,12%)] px-2.5 py-1 rounded-lg">
+              <span className="text-[10px] font-mono text-[hsl(215,20%,50%)] bg-[hsl(222,47%,12%)] px-2.5 py-1 rounded-lg border border-[hsl(222,25%,18%)]">
                 {messages.length} Events Logged
               </span>
             </div>
 
             {/* Transcript Log List */}
-            <div className="flex-1 overflow-y-auto space-y-3.5 pr-2 custom-scrollbar text-xs">
+            <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar text-xs">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center text-[hsl(215,20%,50%)] space-y-2 p-6">
-                  <Terminal className="w-8 h-8 text-[hsl(222,25%,30%)]" />
-                  <p className="font-medium">Dialogue transcript empty.</p>
-                  <p className="text-[11px] max-w-xs">
-                    Start the voice interview to observe real-time AI system prompts, speech-to-text conversion, and turn logs.
+                <div className="h-full flex flex-col items-center justify-center text-center text-[hsl(215,20%,50%)] space-y-3 p-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[hsl(222,47%,12%)] border border-[hsl(222,25%,20%)] flex items-center justify-center text-[hsl(258,90%,76%)] shadow-inner">
+                    <Terminal className="w-7 h-7 opacity-75" />
+                  </div>
+                  <p className="font-bold text-[hsl(210,40%,90%)] text-sm">Conversation Feed Awaiting Launch</p>
+                  <p className="text-[11px] max-w-xs leading-relaxed opacity-80">
+                    Start the audio call above to observe low-latency speech-to-text conversion, system turns, and timestamped interviewer interactions.
                   </p>
                 </div>
               ) : (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`p-3.5 rounded-2xl border transition-all ${
-                      msg.sender === 'ai'
-                        ? 'bg-[hsl(258,90%,66%)]/10 border-[hsl(258,90%,66%)]/30 text-[hsl(210,40%,98%)] ml-2'
-                        : msg.sender === 'candidate'
-                        ? 'bg-[hsl(222,47%,14%)] border-emerald-500/30 text-emerald-300 mr-2'
-                        : 'bg-[hsl(222,47%,10%)] border-[hsl(222,25%,20%)] text-[hsl(215,20%,60%)] text-[11px] italic'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1 text-[10px] font-bold uppercase tracking-wider opacity-75">
-                      <span className="flex items-center gap-1">
-                        {msg.sender === 'ai' && '🤖 Alex (AI Recruiter)'}
-                        {msg.sender === 'candidate' && '👤 Candidate (You)'}
-                        {msg.sender === 'system' && '⚙️ System Log'}
-                        {msg.sender === 'error' && '⚠️ Alert Notice'}
-                      </span>
-                      <span className="font-mono text-[9px]">{msg.timestamp}</span>
+                <>
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`p-3.5 rounded-2xl border transition-all ${
+                        msg.sender === 'ai'
+                          ? 'bg-[hsl(258,90%,66%)]/10 border-[hsl(258,90%,66%)]/30 text-[hsl(210,40%,98%)] ml-2 shadow-sm'
+                          : msg.sender === 'candidate'
+                          ? 'bg-[hsl(222,47%,14%)] border-emerald-500/35 text-emerald-300 mr-2 shadow-sm'
+                          : 'bg-[hsl(222,47%,10%)] border-[hsl(222,25%,20%)] text-[hsl(215,20%,60%)] text-[11px] italic'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1 text-[10px] font-bold uppercase tracking-wider opacity-80">
+                        <span className="flex items-center gap-1.5">
+                          {msg.sender === 'ai' && '🤖 Alex (AI Recruiter)'}
+                          {msg.sender === 'candidate' && '👤 Candidate (You)'}
+                          {msg.sender === 'system' && '⚙️ System Notice'}
+                          {msg.sender === 'error' && '⚠️ Connection Alert'}
+                        </span>
+                        <span className="font-mono text-[9px] opacity-70">{msg.timestamp}</span>
+                      </div>
+                      <p className="leading-relaxed whitespace-pre-wrap font-sans text-xs">{msg.text}</p>
                     </div>
-                    <p className="leading-relaxed whitespace-pre-wrap font-sans">{msg.text}</p>
-                  </div>
-                ))
+                  ))}
+                  <div ref={transcriptEndRef} />
+                </>
               )}
             </div>
 
@@ -688,28 +771,136 @@ export default function VapiCallContainer({ interviewId }) {
                 <Button
                   type="button"
                   onClick={() => router.push(`/interview/${interviewId}`)}
-                  className="w-full py-3 h-11 rounded-xl bg-[hsl(222,47%,16%)] hover:bg-[hsl(222,47%,20%)] text-[hsl(210,40%,98%)] border border-[hsl(258,90%,66%)]/40 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                  className="w-full py-3 h-11 rounded-xl bg-gradient-to-r from-[hsl(222,47%,16%)] to-[hsl(222,47%,20%)] hover:bg-[hsl(222,47%,24%)] text-[hsl(210,40%,98%)] border border-[hsl(258,90%,66%)]/40 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
                 >
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Review Candidate Submissions & Resume Report</span>
+                  <span>Return to Candidate Gateway & View Day 8 Evaluation</span>
                 </Button>
               </div>
             )}
           </div>
         </div>
 
+        {/* Right Panel (3 Spans): Day 7 Real-Time AI Mentor & Coaching Sidebar */}
+        <div className="lg:col-span-3 flex flex-col">
+          <div className="glass rounded-3xl p-5 border border-emerald-500/30 shadow-2xl flex-1 flex flex-col justify-between h-[520px] bg-gradient-to-b from-[hsl(222,47%,8%)] to-[hsl(222,47%,11%)] relative overflow-hidden">
+            
+            {/* Ambient Corner Glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Header */}
+            <div>
+              <div className="flex items-center justify-between border-b border-[hsl(222,25%,18%)] pb-3.5 mb-4">
+                <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+                  <Brain className="w-4 h-4 text-emerald-400 animate-pulse" />
+                  <span>Live AI Mentor Tips</span>
+                </div>
+                {mentorFeedback.isUpdating && (
+                  <RefreshCw className="w-3.5 h-3.5 text-[hsl(258,90%,76%)] animate-spin" />
+                )}
+              </div>
+
+              {/* Mentor Analysis Cards */}
+              <div className="space-y-4 text-xs">
+                
+                {/* Real-Time Coaching Suggestion Card */}
+                <div className="p-4 rounded-2xl bg-[hsl(222,47%,12%)]/90 border border-emerald-500/30 shadow-inner space-y-2 relative transition-all duration-500">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                    <span>Actionable Coaching Tip</span>
+                  </div>
+                  <p className="text-[hsl(210,40%,95%)] text-[11px] leading-relaxed font-medium">
+                    &ldquo;{mentorFeedback.suggestion}&rdquo;
+                  </p>
+                </div>
+
+                {/* Speech Tonal Sentiment & Clarity Meter */}
+                <div className="p-3.5 rounded-2xl bg-[hsl(222,47%,10%)] border border-[hsl(222,25%,20%)] space-y-3">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-[hsl(215,20%,65%)] flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-[hsl(258,90%,76%)]" />
+                      Speech Tone:
+                    </span>
+                    <span className="font-bold text-[hsl(210,40%,98%)] bg-[hsl(258,90%,66%)]/20 px-2.5 py-0.5 rounded-lg border border-[hsl(258,90%,66%)]/40 text-[10px]">
+                      {mentorFeedback.tone}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[11px] font-semibold">
+                      <span className="text-[hsl(215,20%,65%)] flex items-center gap-1.5">
+                        <Award className="w-3.5 h-3.5 text-emerald-400" />
+                        Clarity & Structure:
+                      </span>
+                      <span className="text-emerald-400 font-mono font-bold">{mentorFeedback.clarity_score}%</span>
+                    </div>
+                    {/* Animated Progress Bar */}
+                    <div className="w-full h-2 rounded-full bg-[hsl(222,47%,16%)] overflow-hidden p-0.5 border border-[hsl(222,25%,22%)]">
+                      <div 
+                        className="h-full rounded-full bg-gradient-to-r from-[hsl(258,90%,66%)] to-emerald-400 transition-all duration-700 ease-out"
+                        style={{ width: `${mentorFeedback.clarity_score}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Competency Keywords Identified */}
+                <div className="space-y-2 pt-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[hsl(215,20%,60%)] flex items-center gap-1.5">
+                    <Target className="w-3 h-3 text-[hsl(258,90%,76%)]" />
+                    <span>Live Competencies Detected:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(mentorFeedback.topics || []).map((topic, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-1 rounded-lg text-[10px] font-bold tracking-tight bg-[hsl(222,47%,16%)] text-[hsl(258,90%,82%)] border border-[hsl(258,90%,66%)]/30 shadow-xs"
+                      >
+                        #{topic}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Recommended Next Probing Angle for Recruiter */}
+                <div className="p-3 rounded-xl bg-[hsl(258,90%,66%)]/10 border border-[hsl(258,90%,66%)]/25 text-[11px] space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[hsl(258,90%,80%)] flex items-center gap-1">
+                    <HelpCircle className="w-3 h-3" />
+                    <span>Recruiter Probe Hint:</span>
+                  </div>
+                  <p className="text-[hsl(210,40%,90%)] text-[11px] italic">
+                    {mentorFeedback.next_angle}
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Bottom AI Mentor Status Footer */}
+            <div className="pt-3 border-t border-[hsl(222,25%,16%)] flex items-center justify-between text-[10px] text-[hsl(215,20%,50%)]">
+              <span>Model: <strong className="text-[hsl(210,40%,85%)]">Gemini 1.5 Flash</strong></span>
+              <span className="text-emerald-400 font-mono">● Realtime Loop</span>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
-      {/* ── Bottom Session Memory Inspection Bar ────────────────────────── */}
-      <div className="glass rounded-2xl p-4 border border-[hsl(222,25%,16%)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[hsl(215,20%,60%)]">
-        <div className="flex items-center gap-2.5">
+      {/* ── Bottom Session Memory & System Inspection Bar ───────────────── */}
+      <div className="glass rounded-2xl p-4 border border-[hsl(222,25%,16%)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[hsl(215,20%,60%)] shadow-lg">
+        <div className="flex items-center gap-2.5 truncate">
           <Terminal className="w-4 h-4 text-[hsl(258,90%,76%)] flex-shrink-0" />
-          <span>
-            Active AI Prompt Memory: <strong className="text-[hsl(210,40%,98%)]">Injected into Vapi Assistant Loop ({sessionData?.aiPrompt?.length || 0} characters)</strong>
+          <span className="truncate">
+            Active Prompt Tunnel: <strong className="text-[hsl(210,40%,98%)]">Injected into Vapi Assistant Loop ({sessionData?.aiPrompt?.length || 0} chars)</strong>
           </span>
         </div>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
-          <span>✔ Day 6 Pipeline Verified</span>
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-mono text-[hsl(215,20%,50%)]">Turn Count: {mentorFeedback.turnCount || 0}</span>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] text-emerald-300 bg-emerald-500/15 px-3 py-1 rounded-lg border border-emerald-500/30">
+            <Zap className="w-3 h-3 text-amber-300 fill-amber-300" />
+            <span>Day 7 Pipeline Verified</span>
+          </div>
         </div>
       </div>
     </div>

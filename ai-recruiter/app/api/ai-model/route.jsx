@@ -2,24 +2,6 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import pdf from 'pdf-parse';
 
-/**
- * app/api/ai-model/route.jsx
- *
- * Day 55: Candidate Resume Parsing & Gemini AI Custom Persona Generator
- *
- * Runtime: Node.js (Required for Buffer and pdf-parse file reading)
- *
- * Responsibilities:
- * 1. Accepts FormData containing:
- *    - resume (PDF File) OR resumeText (string from Demo Data)
- *    - candidateName, candidateEmail
- *    - jobRole, jobDescription
- * 2. Parses uploaded PDF binary buffer into plain raw text via `pdf-parse`.
- * 3. Sends prompt to Google Gemini AI (@google/generative-ai) to analyze
- *    the resume against the job description.
- * 4. Generates a tailored Vapi Voice Assistant system prompt and interview focus points.
- * 5. Features a robust Fallback Simulation Mode if GEMINI_API_KEY is unconfigured or offline.
- */
 
 export const runtime = 'nodejs';
 
@@ -102,7 +84,7 @@ Do NOT include markdown code fences or explanatory text outside the JSON object.
 
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
-        
+
         // Clean potential markdown code blocks if Gemini wrapped the JSON
         const cleanedJson = responseText.replace(/```json/i, '').replace(/```/g, '').trim();
         const parsedData = JSON.parse(cleanedJson);
