@@ -475,7 +475,7 @@ export default function VapiCallContainer({ interviewId }) {
     }, 1800);
   };
 
-  // 3. Terminate Call Loop
+  // 3. Terminate Call Loop & Trigger Day 8 Post-Call Evaluation
   const handleEndCall = () => {
     setCallStatus('ended');
     stopCallTimer();
@@ -491,10 +491,11 @@ export default function VapiCallContainer({ interviewId }) {
     setActiveSpeaker(null);
     setVolumeLevel(0);
     addLogMessage('system', '🔴 Call terminated cleanly. Archiving interview dialogue records into session memory...');
+    addLogMessage('system', '🟢 Day 8 Active: Pre-computing comprehensive executive evaluation via Gemini 1.5 Flash...');
     
     // Save transcript history for Day 8 completion evaluations
     try {
-      sessionStorage.setItem('completed_interview_transcript', JSON.stringify({
+      const transcriptPayload = {
         interviewId,
         candidateName: sessionData?.candidateName,
         jobRole: sessionData?.jobRole,
@@ -502,7 +503,30 @@ export default function VapiCallContainer({ interviewId }) {
         messages,
         finalMentorClarityScore: mentorFeedback.clarity_score,
         timestamp: new Date().toISOString()
-      }));
+      };
+      sessionStorage.setItem('completed_interview_transcript', JSON.stringify(transcriptPayload));
+
+      // Asynchronously initiate Gemini analysis so it is ready when user arrives at /completed
+      fetch('/api/ai-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'evaluate_interview',
+          interview_id: interviewId,
+          candidate_name: sessionData?.candidateName || 'Candidate',
+          candidate_email: sessionData?.candidateEmail || 'candidate@example.com',
+          job_role: sessionData?.jobRole || 'Senior AI Engineer',
+          full_transcript: messages
+        })
+      }).then(res => res.json()).then(data => {
+        if (data && data.evaluation) {
+          sessionStorage.setItem(`day8_evaluation_${interviewId}`, JSON.stringify({
+            data: data.evaluation,
+            mode: data.mode
+          }));
+        }
+      }).catch(err => console.warn('Background pre-evaluation note:', err));
+
     } catch (e) {}
   };
 
@@ -765,16 +789,19 @@ export default function VapiCallContainer({ interviewId }) {
               )}
             </div>
 
-            {/* Post-Call Navigation Action */}
+            {/* Post-Call Navigation Action (Day 8 Milestone Bridge) */}
             {callStatus === 'ended' && (
-              <div className="mt-4 pt-4 border-t border-[hsl(222,25%,18%)] animate-in fade-in duration-300">
+              <div className="mt-4 pt-4 border-t border-[hsl(222,25%,18%)] animate-in fade-in duration-300 space-y-2">
+                <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-center text-xs text-emerald-300 font-bold">
+                  ✔ Interview archived! Click below to review your Day 8 evaluation dossier & CTO hiring rating.
+                </div>
                 <Button
                   type="button"
-                  onClick={() => router.push(`/interview/${interviewId}`)}
-                  className="w-full py-3 h-11 rounded-xl bg-gradient-to-r from-[hsl(222,47%,16%)] to-[hsl(222,47%,20%)] hover:bg-[hsl(222,47%,24%)] text-[hsl(210,40%,98%)] border border-[hsl(258,90%,66%)]/40 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                  onClick={() => router.push(`/interview/${interviewId}/completed`)}
+                  className="w-full py-3.5 h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-[hsl(258,90%,66%)] hover:from-emerald-600 hover:to-[hsl(258,90%,60%)] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl hover:shadow-[hsl(258,90%,66%)]/40 transition-all cursor-pointer"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Return to Candidate Gateway & View Day 8 Evaluation</span>
+                  <CheckCircle2 className="w-4 h-4 animate-bounce text-white" />
+                  <span>View Complete Day 8 Evaluation & Executive Results &rarr;</span>
                 </Button>
               </div>
             )}
