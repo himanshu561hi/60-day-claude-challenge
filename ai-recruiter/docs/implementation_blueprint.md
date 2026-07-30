@@ -325,9 +325,9 @@ Connect recruiter pipelines, displaying candidate submission lists, and building
 * Open candidate details popup, review transcripts, and confirm scrolling behavior works.
 
 ### ✅ End-of-Day Checklist
-- [ ] Recruiter can view candidate list.
-- [ ] Scores are color-coded (red, yellow, green).
-- [ ] Full transcripts are readable.
+- [x] Recruiter can view candidate list.
+- [x] Scores are color-coded (red, yellow, green).
+- [x] Full transcripts are readable.
 
 ---
 
